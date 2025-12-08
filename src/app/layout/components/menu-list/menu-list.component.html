@@ -1,0 +1,42 @@
+<!-- CATEGORY FILTER BAR -->
+<div class="filter-bar">
+
+  <div 
+    class="filter-item" 
+    *ngFor="let cat of categories" 
+    [class.active]="selectedCategory === cat"
+    (click)="selectCategory(cat)"
+  >
+    {{ cat }}
+  </div>
+
+  <!-- VEG TOGGLE -->
+  <div class="veg-toggle">
+    <label class="switch">
+      <input type="checkbox" [(ngModel)]="vegOnly" (change)="applyFilters()">
+      <span class="slider round"></span>
+    </label>
+    <span class="veg-label">Veg</span>
+  </div>
+
+</div>
+
+
+<!-- MENU GRID -->
+<div class="menu-grid">
+  <div class="menu-card" *ngFor="let m of filteredMenu">
+
+    <img [src]="m.img" class="item-img" />
+
+    <div class="item-name">{{ m.name }}</div>
+    <div class="item-price">₹ {{ m.price }}</div>
+
+    <div class="qty-controls">
+      <button class="qty-btn" (click)="decreaseQty(m)">-</button>
+      <span class="qty-value">{{ quantities[m.id] || 0 }}
+</span>
+      <button class="qty-btn" (click)="increaseQty(m)">+</button>
+    </div>
+
+  </div>
+</div>

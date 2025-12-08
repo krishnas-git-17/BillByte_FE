@@ -1,0 +1,77 @@
+<div class="menu-table-wrapper">
+
+  <!-- EMPTY STATE -->
+  <div *ngIf="items.length === 0" class="empty-box">
+    <h2>No Menu Items Found</h2>
+    <button class="add-btn" (click)="addRow()">+ Add Menu Item</button>
+  </div>
+
+  <!-- TABLE -->
+  <table class="menu-table" *ngIf="items.length > 0">
+
+    <thead>
+      <tr>
+        <th>SI No</th>
+        <th>Item Code</th>
+        <th>Item Name</th>
+        <th>Type</th>
+        <th>Veg?</th>
+        <th>Price</th>
+        <th>Photo</th>
+        <th>Save</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      <tr *ngFor="let row of items; let i = index">
+
+        <td>{{ row.si }}</td>
+
+        <td>{{ row.code }}</td>
+
+        <td>
+          <input [(ngModel)]="row.name" placeholder="Item name">
+        </td>
+
+        <td>
+          <input [(ngModel)]="row.type" placeholder="Category">
+        </td>
+
+        <td>
+          <select [(ngModel)]="row.veg">
+            <option [value]="true">Veg</option>
+            <option [value]="false">Non-Veg</option>
+          </select>
+        </td>
+
+        <td>
+          <input type="number" [(ngModel)]="row.price" placeholder="Price">
+        </td>
+
+        <td class="photo-cell">
+          <img *ngIf="row.photo" [src]="row.photo" class="preview">
+
+          <input type="file"
+                 accept="image/*"
+                 (change)="onFileSelect($event, row)">
+        </td>
+
+        <td>
+          <button class="save-btn" (click)="saveRow(row)">✔</button>
+        </td>
+
+        <td>
+          <button class="delete-btn" (click)="deleteRow(i)">✖</button>
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+  <button class="add-btn bottom-add" (click)="addRow()">+ Add Row</button>
+
+</div>

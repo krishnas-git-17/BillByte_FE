@@ -1,0 +1,94 @@
+<app-page-header 
+  [title]="'Orders - Table ' + tableId.replace('T','') + ' (' + tableType + ')'">
+</app-page-header>
+
+<div class="orders-layout">
+
+  <!-- LEFT MENU BOX -->
+  <div class="menu-box">
+    <div class="menu-scroll">
+      
+      <app-menu-list 
+        [quantities]="quantities"
+        (quantityChange)="onQuantityChange($event)">
+      </app-menu-list>
+
+    </div>
+  </div>
+
+  <!-- RIGHT ORDER BOX -->
+  <div class="order-box">
+  
+    <h2 class="section-title">Order Items</h2>
+
+    <!-- SELECTED ITEMS LIST -->
+    <div class="order-scroll">
+      <div class="order-row" *ngFor="let c of cart | keyvalue">
+    
+  <div class="order-left">
+    {{ $any(c.value).name }} × {{ $any(c.value).qty }}
+  </div>
+
+  <div class="order-price">
+    ₹ {{ $any(c.value).price * $any(c.value).qty }}
+  </div>
+
+  <div class="order-remove" (click)="removeFromCart($any(c.value).id)">
+    ✕
+  </div>
+
+</div>
+
+    </div>
+
+    <!-- ORDER TYPE TABS -->
+    <div class="order-type">
+      <button 
+        class="type-btn"
+        [class.active]="orderType === 'Dine'"
+        (click)="orderType = 'Dine'">
+        Dine
+      </button>
+
+      <button 
+        class="type-btn"
+        [class.active]="orderType === 'Parcel'"
+        (click)="orderType = 'Parcel'">
+        Parcel
+      </button>
+
+      <button 
+        class="type-btn"
+        [class.active]="orderType === 'Delivery'"
+        (click)="orderType = 'Delivery'">
+        Delivery
+      </button>
+    </div>
+
+    <!-- BILL SUMMARY -->
+    <div class="bill-summary">
+      <div class="bill-line">
+        <span>Subtotal</span>
+        <span>₹ {{ subtotal }}</span>
+      </div>
+
+      <div class="bill-line">
+        <span>Tax (5%)</span>
+        <span>₹ {{ tax }}</span>
+      </div>
+
+      <div class="bill-payable">
+        <span>Payable Amount</span>
+        <span>₹ {{ total }}</span>
+      </div>
+    </div>
+
+    <!-- PROCEED BUTTON -->
+   <button class="proceed-btn" (click)="onProceedClick()">
+  {{ proceedLabel }}
+</button>
+
+
+  </div>
+
+</div>
