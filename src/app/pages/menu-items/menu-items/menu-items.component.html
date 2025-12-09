@@ -1,77 +1,99 @@
-<div class="menu-table-wrapper">
+<div class="menu-wrapper">
 
-  <!-- EMPTY STATE -->
-  <div *ngIf="items.length === 0" class="empty-box">
-    <h2>No Menu Items Found</h2>
-    <button class="add-btn" (click)="addRow()">+ Add Menu Item</button>
+  <!-- HEADER -->
+  <div class="header">
+    <h2>Menu Items</h2>
   </div>
 
-  <!-- TABLE -->
-  <table class="menu-table" *ngIf="items.length > 0">
+  <!-- ACTION SECTION -->
+  <div class="action-section">
 
-    <thead>
-      <tr>
-        <th>SI No</th>
-        <th>Item Code</th>
-        <th>Item Name</th>
-        <th>Type</th>
-        <th>Veg?</th>
-        <th>Price</th>
-        <th>Photo</th>
-        <th>Save</th>
-        <th>Delete</th>
-      </tr>
-    </thead>
+    <div class="button-row">
+        <div class="search-row">
+      <input type="text" [(ngModel)]="searchText" placeholder="Search items..." />
+    </div>
+      <button class="btn outline">⬇ Import</button>
+      <button class="btn outline">⬆ Export</button>
+      <button class="btn add" (click)="showAddPopup = true">+ Add Item</button>
+      
+    </div>
 
-    <tbody>
+    
 
-      <tr *ngFor="let row of items; let i = index">
+  </div>
 
-        <td>{{ row.si }}</td>
+  <!-- MAIN CONTENT AREA -->
+  <div class="content-area">
 
-        <td>{{ row.code }}</td>
+    <!-- EMPTY STATE -->
+    <div *ngIf="items.length === 0" class="empty-box">
+      <h3>No Menu Items Found</h3>
+      <button class="btn add" (click)="showAddPopup = true">+ Add Item</button>
+    </div>
 
-        <td>
-          <input [(ngModel)]="row.name" placeholder="Item name">
-        </td>
+    <!-- TABLE WHEN ITEMS EXIST -->
+    <div *ngIf="items.length > 0" class="table-box">
 
-        <td>
-          <input [(ngModel)]="row.type" placeholder="Category">
-        </td>
+   <div class="table-box">
 
-        <td>
-          <select [(ngModel)]="row.veg">
-            <option [value]="true">Veg</option>
-            <option [value]="false">Non-Veg</option>
-          </select>
-        </td>
+  <div class="table-container">
+    <table class="menu-table">
+      <thead>
+        <tr>
+          <th>Menu ID</th>
+          <th>Item Name</th>
+          <th>Type</th>
+          <th>Veg / Non-Veg</th>
+          <th>Status</th>
+          <th>Price</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
 
-        <td>
-          <input type="number" [(ngModel)]="row.price" placeholder="Price">
-        </td>
+      <tbody>
+        <tr *ngFor="let item of items">
+          <td>{{ item.menuId }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.type }}</td>
 
-        <td class="photo-cell">
-          <img *ngIf="row.photo" [src]="row.photo" class="preview">
+          <td>
+            <span [class.veg]="item.vegType === 'Veg'"
+                  [class.nonveg]="item.vegType === 'Non-Veg'">
+              {{ item.vegType }}
+            </span>
+          </td>
 
-          <input type="file"
-                 accept="image/*"
-                 (change)="onFileSelect($event, row)">
-        </td>
+          <td>
+            <span class="status" 
+                  [class.available]="item.status === 'Available'"
+                  [class.out]="item.status === 'Out of Stock'">
+              {{ item.status }}
+            </span>
+          </td>
 
-        <td>
-          <button class="save-btn" (click)="saveRow(row)">✔</button>
-        </td>
+          <td>₹ {{ item.price }}</td>
 
-        <td>
-          <button class="delete-btn" (click)="deleteRow(i)">✖</button>
-        </td>
+          <td class="actions">
+            <button class="icon-btn">👁</button>
+            <button class="icon-btn">✏</button>
+            <button class="icon-btn">🗑</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-      </tr>
+</div>
 
-    </tbody>
+    </div>
 
-  </table>
+    <!-- POPUP -->
+    <app-menu-item-add
+      *ngIf="showAddPopup"
+      (close)="showAddPopup = false"
+      (save)="saveNewItem($event)">
+    </app-menu-item-add>
 
-  <button class="add-btn bottom-add" (click)="addRow()">+ Add Row</button>
+  </div>
 
 </div>

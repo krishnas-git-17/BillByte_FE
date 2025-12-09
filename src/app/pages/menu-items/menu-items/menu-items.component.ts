@@ -1,65 +1,49 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MenuItemAddComponent } from '../menu-item-add.component';
 
 @Component({
   selector: 'app-menu-items',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MenuItemAddComponent],
   templateUrl: './menu-items.component.html',
   styleUrls: ['./menu-items.component.scss']
 })
 export class MenuItemsComponent implements OnInit {
 
+  searchText = '';
   items: any[] = [];
-
-  constructor() {}
+  showAddPopup = false;
 
   ngOnInit(): void {
     this.loadItems();
   }
 
   loadItems() {
-    const data = localStorage.getItem('menu-items');
+    const data = localStorage.getItem('menu_items');
     this.items = data ? JSON.parse(data) : [];
   }
 
-  addRow() {
-    const nextCode = 'MI' + String(this.items.length + 1).padStart(3, '0');
+  saveNewItem(data: any) {
+    const list = JSON.parse(localStorage.getItem("menu_items") || "[]");
+    list.push(data);
+    localStorage.setItem("menu_items", JSON.stringify(list));
 
-    this.items.push({
-      si: this.items.length + 1,
-      code: nextCode,
-      name: '',
-      type: '',
-      veg: true,
-      price: '',
-      photo: '',
-      tempImage: null, // store local file
-      isNew: true
-    });
+    
+
+    this.loadItems();
+    this.showAddPopup = false;
   }
 
-  onFileSelect(event: any, row: any) {
-    const file = event.target.files[0];
-    if (!file) return;
+  deleteItem(item: any) {
+  const list = JSON.parse(localStorage.getItem("menu_items") || "[]");
 
-    // Create temporary preview URL
-    const reader = new FileReader();
-    reader.onload = () => {
-      row.photo = reader.result;  // store base64 preview
-    };
-    reader.readAsDataURL(file);
-  }
+  const updated = list.filter((x: any) => x.menuId !== item.menuId);
 
-  saveRow(row: any) {
-    row.isNew = false;
-    localStorage.setItem('menu-items', JSON.stringify(this.items));
-    alert("Item Saved!");
-  }
+  localStorage.setItem("menu_items", JSON.stringify(updated));
 
-  deleteRow(i: number) {
-    this.items.splice(i, 1);
-    localStorage.setItem('menu_items', JSON.stringify(this.items));
-  }
+  this.items = updated; // refresh UI
+}
+
 }

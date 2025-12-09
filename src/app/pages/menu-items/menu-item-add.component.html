@@ -1,0 +1,73 @@
+<div class="popup-backdrop">
+  <div class="popup-box">
+
+    <h2>Add Item</h2>
+    <hr />
+
+    <!-- Form Grid -->
+    <div class="form-grid">
+
+      <div class="form-control">
+        <label>Menu ID</label>
+        <input type="text" [value]="model.menuId" readonly />
+      </div>
+
+      <div class="form-control">
+        <label>Item Name</label>
+        <input type="text" [(ngModel)]="model.name" placeholder="Enter item name" />
+      </div>
+
+      <div class="form-control">
+        <label>Food Type</label>
+        <select [(ngModel)]="model.type">
+          <option value="">Select Food Type</option>
+          <option *ngFor="let f of foodTypes" [value]="f">{{ f }}</option>
+        </select>
+      </div>
+
+      <div class="form-control">
+        <label>Veg / Non-Veg</label>
+        <select [(ngModel)]="model.vegType">
+          <option>Veg</option>
+          <option>Non-Veg</option>
+        </select>
+      </div>
+
+      <div class="form-control">
+        <label>Status</label>
+        <select [(ngModel)]="model.status">
+          <option>Available</option>
+          <option>Out of Stock</option>
+        </select>
+      </div>
+
+      <!-- ⭐ NEW PRICE FIELD ⭐ -->
+      <div class="form-control">
+        <label>Price</label>
+        <input
+          type="number"
+          [(ngModel)]="model.price"
+          placeholder="Enter price"
+          min="0"
+        />
+      </div>
+
+    </div>
+
+    <!-- Image Upload -->
+    <div class="upload-box">
+      <input type="file" id="fileUpload" hidden (change)="onFileSelect($event)" />
+      <label for="fileUpload" class="upload-area">
+        ⛅ <br />
+        <span>Drop Files Here Or Click To Upload</span>
+      </label>
+    </div>
+
+    <!-- Buttons -->
+    <div class="action-buttons">
+      <button class="cancel" (click)="close.emit()">Cancel</button>
+      <button class="save" (click)="saveItem()">Save</button>
+    </div>
+
+  </div>
+</div>
