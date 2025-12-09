@@ -12,7 +12,8 @@
 
 .menu-scroll, .order-scroll {
   flex: 1;
-  overflow-y: auto;        /* ONLY CONTENT SCROLLS */
+  overflow-x: hidden;       /* Hides bottom scrollbar */
+  scrollbar-width: none;    /* Firefox hide scrollbar */
 }
 
 

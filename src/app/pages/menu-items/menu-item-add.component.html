@@ -42,19 +42,19 @@
       </div>
 
       <!-- ⭐ NEW PRICE FIELD ⭐ -->
-      <div class="form-control">
-        <label>Price</label>
-        <input
-          type="number"
-          [(ngModel)]="model.price"
-          placeholder="Enter price"
-          min="0"
-        />
-      </div>
+     <div class="form-control">
+  <label>Price</label>
+  <input
+    type="number"
+    [(ngModel)]="model.price"
+    placeholder="Enter price"
+    min="0"
+  />
+</div>
 
     </div>
 
-    <!-- Image Upload -->
+    Image Upload
     <div class="upload-box">
       <input type="file" id="fileUpload" hidden (change)="onFileSelect($event)" />
       <label for="fileUpload" class="upload-area">

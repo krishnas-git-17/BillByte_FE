@@ -18,27 +18,40 @@ export interface MenuItem {
 export class MenuListComponent implements OnChanges {
 
   @Input() quantities: { [id: number]: number } = {};
-
   @Output() quantityChange = new EventEmitter<{ item: MenuItem; qty: number }>();
 
-  categories = ['All', 'Breakfast', 'Lunch', 'Starters', 'Beverages', 'Desserts'];
+  categories = ['All', 'Breakfast', 'Lunch', 'Starters', 'Beverages', 'Desserts', 'Dinner', 'Snacks'];
   selectedCategory = 'All';
   vegOnly = false;
 
-  menu = [
-    { id: 1, name: 'Paneer Curry', price: 180, img: '...', category: 'Lunch', veg: true },
-    { id: 2, name: 'Chicken Biryani', price: 220, img: '...', category: 'Lunch', veg: false },
-    { id: 3, name: 'Veg Manchuria', price: 150, img: '...', category: 'Starters', veg: true },
-    { id: 4, name: 'Fried Rice', price: 130, img: '...', category: 'Lunch', veg: true },
-  ];
+  menu: any[] = [];
+  filteredMenu: any[] = [];
 
-  filteredMenu = [...this.menu];
+  ngOnInit() {
+    this.loadMenuFromStorage();
+    this.applyFilters();
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['quantities']) {
-      // FORCE Angular to update bindings
       this.quantities = { ...this.quantities };
     }
+  }
+
+  loadMenuFromStorage() {
+    const data = JSON.parse(localStorage.getItem("menu_items") || "[]");
+
+    this.menu = data.map((item: any, index: number) => ({
+      id: index + 1,
+      menuId: item.menuId,
+      name: item.name,
+      price: item.price || 0,
+      img: item.image || null,
+      category: item.type,
+      veg: item.vegType === "Veg"
+    }));
+
+    this.filteredMenu = [...this.menu];
   }
 
   selectCategory(cat: string) {
