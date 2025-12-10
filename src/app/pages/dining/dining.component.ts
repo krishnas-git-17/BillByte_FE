@@ -19,22 +19,44 @@ export class DiningComponent implements OnInit, OnDestroy {
   nonAcTables = Array.from({ length: 30 }, (_, i) => `NAC-T${i + 1}`);
 
   timers: { [id: string]: string } = {};
-
   private intervalId: any;
 
   ngOnInit(): void {
-    // Load current stored timers
     this.timers = this.tableStatus.getAllTimers();
 
-    // Update timers every 1 sec
-   this.intervalId = setInterval(() => {
-  this.timers = this.tableStatus.getAllTimers();
-}, 1000);
-
+    // update UI every 1 sec
+    this.intervalId = setInterval(() => {
+      this.timers = this.tableStatus.getAllTimers();
+    }, 1000);
   }
 
   ngOnDestroy(): void {
     clearInterval(this.intervalId);
+  }
+
+cleanTimer(raw: string | undefined): string {
+  if (!raw) return "";
+
+  // raw comes like "5m 42s"
+  const parts = raw.split(" ");
+
+  if (parts.length < 2) return "";
+
+  const minutesStr = parts[0].replace("m", ""); // take only minutes
+  const totalMinutes = parseInt(minutesStr, 10);
+
+  const hours = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${mins}m`;
+  }
+
+  return `${mins}m`;
+}
+
+  getTimer(id: string): string {
+    return this.cleanTimer(this.timers[id]);
   }
 
   openOrders(table: string, type: string) {
@@ -45,13 +67,8 @@ export class DiningComponent implements OnInit, OnDestroy {
     return this.tableStatus.getStatus(id) === 'occupied';
   }
 
-  getTimer(id: string) {
-    return this.timers[id];
+  getDisplayName(id: string): string {
+    return id.replace(/^AC-/, '').replace(/^NAC-/, '');
   }
-
- getDisplayName(id: string): string {
-  return id.replace(/^AC-/, '').replace(/^NAC-/, '');
-}
-
 
 }
