@@ -82,27 +82,28 @@
                         </thead>
 
                         <tbody>
-                            <tr *ngFor="let item of filteredItems; let i = index">
+                            <tr *ngFor="let item of filteredItems; let i = index; trackBy: trackByMenuId">
 
                                 <td>{{ item.menuId }}</td>
 
                                 <td>
                                     <ng-container *ngIf="editIndex === i; else viewName">
-                                        <input [(ngModel)]="tempEditData.name" />
+                                        <input class="edit-input" [(ngModel)]="tempEditData.name" />
                                     </ng-container>
                                     <ng-template #viewName>{{ item.name }}</ng-template>
                                 </td>
 
                                 <td>
                                     <ng-container *ngIf="editIndex === i; else viewType">
-                                        <input [(ngModel)]="tempEditData.type" />
+                                        <input class="edit-input" [(ngModel)]="tempEditData.type" />
                                     </ng-container>
                                     <ng-template #viewType>{{ item.type }}</ng-template>
                                 </td>
 
                                 <td>
                                     <ng-container *ngIf="editIndex === i; else viewVeg">
-                                        <select [(ngModel)]="tempEditData.vegType">
+                                        <select class="edit-select" [(ngModel)]="tempEditData.vegType">
+
                                             <option>Veg</option>
                                             <option>Non-Veg</option>
                                         </select>
@@ -118,7 +119,7 @@
 
                                 <td>
                                     <ng-container *ngIf="editIndex === i; else viewStatus">
-                                        <select [(ngModel)]="tempEditData.status">
+                                        <select class="edit-select" [(ngModel)]="tempEditData.status">
                                             <option>Available</option>
                                             <option>Out of Stock</option>
                                         </select>
@@ -134,7 +135,7 @@
 
                                 <td>
                                     <ng-container *ngIf="editIndex === i; else viewPrice">
-                                        <input type="number" [(ngModel)]="tempEditData.price" />
+                                        <input class="edit-input" type="number" [(ngModel)]="tempEditData.price" />
                                     </ng-container>
                                     <ng-template #viewPrice>₹ {{ item.price }}</ng-template>
                                 </td>
@@ -145,7 +146,8 @@
                                     <!-- NON-EDIT MODE -->
                                     <ng-container *ngIf="editIndex !== i">
                                         <button class="icon-btn" (click)="enableEdit(i)">🖉</button>
-                                        <button class="icon-btn" (click)="deleteItem(item)">🗑️</button>
+                                        <button class="icon-btn" (click)="deleteConfirm(item)">🗑️</button>
+
                                     </ng-container>
 
                                     <!-- EDIT MODE -->
@@ -171,5 +173,10 @@
         </app-menu-item-add>
 
     </div>
+
+    <app-snackbar 
+  [message]="snackMessage" 
+  [show]="showSnack">
+</app-snackbar>
 
 </div>

@@ -68,6 +68,10 @@
       <button class="cancel" (click)="close.emit()">Cancel</button>
       <button class="save" (click)="saveItem()">Save</button>
     </div>
+<app-snackbar 
+  [message]="snackMessage" 
+  [show]="showSnack">
+</app-snackbar>
 
   </div>
 </div>

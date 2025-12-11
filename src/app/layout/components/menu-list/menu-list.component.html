@@ -1,42 +1,55 @@
 <!-- CATEGORY FILTER BAR -->
 <div class="filter-bar">
 
-  <div 
-    class="filter-item" 
-    *ngFor="let cat of categories" 
-    [class.active]="selectedCategory === cat"
-    (click)="selectCategory(cat)"
-  >
-    {{ cat }}
-  </div>
 
-  <!-- VEG TOGGLE -->
-  <div class="veg-toggle">
-    <label class="switch">
-      <input type="checkbox" [(ngModel)]="vegOnly" (change)="applyFilters()">
-      <span class="slider round"></span>
-    </label>
-    <span class="veg-label">Veg</span>
-  </div>
+    <div class="filter-item" *ngFor="let cat of visibleCategories" [class.active]="selectedCategory === cat"
+        (click)="selectCategory(cat)">
+        {{ cat }}
+    </div>
+
+    <div class="more-filter" *ngIf="allCategories.length > 6">
+        <button (click)="showMore = !showMore">
+            More ▼
+        </button>
+
+        <div class="dropdown" *ngIf="showMore">
+            <div class="dropdown-item" *ngFor="let cat of allCategories.slice(6)"
+                (click)="selectCategory(cat); showMore = false;">
+                {{ cat }}
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <!-- VEG TOGGLE -->
+    <div class="veg-toggle">
+        <label class="switch">
+            <input type="checkbox" [(ngModel)]="vegOnly" (change)="applyFilters()">
+            <span class="slider round"></span>
+        </label>
+        <span class="veg-label">Veg</span>
+    </div>
 
 </div>
 
 
 <!-- MENU GRID -->
 <div class="menu-grid">
-  <div class="menu-card" *ngFor="let m of filteredMenu">
-
-    <img [src]="m.img" class="item-img" />
-
-    <div class="item-name">{{ m.name }}</div>
-    <div class="item-price">₹ {{ m.price }}</div>
-
-    <div class="qty-controls">
-      <button class="qty-btn" (click)="decreaseQty(m)">-</button>
-      <span class="qty-value">{{ quantities[m.id] || 0 }}
-</span>
-      <button class="qty-btn" (click)="increaseQty(m)">+</button>
+    <div class="menu-card" *ngFor="let m of filteredMenu" [class.out-of-stock]="m.status === 'Out of Stock'">
+        <img [src]="m.img" class="item-img" />
+        <div class="item-name">{{ m.name }}</div>
+        <div class="item-price">₹ {{ m.price }}</div>
+        <div class="add-btn" *ngIf="(quantities[m.id] || 0) === 0 && m.status === 'Available'">
+            <button class="add-button" (click)="increaseQty(m)">Add</button>
+        </div>
+        <div class="qty-controls" *ngIf="(quantities[m.id] || 0) > 0 && m.status === 'Available'">
+            <button class="qty-btn" (click)="decreaseQty(m)">-</button>
+            <span class="qty-value">{{ quantities[m.id] }}</span>
+            <button class="qty-btn" (click)="increaseQty(m)">+</button>
+        </div>
+        <div class="out-label" *ngIf="m.status === 'Out of Stock'">Out of Stock</div>
     </div>
 
-  </div>
 </div>

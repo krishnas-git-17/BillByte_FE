@@ -36,33 +36,24 @@ export class DiningComponent implements OnInit, OnDestroy {
 
 cleanTimer(raw: string | undefined): string {
   if (!raw) return "";
-
-  // raw comes like "5m 42s"
   const parts = raw.split(" ");
-
   if (parts.length < 2) return "";
-
-  const minutesStr = parts[0].replace("m", ""); // take only minutes
+  const minutesStr = parts[0].replace("m", ""); 
   const totalMinutes = parseInt(minutesStr, 10);
-
   const hours = Math.floor(totalMinutes / 60);
   const mins = totalMinutes % 60;
-
   if (hours > 0) {
     return `${hours}h ${mins}m`;
   }
 
   return `${mins}m`;
 }
-
   getTimer(id: string): string {
     return this.cleanTimer(this.timers[id]);
   }
-
   openOrders(table: string, type: string) {
-    this.router.navigate(['/orders', table, type]);
+    this.router.navigate(['dashboard/orders', table, type]);
   }
-
   isOccupied(id: string) {
     return this.tableStatus.getStatus(id) === 'occupied';
   }
