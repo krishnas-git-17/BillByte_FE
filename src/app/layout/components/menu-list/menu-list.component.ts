@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MenuItemsService } from '../../../services/menu-items.service';
 import { LoaderService } from '../../../services/loader.service';
+import { IMAGES } from '../../../shared/image.constants';
 
 export interface MenuItem {
   id: number;
@@ -28,8 +29,8 @@ export class MenuListComponent implements OnInit, OnChanges {
   menu: any[] = [];
   filteredMenu: any[] = [];
 
-  allCategories: string[] = [];       // all from API
-  visibleCategories: string[] = [];   // first 5 + "All"
+  allCategories: string[] = [];      
+  visibleCategories: string[] = [];
   showMore = false;
 
   constructor(
@@ -58,7 +59,10 @@ export class MenuListComponent implements OnInit, OnChanges {
           menuId: item.menuId,
           name: item.name,
           price: item.price || 0,
-          img: item.imageUrl || null,
+           img: item.imageUrl && item.imageUrl !== ""
+       ? item.imageUrl
+       : IMAGES.MENU_THUMBNAIL,
+
           category: item.type,
           veg: item.vegType === "Veg",
           status: item.status
@@ -76,7 +80,6 @@ export class MenuListComponent implements OnInit, OnChanges {
     });
   }
 
-  // Build categories from API by frequency, highest first
   buildCategoryList() {
     const countMap: Record<string, number> = {};
 
@@ -87,8 +90,8 @@ export class MenuListComponent implements OnInit, OnChanges {
 
     const sorted = Object.keys(countMap).sort((a, b) => countMap[b] - countMap[a]);
 
-    this.allCategories = ['All', ...sorted];      // keep All at top
-    this.visibleCategories = this.allCategories.slice(0, 6); // "All" + top 5
+    this.allCategories = ['All', ...sorted];     
+    this.visibleCategories = this.allCategories.slice(0, 6);
   }
 
   toggleMore(event: MouseEvent) {
@@ -116,7 +119,6 @@ export class MenuListComponent implements OnInit, OnChanges {
       return categoryMatch && vegMatch;
     });
 
-    // Selected items first
     this.filteredMenu = [
       ...temp.filter(m => (this.quantities[m.id] || 0) > 0),
       ...temp.filter(m => (this.quantities[m.id] || 0) === 0)

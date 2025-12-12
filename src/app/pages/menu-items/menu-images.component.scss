@@ -1,0 +1,116 @@
+.img-wrapper {
+  padding: 20px;
+}
+
+.empty-box {
+  text-align: center;
+  margin-top: 60px;
+}
+
+.upload-box input {
+  padding: 12px;
+  cursor: pointer;
+}
+
+.top-upload {
+  text-align: right;
+  margin-bottom: 12px;
+}
+
+.upload-btn {
+  padding: 8px 14px;
+  background: #4caf50;
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.img-wrapper {
+  padding: 20px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+
+.btn.outline {
+  background: white;
+  border: 1px solid #ccc;
+}
+
+.btn.add {
+  background: #ff8f2e;
+  color: white;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.img-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* IMPORTANT */
+}
+
+.img-table th,
+.img-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.img-table th:nth-child(1),
+.img-table td:nth-child(1) {
+  width: 80px;
+}
+
+.img-table th:nth-child(2),
+.img-table td:nth-child(2) {
+  width: 140px;
+}
+
+.img-table th:nth-child(3),
+.img-table td:nth-child(3) {
+  width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.img-table th:nth-child(4),
+.img-table td:nth-child(4) {
+  width: 160px;
+}
+
+.thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;   /* Ensures image doesn't overflow or break row */
+  border-radius: 8px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  margin: 0 10px;
+}

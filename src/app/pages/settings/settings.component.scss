@@ -1,0 +1,35 @@
+.settings-container {
+  padding: 20px;
+}
+
+.title {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.card-grid {
+  display: flex;
+  gap: 20px;
+}
+
+.setting-card {
+  flex: 1;
+  padding: 20px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: center;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  }
+
+  mat-icon {
+    font-size: 40px;
+    color: #ff8f2e;
+  }
+}

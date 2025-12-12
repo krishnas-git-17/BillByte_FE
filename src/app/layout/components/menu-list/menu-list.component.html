@@ -38,7 +38,7 @@
 <!-- MENU GRID -->
 <div class="menu-grid">
     <div class="menu-card" *ngFor="let m of filteredMenu" [class.out-of-stock]="m.status === 'Out of Stock'">
-        <img [src]="m.img" class="item-img" />
+       <img [src]="m.img" class="item-img" />
         <div class="item-name">{{ m.name }}</div>
         <div class="item-price">₹ {{ m.price }}</div>
         <div class="add-btn" *ngIf="(quantities[m.id] || 0) === 0 && m.status === 'Available'">

@@ -10,17 +10,18 @@ import Swal from 'sweetalert2';
 import { MenuItemsService } from '../../../services/menu-items.service';
 import { LoaderService } from '../../../services/loader.service';
 import { SnackbarComponent } from '../../../layout/components/snackbar.component';
+import { MenuItemImageService } from '../../../services/menu-item-image.service';
 
 @Component({
     selector: 'app-menu-items',
     standalone: true,
-    imports: [CommonModule, FormsModule, MenuItemAddComponent,SnackbarComponent],
+    imports: [CommonModule, FormsModule, MenuItemAddComponent, SnackbarComponent],
     templateUrl: './menu-items.component.html',
     styleUrls: ['./menu-items.component.scss']
 })
 export class MenuItemsComponent implements OnInit {
 
-    constructor(private menuService: MenuItemsService, private loader: LoaderService, private cdr: ChangeDetectorRef) { }
+    constructor(private menuService: MenuItemsService, private imageService: MenuItemImageService, private loader: LoaderService, private cdr: ChangeDetectorRef) { }
 
     showSnack = false;
     snackMessage = "";
@@ -35,12 +36,12 @@ export class MenuItemsComponent implements OnInit {
         this.loadItems();
     }
 
- showSnackbar(msg: string) {
+    showSnackbar(msg: string) {
         this.snackMessage = msg;
         this.showSnack = true;
 
         setTimeout(() => (this.showSnack = false), 2500);
-    }    
+    }
     loadItems() {
         this.loader.show();
 
@@ -84,11 +85,32 @@ export class MenuItemsComponent implements OnInit {
         this.filteredItems = [item];
     }
 
-
-    saveNewItem(data: any) {
+    createMenuItemFinal(data: any) {
         this.menuService.createMenuItem(data).subscribe(() => {
             this.loadItems();
             this.showAddPopup = false;
+            this.showSnackbar("Item Added Successfully!");
+        });
+    }
+
+    saveNewItem(data: any) {
+
+        if (data.imageUrl && data.imageUrl !== "" && data.imageUrl !== null) {
+            this.createMenuItemFinal(data);
+            return;
+        }
+
+        this.imageService.getAll().subscribe(imgList => {
+
+            const match = imgList.find(x =>
+                x.itemName.toLowerCase() === data.name.toLowerCase()
+            );
+
+            if (match) {
+                data.imageUrl = match.itemImage;
+            }
+
+            this.createMenuItemFinal(data);
         });
     }
 
@@ -100,8 +122,8 @@ export class MenuItemsComponent implements OnInit {
 
         const reader = new FileReader();
 
-        reader.onload = (e: any) => {
-            const workbook = XLSX.read(e.target.result, { type: 'binary' });
+        reader.onload = () => {
+            const workbook = XLSX.read(reader.result, { type: 'binary' });
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
             const excelRows: any[] = XLSX.utils.sheet_to_json(sheet);
 
@@ -111,67 +133,66 @@ export class MenuItemsComponent implements OnInit {
                 return;
             }
 
-            const newItems: Array<{
-                menuId: string;
-                name: string;
-                type: string;
-                vegType: string;
-                status: string;
-                price: number;
-                imageUrl?: string | null;
-                createdBy: string;
-            }> = [];
+            this.imageService.getAll().subscribe((imgList: any[]) => {
 
-            const skippedItems: string[] = [];
+                const newItems: any[] = [];
+                const skippedItems: string[] = [];
 
+                excelRows.forEach(row => {
 
-            excelRows.forEach(row => {
-                const menuId = row.MenuId || row.menuId;
+                    const menuId = row.MenuId || row.menuId;
+                    const name = (row.Name || row.name || "").trim();
 
-                const exists = this.items.some(x => x.menuId === menuId);
+                    if (this.items.some(x => x.menuId === menuId)) {
+                        skippedItems.push(menuId);
+                        return;
+                    }
 
-                if (exists) {
-                    skippedItems.push(menuId);
-                } else {
+                    const matchedImg = imgList.find(img =>
+                        img.itemName.toLowerCase() === name.toLowerCase()
+                    );
+
                     newItems.push({
-                        menuId: menuId,
-                        name: row.Name || row.name,
+                        menuId,
+                        name,
                         type: row.Type || row.type,
                         vegType: row.VegType || row.vegType,
                         status: row.Status || row.status,
                         price: row.Price || row.price,
-                        imageUrl: row.ImageUrl || null,
+                        imageUrl: matchedImg ? matchedImg.itemImage : null,
                         createdBy: "Excel Import"
                     });
-                }
-            });
 
-            if (newItems.length === 0) {
-                this.loader.hide();
-                Swal.fire("No New Records", "All records already exist.", "info");
-                return;
-            }
-            const apiCalls = newItems.map(item => this.menuService.createMenuItem(item));
+                });
 
-            forkJoin(apiCalls).subscribe({
-                next: () => {
+                if (newItems.length === 0) {
                     this.loader.hide();
+                    Swal.fire("No New Items", "All records already exist.", "info");
+                    return;
+                }
 
-                    let message = "Imported successfully!";
+                const apiCalls = newItems.map(item => this.menuService.createMenuItem(item));
 
-                    if (skippedItems.length > 0) {
-                        message += `\nSkipped ${skippedItems.length} duplicate record(s).`;
+                forkJoin(apiCalls).subscribe({
+                    next: () => {
+                        this.loader.hide();
+
+                        let message = "Imported successfully!";
+                        if (skippedItems.length > 0) {
+                            message += `\nSkipped ${skippedItems.length} duplicate record(s).`;
+                        }
+
+                        Swal.fire("Success!", message, "success");
+                        this.loadItems();
+                    },
+                    error: () => {
+                        this.loader.hide();
+                        Swal.fire("Error", "Failed to import records.", "error");
                     }
+                });
 
-                    Swal.fire("Success!", message, "success");
-
-                    this.loadItems();
-                },
-                error: () => {
-                    this.loader.hide();
-                    Swal.fire("Error", "Failed to import records.", "error");
-                }
             });
+
         };
 
         reader.readAsBinaryString(file);
@@ -210,7 +231,7 @@ export class MenuItemsComponent implements OnInit {
         doc.text('Menu Items', 14, 15);
 
         const tableData = this.items.map((item, index) => [
-             index + 1,     
+            index + 1,
             item.menuId,
             item.name,
             item.type,
@@ -221,7 +242,7 @@ export class MenuItemsComponent implements OnInit {
 
         autoTable(doc, {
             startY: 25,
-            head: [['S.No','Menu ID', 'Name', 'Type', 'Veg/Non-Veg', 'Status', 'Price']],
+            head: [['S.No', 'Menu ID', 'Name', 'Type', 'Veg/Non-Veg', 'Status', 'Price']],
             body: tableData,
             styles: { fontSize: 10 },
             headStyles: { fillColor: [255, 143, 46] }
@@ -251,8 +272,8 @@ export class MenuItemsComponent implements OnInit {
             setTimeout(() => {
                 this.editIndex = null;
                 this.cdr.detectChanges();
-            }, 200); 
-           this.showSnackbar("Updated successfully!");
+            }, 200);
+            this.showSnackbar("Updated successfully!");
         });
     }
 
