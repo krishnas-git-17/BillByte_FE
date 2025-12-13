@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { UnsavedOrderGuard } from './pages/orders/unsaved-order.guard';
 
 export const routes: Routes = [
   {
@@ -20,6 +21,7 @@ export const routes: Routes = [
         path: 'dashboard/orders/:tableId/:type',
         loadComponent: () =>
           import('./pages/orders/orders.component').then(m => m.OrdersComponent),
+         canDeactivate: [UnsavedOrderGuard]
       },
       {
         path: 'menu-items',

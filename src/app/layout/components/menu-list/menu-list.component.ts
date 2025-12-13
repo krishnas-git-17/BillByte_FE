@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Output, Input, OnChanges, SimpleChanges, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnChanges, SimpleChanges, OnInit,ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MenuItemsService } from '../../../services/menu-items.service';
 import { LoaderService } from '../../../services/loader.service';
 import { IMAGES } from '../../../shared/image.constants';
+import { Router } from '@angular/router';
 
 export interface MenuItem {
   id: number;
@@ -16,12 +17,14 @@ export interface MenuItem {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './menu-list.component.html',
-  styleUrl: './menu-list.component.scss'
+  styleUrls: ['./menu-list.component.scss']
 })
 export class MenuListComponent implements OnInit, OnChanges {
-
   @Input() quantities: { [id: number]: number } = {};
+  @Input() cartCount: number = 0;
+  @Input() searchText: string = "";
   @Output() quantityChange = new EventEmitter<{ item: MenuItem; qty: number }>();
+@ViewChild('catScroll') catScroll: any;
 
   selectedCategory = 'All';
   vegOnly = false;
@@ -29,26 +32,47 @@ export class MenuListComponent implements OnInit, OnChanges {
   menu: any[] = [];
   filteredMenu: any[] = [];
 
-  allCategories: string[] = [];      
+  allCategories: string[] = [];
   visibleCategories: string[] = [];
+  extraCategories: string[] = [];
   showMore = false;
 
   constructor(
     private menuService: MenuItemsService,
-    private loader: LoaderService
-  ) {}
+    private loader: LoaderService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
     this.loadMenuFromApi();
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    if (changes['searchText']) {
+      this.applyFilters();
+    }
+
     if (changes['quantities']) {
       this.quantities = { ...this.quantities };
       this.applyFilters();
     }
   }
+  applySearch(text: string) {
+    text = text.toLowerCase();
 
+    this.filteredMenu = this.menu.filter(m =>
+      m.name.toLowerCase().includes(text) ||
+      m.type.toLowerCase().includes(text)
+    );
+  }
+
+scrollLeft() {
+  this.catScroll.nativeElement.scrollBy({ left: -200, behavior: 'smooth' });
+}
+
+scrollRight() {
+  this.catScroll.nativeElement.scrollBy({ left: 200, behavior: 'smooth' });
+}
   loadMenuFromApi() {
     this.loader.show();
 
@@ -59,11 +83,8 @@ export class MenuListComponent implements OnInit, OnChanges {
           menuId: item.menuId,
           name: item.name,
           price: item.price || 0,
-           img: item.imageUrl && item.imageUrl !== ""
-       ? item.imageUrl
-       : IMAGES.MENU_THUMBNAIL,
-
-          category: item.type,
+          img: item.imageUrl && item.imageUrl !== "" ? item.imageUrl : IMAGES.MENU_THUMBNAIL,
+          category: item.type || 'Others',
           veg: item.vegType === "Veg",
           status: item.status
         }));
@@ -79,7 +100,9 @@ export class MenuListComponent implements OnInit, OnChanges {
       }
     });
   }
-
+  openAddMenu() {
+    this.router.navigate(['/menu-items']);
+  }
   buildCategoryList() {
     const countMap: Record<string, number> = {};
 
@@ -90,38 +113,43 @@ export class MenuListComponent implements OnInit, OnChanges {
 
     const sorted = Object.keys(countMap).sort((a, b) => countMap[b] - countMap[a]);
 
-    this.allCategories = ['All', ...sorted];     
+    this.allCategories = ['All', ...sorted];
+
     this.visibleCategories = this.allCategories.slice(0, 6);
+
+    this.extraCategories = this.allCategories.slice(6);
   }
 
-  toggleMore(event: MouseEvent) {
-    event.stopPropagation();
+  toggleMore() {
     this.showMore = !this.showMore;
-  }
-
-  closeMore() {
-    this.showMore = false;
+    console.log('toggleMore ->', this.showMore);
   }
 
   selectCategory(cat: string) {
     this.selectedCategory = cat;
     this.applyFilters();
-    this.closeMore();
   }
 
   applyFilters() {
-    let temp = this.menu.filter(m => {
+    const text = this.searchText.toLowerCase();
+
+    this.filteredMenu = this.menu.filter(m => {
+      const searchMatch =
+        !text || m.name.toLowerCase().includes(text) || m.category.toLowerCase().includes(text);
+
       const categoryMatch =
-        this.selectedCategory === 'All' || m.category === this.selectedCategory;
+        this.selectedCategory === 'All' ||
+        m.category === this.selectedCategory;
 
-      const vegMatch = !this.vegOnly || m.veg === true;
+      const vegMatch =
+        !this.vegOnly || m.veg === true;
 
-      return categoryMatch && vegMatch;
+      return searchMatch && categoryMatch && vegMatch;
     });
 
     this.filteredMenu = [
-      ...temp.filter(m => (this.quantities[m.id] || 0) > 0),
-      ...temp.filter(m => (this.quantities[m.id] || 0) === 0)
+      ...this.filteredMenu.filter(m => (this.quantities[m.id] || 0) > 0),
+      ...this.filteredMenu.filter(m => (this.quantities[m.id] || 0) === 0)
     ];
   }
 

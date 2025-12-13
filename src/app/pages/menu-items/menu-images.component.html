@@ -1,62 +1,86 @@
 <app-page-header title="Menu Images"></app-page-header>
 
-<div class="img-wrapper">
+<div class="menu-wrapper">
 
-    <div class="header-row">
-
-        <div class="btn-group">
-
-            <button class="upload-btn" (click)="folderInput.click()">+ Import Folder</button>
+    <div class="action-section">
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Search item..." [(ngModel)]="searchText"
+                (input)="onSearch()" />
+        </div>
+        <div class="button-row">
+            <button class="btn outline" (click)="folderInput.click()">+ Import Folder</button>
             <input type="file" #folderInput hidden webkitdirectory multiple (change)="importFolder($event)" />
 
             <button class="btn add" (click)="singleInput.click()">+ Upload Image</button>
             <input type="file" #singleInput hidden accept="image/*" (change)="onSingleFile($event)" />
-
         </div>
+
     </div>
 
     <div class="empty-box" *ngIf="images.length === 0">
         <h3>No Images Uploaded</h3>
-
         <button class="btn add" (click)="emptyInput.click()">+ Upload Image</button>
         <input type="file" #emptyInput hidden accept="image/*" (change)="onSingleFile($event)" />
     </div>
 
-    <!-- TABLE -->
-    <div *ngIf="images.length > 0" class="table-container">
+    <div class="table-box" *ngIf="images.length > 0">
 
-        <table class="img-table">
-            <thead>
-                <tr>
-                    <th>Sl No</th>
-                    <th>Preview</th>
-                    <th>Item Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+        <div class="table-container">
+            <table class="img-table">
+                <thead>
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Preview</th>
+                        <th>Item Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                <tr *ngFor="let item of images; let i = index">
+                <tbody>
+                    <tr *ngFor="let item of filteredImages; let i = index">
 
-                    <td>{{ i + 1 }}</td>
+                        <td>{{ i + 1 }}</td>
 
-                    <td>
-                        <img [src]="item.itemImage" class="thumb" />
-                    </td>
+                        <td>
+                            <img *ngIf="editIndex !== i" [src]="item.itemImage" class="thumb" />
 
-                    <td>{{ item.itemName }}</td>
+                            <div *ngIf="editIndex === i" class="edit-image-box">
+                                <img [src]="editData.itemImage" class="thumb" />
 
-                    <td>
-                        <button class="icon-btn" (click)="edit(item)">✏️</button>
-                        <button class="icon-btn" (click)="delete(item)">🗑️</button>
-                    </td>
+                                <button class="image-upload-btn" (click)="imageInput.click()">Change</button>
+                                <input type="file" #imageInput hidden accept="image/*" (change)="onEditImage($event)" />
+                            </div>
+                        </td>
 
-                </tr>
-            </tbody>
+                        <td>
+                            <ng-container *ngIf="editIndex === i; else viewName">
+                                <input class="edit-input" [(ngModel)]="editData.itemName" />
+                            </ng-container>
+
+                            <ng-template #viewName>
+                                {{ item.itemName }}
+                            </ng-template>
+                        </td>
+
+                        <td>
+                            <ng-container *ngIf="editIndex !== i">
+                                <button class="icon-btn" (click)="enableEdit(item, i)">✏️</button>
+                                <button class="icon-btn" (click)="delete(item)">🗑️</button>
+                            </ng-container>
+
+                            <ng-container *ngIf="editIndex === i">
+                                <button class="icon-btn" (click)="saveEdit(item)">✔</button>
+                                <button class="icon-btn" (click)="cancelEdit()">✖</button>
+                            </ng-container>
+                        </td>
+
+                    </tr>
+                </tbody>
 
 
-        </table>
-
+            </table>
+        </div>
     </div>
 
 </div>
