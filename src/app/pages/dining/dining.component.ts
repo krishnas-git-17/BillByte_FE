@@ -4,6 +4,11 @@ import { Router } from '@angular/router';
 import { TableStatusService } from '../../services/table-status.service';
 import { ReportsComponent } from '../reports/reports.component';
 
+interface Section {
+  name: string;
+  tableCount: number;
+}
+
 @Component({
   selector: 'app-dining',
   standalone: true,
@@ -13,18 +18,21 @@ import { ReportsComponent } from '../reports/reports.component';
 })
 export class DiningComponent implements OnInit, OnDestroy {
 
-  constructor(private router: Router, private tableStatus: TableStatusService) {}
-
-  acTables = Array.from({ length: 24 }, (_, i) => `AC-T${i + 1}`);
-  nonAcTables = Array.from({ length: 30 }, (_, i) => `NAC-T${i + 1}`);
+  sections: Section[] = [];
+  tablesBySection: { name: string; tables: string[] }[] = [];
 
   timers: { [id: string]: string } = {};
   private intervalId: any;
 
-  ngOnInit(): void {
-    this.timers = this.tableStatus.getAllTimers();
+  constructor(
+    private router: Router,
+    private tableStatus: TableStatusService
+  ) {}
 
-    // update UI every 1 sec
+  ngOnInit(): void {
+    this.loadSections();
+
+    this.timers = this.tableStatus.getAllTimers();
     this.intervalId = setInterval(() => {
       this.timers = this.tableStatus.getAllTimers();
     }, 1000);
@@ -34,32 +42,44 @@ export class DiningComponent implements OnInit, OnDestroy {
     clearInterval(this.intervalId);
   }
 
-cleanTimer(raw: string | undefined): string {
-  if (!raw) return "";
-  const parts = raw.split(" ");
-  if (parts.length < 2) return "";
-  const minutesStr = parts[0].replace("m", ""); 
-  const totalMinutes = parseInt(minutesStr, 10);
-  const hours = Math.floor(totalMinutes / 60);
-  const mins = totalMinutes % 60;
-  if (hours > 0) {
-    return `${hours}h ${mins}m`;
+  /* ---------------- LOAD FROM LOCAL STORAGE ---------------- */
+  loadSections() {
+    const data = localStorage.getItem('table_preferences');
+    if (!data) return;
+
+    this.sections = JSON.parse(data);
+
+    this.tablesBySection = this.sections.map(sec => ({
+      name: sec.name,
+      tables: Array.from(
+        { length: sec.tableCount },
+        (_, i) => `${sec.name}-T${i + 1}`
+      )
+    }));
   }
 
-  return `${mins}m`;
-}
+  /* ---------------- HELPERS ---------------- */
   getTimer(id: string): string {
     return this.cleanTimer(this.timers[id]);
   }
-  openOrders(table: string, type: string) {
-    this.router.navigate(['dashboard/orders', table, type]);
+
+  cleanTimer(raw: string | undefined): string {
+    if (!raw) return '';
+    const mins = parseInt(raw.split('m')[0], 10);
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
   }
+
   isOccupied(id: string) {
     return this.tableStatus.getStatus(id) === 'occupied';
   }
 
-  getDisplayName(id: string): string {
-    return id.replace(/^AC-/, '').replace(/^NAC-/, '');
+  openOrders(table: string, section: string) {
+    this.router.navigate(['dashboard/orders', table, section]);
   }
 
+  getDisplayName(id: string): string {
+    return id.split('-T')[1];
+  }
 }

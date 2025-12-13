@@ -6,10 +6,14 @@ import { TableStatusService } from '../../services/table-status.service';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { CheckoutComponent } from '../../layout/components/checkout/checkout.component';
+import { CompletedOrdersService } from '../../services/completed-orders.service';
+import { ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
 @Component({
     selector: 'app-orders',
     standalone: true,
-    imports: [CommonModule, MenuListComponent, FormsModule, MatIconModule],
+    imports: [CommonModule, MenuListComponent, FormsModule, MatIconModule, CheckoutComponent],
     templateUrl: './orders.component.html',
     styleUrl: './orders.component.scss'
 })
@@ -29,28 +33,31 @@ export class OrdersComponent implements AfterViewInit {
     orderType: 'Dine' | 'Parcel' | 'Delivery' = 'Dine';
     discountPercent: number = 0;
     discountAmount: number = 0;
-
+    isSubmitting = false;
     subtotal = 0;
     tax = 0;
     total = 0;
 
     isOccupied = false;
 
-    
+
 
     constructor(
         private location: Location,
         private route: ActivatedRoute,
-        private tableStatus: TableStatusService
+        private tableStatus: TableStatusService,
+        private completedOrders: CompletedOrdersService,
+        private cdr: ChangeDetectorRef,
+        private router: Router 
     ) {
-         window.onbeforeunload = () => {
-      if (this.cartCount > 0 && !this.isOccupied) {
-        return "Unsaved order will be lost. Continue?";
-      }
-      return null;
-    };
+        window.onbeforeunload = () => {
+            if (this.cartCount > 0 && !this.isOccupied) {
+                return "Unsaved order will be lost. Continue?";
+            }
+            return null;
+        };
         this.isOccupied = false;
-    this.isCheckoutMode = false;
+        this.isCheckoutMode = false;
 
         this.tableId = this.route.snapshot.params['tableId'];
         this.tableType = this.route.snapshot.params['type'];
@@ -64,26 +71,26 @@ export class OrdersComponent implements AfterViewInit {
             this.tax = saved.tax || 0;
             this.total = saved.total || 0;
             this.isOccupied = saved.occupied ?? this.isOccupied;
-            this.isCheckoutMode = this.isOccupied;
+            // this.isCheckoutMode = this.isOccupied;
         }
     }
 
- goBack() {
-  if (this.cartCount > 0 && !this.isOccupied) {
-    const confirmLeave = confirm(
-      "You have unsaved items. If you go back, the order will be cleared. Proceed?"
-    );
+    goBack() {
+        if (this.cartCount > 0 && !this.isOccupied) {
+            const confirmLeave = confirm(
+                "You have unsaved items. If you go back, the order will be cleared. Proceed?"
+            );
 
-    if (!confirmLeave) return;
+            if (!confirmLeave) return;
 
-    // Clear items
-    this.cart = {};
-    this.quantities = {};
-    this.tableStatus.clearOrder(this.tableId);
-  }
+            // Clear items
+            this.cart = {};
+            this.quantities = {};
+            this.tableStatus.clearOrder(this.tableId);
+        }
 
-  this.location.back();
-}
+        this.location.back();
+    }
 
 
 
@@ -103,6 +110,7 @@ export class OrdersComponent implements AfterViewInit {
     }
 
     onQuantityChange(ev: { item: MenuItem; qty: number }) {
+        if (this.isCheckoutMode) return; 
         const { item, qty } = ev;
 
         if (qty === 0) {
@@ -158,7 +166,7 @@ export class OrdersComponent implements AfterViewInit {
         this.tax = Math.round(afterDiscount * 0.05);   // 5% tax
 
         this.total = afterDiscount + this.tax;
-}
+    }
 
 
     saveOrder() {
@@ -172,67 +180,41 @@ export class OrdersComponent implements AfterViewInit {
         });
     }
 
-  onProceedClick() {
+    onProceedClick() {
+        if (this.isOccupied) return;
 
-  // FIRST CLICK → LOCK TABLE + SHOW CHECKOUT BUTTON
-  if (!this.isOccupied && !this.isCheckoutMode) {
+        this.isOccupied = true;
+        this.isCheckoutMode = false;
 
-    this.isOccupied = true;
-    this.isCheckoutMode = true;   // show checkout button
-
-    this.tableStatus.setStatus(this.tableId, 'occupied');
-    this.tableStatus.startTimer(this.tableId);
-    this.saveOrder();
-
-    return;   // STOP HERE — do NOT complete order
-  }
-
-  // IF IN CHECKOUT MODE → DO NOT COMPLETE ORDER YET
-  if (this.isCheckoutMode) {
-    return;   // wait for checkout() click
-  }
-
-  // FINAL: COMPLETE ORDER
-  this.completeOrder();
-}
+        this.tableStatus.setStatus(this.tableId, 'occupied');
+        this.tableStatus.startTimer(this.tableId);
+        this.saveOrder();
+    }
 
     checkout() {
-  const orderData = {
-    tableId: this.tableId,
-    items: this.cart,
-    subtotal: this.subtotal,
-    tax: this.tax,
-    discount: this.discountPercent,
-    total: this.total,
-    orderType: this.orderType,
-    timestamp: new Date().toISOString()
-  };
+        this.isCheckoutMode = true;
+    }
 
-  // Save completed order
-  const existing = JSON.parse(localStorage.getItem("completedOrders") || "[]");
-  existing.push(orderData);
-  localStorage.setItem("completedOrders", JSON.stringify(existing));
 
-  // Clear table
-  this.completeOrder();
-}
+    completeOrder() {
+        this.isOccupied = false;
+        this.isCheckoutMode = false;
 
-completeOrder() {
-  this.isOccupied = false;
-  this.isCheckoutMode = false;
+        this.tableStatus.setStatus(this.tableId, 'available');
+        this.tableStatus.stopTimer(this.tableId);
 
-  this.tableStatus.setStatus(this.tableId, 'available');
-  this.tableStatus.stopTimer(this.tableId);
+        this.cart = {};
+        this.quantities = {};
+        this.subtotal = this.tax = this.total = 0;
+        this.discountPercent = 0;
 
-  this.cart = {};
-  this.quantities = {};
-  this.subtotal = this.tax = this.total = 0;
-  this.discountPercent = 0;
+        if (this.menuList) this.menuList.applyFilters();
 
-  if (this.menuList) this.menuList.applyFilters();
+        this.tableStatus.clearOrder(this.tableId);
+        this.cdr.detectChanges()
+        this.router.navigate(['/dashboard']);
+    }
 
-  this.tableStatus.clearOrder(this.tableId);
-}
 
 
 
@@ -242,5 +224,47 @@ completeOrder() {
     get cartCount(): number {
         return this.cart ? Object.keys(this.cart).length : 0;
     }
+
+
+
+onCheckoutComplete(ev: { paymentMode: 'CASH' | 'CARD' | 'UPI' }) {
+
+  const timers = JSON.parse(localStorage.getItem('table_timers') || '{}');
+  const startTime = timers[this.tableId];
+  const tableTimeMinutes = startTime
+    ? Math.floor((Date.now() - startTime) / 60000)
+    : 0;
+
+  const items = Object.values(this.cart).map((item: any) => ({
+    itemName: item.name,   // ✅ matches backend
+    price: item.price,
+    qty: item.qty
+  }));
+
+  const orderData = {
+    tableId: this.tableId,
+    orderType: this.orderType,
+    subtotal: this.subtotal,
+    tax: this.tax,
+    discount: this.discountPercent,
+    total: this.total,
+    paymentMode: ev.paymentMode,
+    tableTimeMinutes,   // ✅ REQUIRED
+    items               // ✅ List<>
+  };
+
+  this.completedOrders.saveOrder(orderData).subscribe({
+    next: () => {
+  console.log('API SUCCESS');
+  this.completeOrder();
+},
+error: err => {
+  console.log('API FAILED');
+}
+  });
+}
+
+
+
 
 }

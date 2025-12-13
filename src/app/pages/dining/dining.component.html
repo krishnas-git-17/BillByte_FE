@@ -1,18 +1,21 @@
 <div class="dining-layout">
 
-  <!-- LEFT TABLES BLOCK -->
+  <!-- LEFT TABLES -->
   <div class="tables-section">
 
-    <!-- NON-AC -->
-    <div class="zone-box">
-      <h2 class="zone-title">Non-AC Dining</h2>
+    <div
+      class="zone-box"
+      *ngFor="let section of tablesBySection"
+      [class.full-height]="tablesBySection.length === 1">
+
+      <h2 class="zone-title">{{ section.name }}</h2>
 
       <div class="table-scroll">
         <div class="table-grid">
 
           <div class="table-card"
-               *ngFor="let t of nonAcTables"
-               (click)="openOrders(t, 'NON-AC')"
+               *ngFor="let t of section.tables"
+               (click)="openOrders(t, section.name)"
                [class.occupied]="isOccupied(t)">
 
             {{ getDisplayName(t) }}
@@ -25,30 +28,7 @@
 
         </div>
       </div>
-    </div>
 
-    <!-- AC -->
-    <div class="zone-box">
-      <h2 class="zone-title">AC Dining</h2>
-
-      <div class="table-scroll">
-        <div class="table-grid">
-
-          <div class="table-card"
-               *ngFor="let t of acTables"
-               (click)="openOrders(t, 'AC')"
-               [class.occupied]="isOccupied(t)">
-
-            {{ getDisplayName(t) }}
-
-            <div class="timer" *ngIf="getTimer(t)">
-              ⏱ {{ getTimer(t) }}
-            </div>
-
-          </div>
-
-        </div>
-      </div>
     </div>
 
   </div>

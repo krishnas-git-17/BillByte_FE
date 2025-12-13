@@ -42,6 +42,12 @@ export const routes: Routes = [
            import('./pages/menu-items/menu-images.component')
                 .then(m => m.MenuImagesComponent)
       },
+      {
+        path: 'settings/table-preferences',
+        loadComponent: () =>
+           import('./pages/TablePreference/table-preference.component')
+                .then(m => m.TablePreferenceComponent)
+      },
 
     ]
   }

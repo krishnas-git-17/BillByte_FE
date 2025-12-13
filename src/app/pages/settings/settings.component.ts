@@ -16,4 +16,7 @@ export class SettingsComponent {
   openMenuImages() {
     this.router.navigate(['/settings/menu-images']);
   }
+  openAppPreferences() {
+    this.router.navigate(['/settings/table-preferences']); 
+  }
 }

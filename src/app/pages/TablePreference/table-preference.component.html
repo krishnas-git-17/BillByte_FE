@@ -1,0 +1,72 @@
+<!-- HEADER -->
+<div class="page-header">
+  <button class="back-btn" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <h2>Table Preferences</h2>
+</div>
+
+<!-- CONTENT -->
+<div class="pref-container">
+
+  <!-- ADD SECTION CARD -->
+  <div class="add-section-card" *ngIf="!showAddForm" (click)="openAddSection()">
+    <span>＋</span>
+    <p>Add Section</p>
+  </div>
+
+  <!-- ADD SECTION FORM (UNCHANGED FLOW) -->
+  <div class="add-form" *ngIf="showAddForm">
+    <h3>Add Section</h3>
+
+    <input
+      type="text"
+      placeholder="Section Name (AC / Non-AC / Floor 1)"
+      [(ngModel)]="sectionName" />
+
+    <input
+      type="number"
+      placeholder="Number of Tables"
+      [(ngModel)]="tableCount" />
+
+    <button class="save-btn" (click)="saveSection()">Save</button>
+  </div>
+
+  <!-- SECTIONS GRID -->
+  <div class="section-grid" *ngIf="sections.length > 0">
+
+    <div class="section-card" *ngFor="let s of sections; let i = index">
+
+      <!-- VIEW MODE -->
+      <ng-container *ngIf="editingIndex !== i">
+        <h4>{{ s.name }}</h4>
+        <p>{{ s.tableCount }} Tables</p>
+
+        <div class="card-actions">
+          <button (click)="startEdit(s, i)">✏️</button>
+          <button (click)="deleteSection(i)">🗑️</button>
+        </div>
+      </ng-container>
+
+      <!-- INLINE EDIT MODE -->
+      <ng-container *ngIf="editingIndex === i">
+        <input
+          type="text"
+          [(ngModel)]="editData.name"
+          placeholder="Section Name" />
+
+        <input
+          type="number"
+          [(ngModel)]="editData.tableCount"
+          placeholder="Tables Count" />
+
+        <div class="card-actions">
+          <button (click)="saveInlineEdit(i)">✔</button>
+          <button (click)="cancelInlineEdit()">✖</button>
+        </div>
+      </ng-container>
+
+    </div>
+
+  </div>
+</div>

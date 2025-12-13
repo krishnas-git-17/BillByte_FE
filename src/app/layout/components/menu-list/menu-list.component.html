@@ -1,82 +1,74 @@
 <div class="menu-list-container">
 
-    <div class="category-wrapper">
+  <div class="category-wrapper">
 
-  <!-- LEFT ARROW -->
- 
+    <!-- LEFT ARROW -->
 
-  <!-- SCROLL CONTAINER -->
-  <div class="category-scroll" #catScroll>
-    <div class="category-item"
-         *ngFor="let cat of allCategories"
-         [class.active]="selectedCategory === cat"
-         (click)="selectCategory(cat)">
-      {{ cat }}
+
+    <!-- SCROLL CONTAINER -->
+    <div class="category-scroll" #catScroll>
+      <div class="category-item" *ngFor="let cat of allCategories" [class.active]="selectedCategory === cat"
+           [class.disabled]="disabled"
+        (click)="selectCategory(cat)">
+        {{ cat }}
+      </div>
+    </div>
+    <button class="arrow-btn" (click)="scrollLeft()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <!-- RIGHT ARROW -->
+    <button class="arrow-btn" (click)="scrollRight()">
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+
+    <!-- VEG TOGGLE (aligned right) -->
+    <div class="veg-toggle">
+      <label class="switch">
+        <input type="checkbox" [(ngModel)]="vegOnly" (change)="applyFilters()" />
+        <span class="slider round"></span>
+      </label>
+      <span class="veg-label">Veg</span>
+    </div>
+
+  </div>
+
+
+
+  <!-- MENU GRID -->
+  <div class="menu-grid" [ngClass]="{ 'wide': cartCount === 0 }" *ngIf="filteredMenu.length > 0">
+    <div class="menu-card" *ngFor="let m of filteredMenu" [class.out-of-stock]="m.status === 'Out of Stock'">
+
+      <img [src]="m.img" class="item-img" />
+      <div class="item-name">{{ m.name }}</div>
+      <div class="item-price">₹ {{ m.price }}</div>
+
+      <div class="add-btn" *ngIf="(quantities[m.id] || 0) === 0 && m.status === 'Available'">
+        <button class="add-button" [disabled]="disabled" (click)="increaseQty(m)">Add</button>
+      </div>
+
+      <div class="qty-controls" *ngIf="(quantities[m.id] || 0) > 0 && m.status === 'Available'">
+        <button class="qty-btn" [disabled]="disabled" (click)="decreaseQty(m)">-</button>
+        <span class="qty-value">{{ quantities[m.id] }}</span>
+        <button class="qty-btn" (click)="increaseQty(m)">+</button>
+      </div>
+
+      <div class="out-label" *ngIf="m.status === 'Out of Stock'">Out of Stock</div>
     </div>
   </div>
- <button class="arrow-btn" (click)="scrollLeft()">
-    ◀
-  </button>
-  <!-- RIGHT ARROW -->
-  <button class="arrow-btn" (click)="scrollRight()">
-    ▶
-  </button>
 
-  <!-- VEG TOGGLE (aligned right) -->
-  <div class="veg-toggle">
-    <label class="switch">
-      <input type="checkbox" [(ngModel)]="vegOnly" (change)="applyFilters()" />
-      <span class="slider round"></span>
-    </label>
-    <span class="veg-label">Veg</span>
+
+  <!-- EMPTY STATES -->
+  <div *ngIf="menu.length === 0" class="empty-wrapper">
+    <div class="empty-card">
+      <p class="empty-text">No menu items available.</p>
+      <button class="add-menu-btn" (click)="openAddMenu()">Add New Item</button>
+    </div>
   </div>
 
-</div>
-
-
-
-    <!-- MENU GRID -->
-    <div 
-        class="menu-grid"
-        [ngClass]="{ 'wide': cartCount === 0 }"
-        *ngIf="filteredMenu.length > 0"
-    >
-        <div class="menu-card"
-             *ngFor="let m of filteredMenu"
-             [class.out-of-stock]="m.status === 'Out of Stock'">
-
-            <img [src]="m.img" class="item-img" />
-            <div class="item-name">{{ m.name }}</div>
-            <div class="item-price">₹ {{ m.price }}</div>
-
-            <div class="add-btn" *ngIf="(quantities[m.id] || 0) === 0 && m.status === 'Available'">
-                <button class="add-button" (click)="increaseQty(m)">Add</button>
-            </div>
-
-            <div class="qty-controls"
-                 *ngIf="(quantities[m.id] || 0) > 0 && m.status === 'Available'">
-                <button class="qty-btn" (click)="decreaseQty(m)">-</button>
-                <span class="qty-value">{{ quantities[m.id] }}</span>
-                <button class="qty-btn" (click)="increaseQty(m)">+</button>
-            </div>
-
-            <div class="out-label" *ngIf="m.status === 'Out of Stock'">Out of Stock</div>
-        </div>
+  <div *ngIf="menu.length > 0 && filteredMenu.length === 0" class="empty-wrapper">
+    <div class="empty-card">
+      <p class="empty-text">Oops! No items match your search.</p>
     </div>
-
-
-    <!-- EMPTY STATES -->
-    <div *ngIf="menu.length === 0" class="empty-wrapper">
-        <div class="empty-card">
-            <p class="empty-text">No menu items available.</p>
-            <button class="add-menu-btn" (click)="openAddMenu()">Add New Item</button>
-        </div>
-    </div>
-
-    <div *ngIf="menu.length > 0 && filteredMenu.length === 0" class="empty-wrapper">
-        <div class="empty-card">
-            <p class="empty-text">Oops! No items match your search.</p>
-        </div>
-    </div>
+  </div>
 
 </div>

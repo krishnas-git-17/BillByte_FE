@@ -1,0 +1,58 @@
+<div class="checkout-box">
+
+  <div class="checkout-header">
+  <button class="back-btn" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <h2 class="section-title">Checkout</h2>
+</div>
+
+
+  <!-- 🔽 SCROLL AREA (like order-scroll) -->
+  <div class="checkout-scroll">
+    <div class="checkout-row" *ngFor="let c of cart | keyvalue">
+      <span>
+        {{ $any(c.value).name }} × {{ $any(c.value).qty }}
+      </span>
+      <span>
+        ₹ {{ $any(c.value).price * $any(c.value).qty }}
+      </span>
+    </div>
+  </div>
+
+  <!-- 🔒 FIXED BOTTOM (like order-bottom) -->
+  <div class="checkout-bottom">
+
+    <h3>Pay By</h3>
+
+    <div class="payment-row">
+      <button class="pay-btn"
+              [class.active]="paymentMode==='CASH'"
+              (click)="paymentMode='CASH'">
+        CASH
+      </button>
+
+      <button class="pay-btn"
+              [class.active]="paymentMode==='CARD'"
+              (click)="paymentMode='CARD'">
+        CARD
+      </button>
+
+      <button class="pay-btn"
+              [class.active]="paymentMode==='UPI'"
+              (click)="paymentMode='UPI'">
+        UPI
+      </button>
+    </div>
+
+    <div class="checkout-pay">
+      <span>TO PAY</span>
+      <span>₹ {{ total }}</span>
+    </div>
+
+    <button class="complete" (click)="confirmCheckout()">
+      COMPLETE ORDER
+    </button>
+
+  </div>
+</div>

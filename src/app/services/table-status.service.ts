@@ -66,6 +66,15 @@ export class TableStatusService {
     delete this.liveTimers[id];
   }
 
+  getElapsedMinutes(tableId: string): number {
+  const timers = JSON.parse(localStorage.getItem(this.TIMER_KEY) || '{}');
+
+  if (!timers[tableId]) return 0;
+
+  const diffMs = Date.now() - timers[tableId];
+  return Math.floor(diffMs / 60000); // minutes
+}
+
   // ---------- GLOBAL TICKER (EVERY 1 SEC) ----------
   private startGlobalTimer() {
     if (this.interval) return;

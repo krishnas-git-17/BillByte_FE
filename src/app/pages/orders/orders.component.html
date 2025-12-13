@@ -20,6 +20,7 @@
     <div class="menu-scroll">
       <app-menu-list 
         [quantities]="quantities"
+          [disabled]="isCheckoutMode"
         [cartCount]="cartCount"
         (quantityChange)="onQuantityChange($event)">
       </app-menu-list>
@@ -27,14 +28,15 @@
   </div>
 
   <!-- RIGHT SIDE ORDER PANEL -->
-  <div class="order-box" *ngIf="cartCount > 0">
+<div class="order-box" *ngIf="cartCount > 0 || isCheckoutMode">
+
+  <!-- ================= ORDER SCREEN ================= -->
+  <ng-container *ngIf="!isCheckoutMode">
 
     <h2 class="section-title">Order Items</h2>
 
-    <!-- SCROLLING LIST -->
     <div class="order-scroll">
       <div class="order-row" *ngFor="let c of cart | keyvalue">
-        
         <div class="order-name">{{ $any(c.value).name }}</div>
 
         <div class="qty-box">
@@ -46,56 +48,50 @@
         <div class="order-price">
           ₹ {{ $any(c.value).price * $any(c.value).qty }}
         </div>
-
       </div>
     </div>
 
-    <!-- FIXED BOTTOM -->
     <div class="order-bottom">
 
+      <!-- Order type -->
       <div class="order-type-row">
-        <button class="type-btn" [class.active]="orderType === 'Dine'" (click)="orderType = 'Dine'">Dine</button>
-        <button class="type-btn" [class.active]="orderType === 'Parcel'" (click)="orderType = 'Parcel'">Parcel</button>
-        <button class="type-btn" [class.active]="orderType === 'Delivery'" (click)="orderType = 'Delivery'">Delivery</button>
+        <button class="type-btn" [class.active]="orderType==='Dine'" (click)="orderType='Dine'">Dine</button>
+        <button class="type-btn" [class.active]="orderType==='Parcel'" (click)="orderType='Parcel'">Parcel</button>
+        <button class="type-btn" [class.active]="orderType==='Delivery'" (click)="orderType='Delivery'">Delivery</button>
       </div>
 
-      <div class="discount-row">
-        <span>Discount (%)</span>
-        <input type="number" class="discount-input" [(ngModel)]="discountPercent" (input)="calculateTotals()" min="0"
-          max="100" placeholder="0" />
-      </div>
-
+      <!-- Bill -->
       <div class="bill-details">
-        <div class="bill-line">
-          <span>Item Total</span><span>₹ {{ subtotal }}</span>
-        </div>
-
-        <div class="bill-line">
-          <span>Tax (5%)</span><span>₹ {{ tax }}</span>
-        </div>
-
+        <div class="bill-line"><span>Item Total</span><span>₹ {{ subtotal }}</span></div>
+        <div class="bill-line"><span>Tax (5%)</span><span>₹ {{ tax }}</span></div>
         <div class="divider"></div>
-
-        <div class="bill-pay">
-          <span>TO PAY</span><span>₹ {{ total }}</span>
-        </div>
+        <div class="bill-pay"><span>TO PAY</span><span>₹ {{ total }}</span></div>
       </div>
 
-     <button 
-  class="proceed-btn" 
-  *ngIf="!isCheckoutMode" 
-  (click)="onProceedClick()">
-  Proceed
-</button>
+      <!-- BUTTONS -->
+      <button class="proceed-btn" *ngIf="!isOccupied" (click)="onProceedClick()">
+        Proceed
+      </button>
 
-<button 
-  class="proceed-btn checkout" 
-  *ngIf="isCheckoutMode" 
-  (click)="checkout()">
-  Checkout
-</button>
+      <button class="proceed-btn checkout" *ngIf="isOccupied" (click)="checkout()">
+        Checkout
+      </button>
 
     </div>
-  </div>
+  </ng-container>
+
+  <!-- ================= CHECKOUT SCREEN ================= -->
+  <ng-container *ngIf="isCheckoutMode">
+    <app-checkout
+      [cart]="cart"
+      [total]="total"
+      (back)="isCheckoutMode = false"
+      (complete)="onCheckoutComplete($event)">
+    </app-checkout>
+  </ng-container>
+
+</div>
+
+
 
 </div>

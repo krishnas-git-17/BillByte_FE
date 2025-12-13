@@ -4,20 +4,17 @@
 
   <div class="card-grid">
 
-    <!-- GENERAL -->
-    <div class="setting-card">
+    <div class="setting-card" (click)="openAppPreferences()">
       <mat-icon>tune</mat-icon>
-      <h3>General</h3>
-      <p>Application settings and preferences.</p>
-      <!-- <button mat-raised-button color="primary">Open</button> -->
+      <h3>Table Settings</h3>
+      <p>Table settings and Section Settings.</p>
     </div>
 
-    <!-- MENU ITEM IMAGES -->
+
     <div class="setting-card" (click)="openMenuImages()">
       <mat-icon>image</mat-icon>
       <h3>Menu Item Images</h3>
       <p>Upload and manage menu item pictures.</p>
-      <!-- <button mat-raised-button color="accent">Manage</button> -->
     </div>
 
   </div>

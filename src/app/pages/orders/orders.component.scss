@@ -1,3 +1,11 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+}
+
+
 /* ========== HEADER ========== */
 .order-header {
   display: flex;
@@ -51,6 +59,7 @@
   display: flex;
   gap: 10px;
   height: calc(100vh - 150px);
+  align-items: stretch;
 }
 
 .orders-layout.full-width .order-box {

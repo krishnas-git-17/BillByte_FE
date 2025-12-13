@@ -1,6 +1,6 @@
 export const API_CONFIG = {
-    //  BASE_URL: "https://localhost:7117/api",
-    BASE_URL: "https://billbyte-be-4.onrender.com/api",
+    BASE_URL: "https://localhost:7117/api",
+    // BASE_URL: "https://billbyte-be-4.onrender.com/api",
 
 
     MENU: {
@@ -16,6 +16,12 @@ export const API_CONFIG = {
         GET_BY_ID: (id: string) => `/MenuItemImage/${id}`,
         UPDATE: (id: string) => `/MenuItemImage/${id}`,
         DELETE: (id: string) => `/MenuItemImage/${id}`
+    },
+    COMPLETED_ORDERS: {
+        GET_ALL: "/completed-orders",
+        CREATE: "/completed-orders",
+        GET_BY_ID: (id: string) => `/completed-orders/${id}`,
+        DELETE: (id: string) => `/completed-orders/${id}`
     }
 
 

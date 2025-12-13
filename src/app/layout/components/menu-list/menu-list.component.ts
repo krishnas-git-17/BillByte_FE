@@ -5,6 +5,7 @@ import { MenuItemsService } from '../../../services/menu-items.service';
 import { LoaderService } from '../../../services/loader.service';
 import { IMAGES } from '../../../shared/image.constants';
 import { Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 
 export interface MenuItem {
   id: number;
@@ -15,7 +16,7 @@ export interface MenuItem {
 @Component({
   selector: 'app-menu-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './menu-list.component.html',
   styleUrls: ['./menu-list.component.scss']
 })
@@ -24,7 +25,8 @@ export class MenuListComponent implements OnInit, OnChanges {
   @Input() cartCount: number = 0;
   @Input() searchText: string = "";
   @Output() quantityChange = new EventEmitter<{ item: MenuItem; qty: number }>();
-@ViewChild('catScroll') catScroll: any;
+  @Input() disabled = false;
+  @ViewChild('catScroll') catScroll: any;
 
   selectedCategory = 'All';
   vegOnly = false;
@@ -154,11 +156,17 @@ scrollRight() {
   }
 
   increaseQty(item: any) {
+    if (this.disabled) {
+    return; 
+  }
     const updatedQty = (this.quantities[item.id] || 0) + 1;
     this.quantityChange.emit({ item, qty: updatedQty });
   }
 
   decreaseQty(item: any) {
+     if (this.disabled) {
+    return; 
+  }
     const updatedQty = Math.max((this.quantities[item.id] || 0) - 1, 0);
     this.quantityChange.emit({ item, qty: updatedQty });
   }
