@@ -1,14 +1,8 @@
 [build]
   command = "npm run build"
-  publish = "dist/BillByte"
+  publish = "dist/BillByte/browser"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-  [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
