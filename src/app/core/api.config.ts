@@ -11,11 +11,11 @@ export const API_CONFIG = {
         GET_BY_ID: (id: string) => `/MenuItems/${id}`
     },
     MENU_IMAGE: {
-        GET_ALL: "/MenuItemImage",
-        CREATE: "/MenuItemImage",
-        GET_BY_ID: (id: string) => `/MenuItemImage/${id}`,
-        UPDATE: (id: string) => `/MenuItemImage/${id}`,
-        DELETE: (id: string) => `/MenuItemImage/${id}`
+        GET_ALL: "/menu-item-images",
+        CREATE: "/menu-item-images",
+        GET_BY_ID: (id: string) => `/menu-item-images/${id}`,
+        UPDATE: (id: string) => `/menu-item-images/${id}`,
+        DELETE: (id: string) => `/menu-item-images/${id}`
     },
     COMPLETED_ORDERS: {
         GET_ALL: "/completed-orders",
