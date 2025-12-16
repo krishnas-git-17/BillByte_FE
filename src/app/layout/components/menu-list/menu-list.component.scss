@@ -1,3 +1,84 @@
+/* ================= MOBILE SUPPORT ================= */
+@media (max-width: 768px) {
+
+  :host {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .order-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .header-title {
+    font-size: 18px;
+    width: 100%;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+
+  /* LAYOUT */
+  .orders-layout {
+    flex-direction: column;
+    height: calc(100dvh - 110px);
+  }
+
+  /* MENU */
+  .menu-box {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+  }
+
+  .menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-height: unset;
+  }
+
+  /* ORDER / CHECKOUT PANEL */
+  .order-box {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    width: 100%;
+    height: 70dvh;
+
+    border-radius: 16px 16px 0 0;
+    padding: 15px;
+
+    z-index: 1000;
+    box-shadow: 0 -6px 24px rgba(0,0,0,0.2);
+  }
+
+  /* SCROLL AREA */
+  .order-scroll,
+  .checkout-list {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  /* BOTTOM FIX */
+  .order-bottom,
+  .checkout-bottom {
+    margin-top: auto;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* BUTTONS */
+  .proceed-btn,
+  .complete {
+    height: 52px;
+    font-size: 17px;
+  }
+}
+
+
 :host {
   display: block;
   height: 100%;
