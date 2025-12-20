@@ -1,0 +1,49 @@
+<div class="charts-page">
+
+    <!-- TOP CHARTS -->
+    <div class="charts-grid">
+
+        <div class="chart-card">
+            <h3>Order Activity</h3>
+            <apx-chart [series]="orderActivitySeries" [chart]="barChart" [plotOptions]="barPlotOptions"
+                [dataLabels]="barDataLabels" [grid]="barGrid" [xaxis]="dayAxis">
+            </apx-chart>
+        </div>
+
+        <div class="chart-card">
+            <h3>Revenue Trend</h3>
+            <apx-chart [series]="ordersTrendSeries" [chart]="areaChart" [stroke]="areaStroke" [fill]="areaFill"
+                [grid]="areaGrid" [xaxis]="dayAxis">
+            </apx-chart>
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+        <h3>Recent Orders</h3>
+  <div class="table-scroll">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Order</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let o of orders | slice:0:5">
+                    <td>{{ o.createdDate | date:'short' }}</td>
+                    <td>#{{ o.id }}</td>
+                    <td>{{ o.items.length }}</td>
+                    <td>₹{{ o.total }}</td>
+                    <td>{{ o.paymentMode }}</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+</div>

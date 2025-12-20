@@ -1,54 +1,97 @@
 <app-loader *ngIf="loader.loading$ | async"></app-loader>
 
-<div class="summary-container">
-  <header>
-    <h2>Daily Sales Summary</h2>
-    <p>{{ todaySummary.orderCount }} Orders Processed Today</p>
-  </header>
+<div class="reports-page">
 
-  <div class="card revenue">
-    <span class="label">Total Revenue (Net)</span>
-    <div class="val">₹{{ todaySummary.totalRevenue }}</div>
-    <small>Incl. ₹{{ todaySummary.totalTax }} Tax</small>
+  <!-- DATE FILTER -->
+  <div class="filter-bar">
+    <div class="date-group">
+      <label>From</label>
+      <input type="date" [(ngModel)]="fromDate" />
+    </div>
+
+    <div class="date-group">
+      <label>To</label>
+      <input type="date" [(ngModel)]="toDate" />
+    </div>
+    <div class="date-group">
+      <label>Report Type</label>
+      <select [(ngModel)]="reportType" (change)="onReportTypeChange()">
+        <option value="summary">Summary</option>
+        <option value="charts">Visualizations</option>
+        <option value="tables">Tables</option>
+      </select>
+    </div>
+    <button class="apply-btn" (click)="applyDateFilter()">Apply</button>
   </div>
 
-  <div class="dashboard-grid">
-    
-    <div class="payment-section">
-      <h3>Payment Breakdown</h3>
-      <div class="payment-stack">
-        <div class="sub-card">
-          <span class="label">Cash</span>
-          <b>₹{{ todaySummary.cash }}</b>
-        </div>
-        <div class="sub-card">
-          <span class="label">Card</span>
-          <b>₹{{ todaySummary.card }}</b>
-        </div>
-        <div class="sub-card">
-          <span class="label">UPI</span>
-          <b>₹{{ todaySummary.upi }}</b>
-        </div>
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-label">Total Orders</span>
+      <div class="kpi-value">{{ summary.totalOrders }}</div>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">Total Revenue</span>
+      <div class="kpi-value">₹{{ summary.totalRevenue }}</div>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">Avg Order Value</span>
+      <div class="kpi-value">₹{{ summary.avgOrderValue }}</div>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">Total Tax</span>
+      <div class="kpi-value">₹{{ summary.totalTax }} ({{ taxPercent }}%)</div>
+    </div>
+  </div>
+
+  <!-- REPORT GRID -->
+  <div *ngIf="reportType === 'summary'" class="report-grid">
+
+    <div class="card">
+      <h3>Top Selling Items</h3>
+      <div *ngFor="let i of topItems" class="row">
+        <span>{{ i.name }}</span>
+        <b>{{ i.qty }} | ₹{{ i.revenue }}</b>
       </div>
     </div>
 
-    <div class="top-items-card">
-      <div class="card-header">
-        <h3>Top Selling Items</h3>
-        <span class="badge">Qty sold</span>
-      </div>
-      <div class="item-list">
-        <div class="item-row" *ngFor="let item of topItems">
-          <div class="item-info">
-            <span class="name">{{ item.name }}</span>
-            <small>{{ item.qty }} units</small>
-          </div>
-          <div class="item-stats">
-            <b>₹{{ item.revenue }}</b>
-          </div>
-        </div>
+    <div class="card">
+      <h3>Payment Split</h3>
+      <div class="row"><span>Cash</span><b>₹{{ paymentSplit.CASH }}</b></div>
+      <div class="row"><span>Card</span><b>₹{{ paymentSplit.CARD }}</b></div>
+      <div class="row"><span>UPI</span><b>₹{{ paymentSplit.UPI }}</b></div>
+    </div>
+
+    <div class="card">
+      <h3>Category Performance</h3>
+      <div *ngFor="let c of categoryStats" class="row">
+        <span>{{ c.name }}</span>
+        <b>{{ c.qty }}</b>
       </div>
     </div>
 
+    <div class="card">
+      <h3>Table Performance</h3>
+      <div *ngFor="let t of tableStats" class="row">
+        <span>{{ t.table }}</span>
+        <b>{{ t.orders }} orders</b>
+      </div>
+    </div>
+
+    <div class="card full">
+      <h3>Peak Hour</h3>
+      <b>{{ peakHour }}</b>
+    </div>
+
   </div>
+  <app-reports-charts *ngIf="reportType === 'charts'" [orders]="orders">
+  </app-reports-charts>
+
+  <!-- <app-reports-table
+  *ngIf="reportType === 'tables'"
+  [orders]="orders">
+</app-reports-table> -->
 </div>
