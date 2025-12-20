@@ -1,34 +1,55 @@
 import { Routes } from '@angular/router';
 import { UnsavedOrderGuard } from './pages/orders/unsaved-order.guard';
+import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
+
+  // ✅ LOGIN (NO LAYOUT)
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./pages/login/login.component')
+        .then(m => m.LoginComponent),
+
+  },
+
+  // ✅ APP WITH LAYOUT
   {
     path: '',
     loadComponent: () =>
-      import('./layout/layout.component').then(m => m.LayoutComponent),
+      import('./layout/layout.component')
+        .then(m => m.LayoutComponent),
+    canActivateChild: [AuthGuard],
     children: [
+
       {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'
       },
+
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./pages/dining/dining.component').then(m => m.DiningComponent),
+          import('./pages/dining/dining.component')
+            .then(m => m.DiningComponent)
       },
+
       {
         path: 'dashboard/orders/:tableId/:type',
         loadComponent: () =>
-          import('./pages/orders/orders.component').then(m => m.OrdersComponent),
-         canDeactivate: [UnsavedOrderGuard]
+          import('./pages/orders/orders.component')
+            .then(m => m.OrdersComponent),
+        canDeactivate: [UnsavedOrderGuard]
       },
+
       {
         path: 'menu-items',
         loadComponent: () =>
           import('./pages/menu-items/menu-items/menu-items.component')
             .then(m => m.MenuItemsComponent)
       },
+
       {
         path: 'reports',
         loadComponent: () =>
@@ -36,26 +57,26 @@ export const routes: Routes = [
             .then(m => m.ReportsComponent)
       },
 
-
       {
         path: 'settings',
         loadComponent: () =>
-          import('./pages/settings/settings.component').then(m => m.SettingsComponent),
-       
+          import('./pages/settings/settings.component')
+            .then(m => m.SettingsComponent)
       },
-        {
+
+      {
         path: 'settings/menu-images',
         loadComponent: () =>
-           import('./pages/menu-items/menu-images.component')
-                .then(m => m.MenuImagesComponent)
+          import('./pages/menu-items/menu-images.component')
+            .then(m => m.MenuImagesComponent)
       },
+
       {
         path: 'settings/table-preferences',
         loadComponent: () =>
-           import('./pages/TablePreference/table-preference.component')
-                .then(m => m.TablePreferenceComponent)
-      },
-
+          import('./pages/TablePreference/table-preference.component')
+            .then(m => m.TablePreferenceComponent)
+      }
     ]
   }
 ];

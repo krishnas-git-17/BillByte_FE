@@ -128,14 +128,8 @@
   color: #444;
 }
 
-/* ===== RIGHT REPORTS PANEL ===== */
-.reports-panel {
-  background: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #e5e5e5;
-  padding: 15px;
-  overflow-y: auto;
-}
+/* ===== REPORTS PANEL ===== */
+
 
 
 .create-btn {
@@ -174,6 +168,237 @@
   text-align: center;
   color: #555;
 }
+
+
+/* ===== REPORTS PANEL ===== */
+.reports-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+}
+
+/* ===== HEADER ===== */
+.reports-header {
+  display: flex;
+  align-items: center;
+}
+
+/* Title */
+.reports-title {
+  margin: 0;
+  font-size: 27px;
+  font-weight: 900;              /* 🔥 STRONGER */
+  color: #111;
+  left: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.3px;
+}
+
+/* Inline nav icon */
+.nav-icon.inline {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+
+  background: linear-gradient(45deg, #ff7a18, #ffb347);
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 3px 8px rgba(255, 122, 24, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nav-icon.inline:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 6px 14px rgba(255, 122, 24, 0.6);
+}
+
+/* ===== CARD ===== */
+
+.value-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trend {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.trend.up {
+  color: #2ecc71;   /* green */
+}
+
+.trend.down {
+  color: #e74c3c;   /* red */
+}
+
+.trend.same {
+  color: #999;
+}
+
+
+.report-card {
+  background: #ffffff;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;           /* 🔥 softer corners */
+  padding: 12px 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Labels */
+.label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;     /* 🔥 more dashboard-like */
+}
+
+/* Values */
+.value {
+  font-size: 24px;               /* 🔥 bigger */
+  font-weight: 900;
+  color: #222;
+}
+
+/* ===== HIGHLIGHT (REVENUE) ===== */
+.report-card.highlight {
+  background: linear-gradient(45deg, #ff7a18, #ffb347);
+  border: none;
+  box-shadow: 0 6px 16px rgba(255, 122, 24, 0.35);
+}
+
+.report-card.highlight .label,
+.report-card.highlight .value {
+  color: #fff;
+}
+
+/* ===== MINI CHART ===== */
+.mini-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 75px 1fr 30px;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.track {
+  height: 10px;                  /* 🔥 thicker bar */
+  background: #eaeaea;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: 12px;
+}
+
+.fill.today {
+  background: linear-gradient(90deg, #ff7a18, #ffb347);
+}
+
+.fill.yesterday {
+  background: #c7c7c7;
+}
+
+/* ===== LIST ===== */
+.report-card.list {
+  flex: 1;
+}
+
+/* List title enhancement */
+.report-card.list .label {
+  font-size: 15px;
+  font-weight: 800;
+  color: #666;
+}
+
+.report-card.list ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+}
+
+.report-card.list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 17px;
+  font-weight: 600;
+  padding: 8px 0;
+
+  border-bottom: 1px dashed #e5e5e5;
+}
+
+.report-card.list li:last-child {
+  border-bottom: none;
+}
+
+/* Quantity highlight */
+.item-qty {
+  font-weight: 900;
+  color: #ff7a18;
+}
+
+/* Header row for list */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Dropdown */
+.range-select {
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+
+  cursor: pointer;
+  outline: none;
+}
+
+.range-select:hover {
+  border-color: #ff7a18;
+}
+
+.range-select:focus {
+  border-color: #ff7a18;
+  box-shadow: 0 0 0 2px rgba(255, 122, 24, 0.2);
+}
+
 
 
 /* ===== SMALL LAPTOP SAFETY ===== */

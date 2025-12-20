@@ -52,9 +52,106 @@
 
   </div>
 
-  <!-- RIGHT REPORTS -->
-   <ng-container *ngIf="hasTables()">
-  <!-- <app-reports class="reports-panel"></app-reports> -->
-  </ng-container>
+ <!-- RIGHT REPORTS PANEL -->
+<div class="reports-panel">
+
+<!-- REPORTS HEADER -->
+<div class="reports-header">
+  <h3 class="reports-title">
+    Reports
+    <button
+      class="nav-icon inline"
+      title="Open Reports"
+      (click)="goToReports()">
+      ↗
+    </button>
+  </h3>
+</div>
+
+
+
+  <!-- TOTAL ORDERS -->
+<div class="report-card">
+  <span class="label">Total Orders</span>
+
+  <div class="value-row">
+    <span class="value">{{ totalOrders }}</span>
+
+    <span
+      class="trend"
+      [ngClass]="orderTrendDirection">
+      <span *ngIf="orderTrendDirection === 'up'">▲</span>
+      <span *ngIf="orderTrendDirection === 'down'">▼</span>
+      <span *ngIf="orderTrendDirection === 'same'">—</span>
+
+      {{ orderTrendPercent | number:'1.0-0' }}%
+    </span>
+  </div>
+</div>
+
+
+  <!-- ACTIVE TABLES -->
+  <div class="report-card">
+    <span class="label">Active Tables</span>
+    <span class="value">{{ activeTables }}</span>
+  </div>
+
+  <!-- TOTAL REVENUE -->
+  <div class="report-card highlight">
+    <span class="label">Total Revenue</span>
+    <span class="value">₹ {{ totalRevenue }}</span>
+  </div>
+
+  
+  <!-- TOP SELLING ITEMS -->
+  <!-- TOP SELLING ITEMS -->
+<div class="report-card list">
+
+  <div class="list-header">
+    <span class="label">Top Selling Items</span>
+
+    <select
+      class="range-select"
+      [(ngModel)]="topItemsRange"
+      (change)="loadTodayReports()">
+      <option value="today">Today</option>
+      <option value="week">This Week</option>
+      <option value="month">This Month</option>
+    </select>
+  </div>
+
+  <ul>
+    <li *ngFor="let item of topItems">
+      <span class="item-name">{{ item.name }}</span>
+      <span class="item-qty">{{ item.qty }}</span>
+    </li>
+  </ul>
+
+</div>
+
+<!-- ORDERS COMPARISON -->
+  <div class="report-card chart">
+    <span class="label">Orders Comparison</span>
+
+    <div class="mini-chart">
+      <div class="bar">
+        <span>Yesterday</span>
+        <div class="track">
+          <div class="fill yesterday" [style.width.%]="yesterdayPercent"></div>
+        </div>
+        <strong>{{ yesterdayOrders }}</strong>
+      </div>
+
+      <div class="bar">
+        <span>Today</span>
+        <div class="track">
+          <div class="fill today" [style.width.%]="todayPercent"></div>
+        </div>
+        <strong>{{ totalOrders }}</strong>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 </div>
