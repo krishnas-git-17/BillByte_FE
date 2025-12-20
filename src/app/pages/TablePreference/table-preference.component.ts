@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { TablePreferenceService } from '../../services/table-preferences.sevice';
+import { LoaderService } from '../../services/loader.service';
+import Swal from 'sweetalert2';
 
 interface Section {
+  id?: number;
   name: string;
   tableCount: number;
 }
@@ -15,13 +19,11 @@ interface Section {
   templateUrl: './table-preference.component.html',
   styleUrls: ['./table-preference.component.scss']
 })
-export class TablePreferenceComponent {
-
-  private readonly STORAGE_KEY = 'table_preferences';
+export class TablePreferenceComponent implements OnInit {
 
   sections: Section[] = [];
 
-  /* ADD SECTION FORM (UNCHANGED) */
+  /* ADD SECTION */
   showAddForm = false;
   sectionName = '';
   tableCount: number | null = null;
@@ -30,20 +32,27 @@ export class TablePreferenceComponent {
   editingIndex: number | null = null;
   editData: Section = { name: '', tableCount: 0 };
 
-  constructor(private location: Location) {
-    this.loadFromStorage(); // ✅ LOAD ON INIT
+  constructor(
+    private location: Location,
+    private tableService: TablePreferenceService,
+    private loader: LoaderService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadSections(); // ✅ LOAD ON OPEN
   }
 
-  /* ---------------- STORAGE ---------------- */
-  saveToStorage() {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.sections));
-  }
+  /* ---------------- LOAD ---------------- */
+  loadSections() {
+    this.loader.show();
 
-  loadFromStorage() {
-    const data = localStorage.getItem(this.STORAGE_KEY);
-    if (data) {
-      this.sections = JSON.parse(data);
-    }
+    this.tableService.getAll().subscribe({
+      next: (res: any) => {
+        this.sections = res;
+      },
+      error: () => this.loader.hide(),
+      complete: () => this.loader.hide()
+    });
   }
 
   /* NAV */
@@ -58,32 +67,59 @@ export class TablePreferenceComponent {
     this.showAddForm = true;
   }
 
-  saveSection() {
-    if (!this.sectionName || !this.tableCount) return;
+saveSection() {
+  if (!this.sectionName || !this.tableCount) return;
 
-    this.sections.push({
-      name: this.sectionName,
-      tableCount: this.tableCount
-    });
+  const payload = [{
+    name: this.sectionName,
+    tableCount: this.tableCount
+  }];
 
-    this.saveToStorage(); // ✅ SAVE
+  this.loader.show();
 
-    this.showAddForm = false;
-    this.sectionName = '';
-    this.tableCount = null;
-  }
+  this.tableService.create(payload).subscribe({
+    next: () => {
+      this.showAddForm = false;
+      this.sectionName = '';
+      this.tableCount = null;
 
-  /* INLINE EDIT */
+      this.loadSections(); // ✅ IMPORTANT (brings id)
+    },
+    error: () => {
+      this.loader.hide();
+      Swal.fire('Error', 'Failed to add section', 'error');
+    },
+    complete: () => this.loader.hide()
+  });
+}
+
+
+  /* EDIT */
   startEdit(section: Section, index: number) {
     this.editingIndex = index;
     this.editData = { ...section };
   }
 
-  saveInlineEdit(index: number) {
-    this.sections[index] = { ...this.editData };
-    this.saveToStorage(); // ✅ UPDATE SAME RECORD
-    this.cancelInlineEdit();
-  }
+ saveInlineEdit(index: number) {
+  const section = this.sections[index];
+
+  if (!section.id) return; // 🔒 guard
+
+  this.loader.show();
+
+  this.tableService.update(section.id!, this.editData).subscribe({
+    next: () => {
+      this.sections[index] = { ...section, ...this.editData };
+      this.cancelInlineEdit();
+    },
+    error: () => {
+      this.loader.hide();
+      Swal.fire('Error', 'Update failed', 'error');
+    },
+    complete: () => this.loader.hide()
+  });
+}
+
 
   cancelInlineEdit() {
     this.editingIndex = null;
@@ -91,8 +127,33 @@ export class TablePreferenceComponent {
   }
 
   /* DELETE */
-  deleteSection(index: number) {
-    this.sections.splice(index, 1);
-    this.saveToStorage(); // ✅ SAVE
-  }
+deleteSection(index: number) {
+  const section = this.sections[index];
+  if (!section.id) return;
+
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `Delete "${section.name}"?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Delete'
+  }).then(result => {
+
+    if (!result.isConfirmed) return;
+
+    this.loader.show();
+
+    this.tableService.delete(section.id!).subscribe({
+      next: () => {
+        this.sections.splice(index, 1);
+      },
+      error: () => {
+        this.loader.hide();
+        Swal.fire('Error', 'Delete failed', 'error');
+      },
+      complete: () => this.loader.hide()
+    });
+  });
+}
+
 }

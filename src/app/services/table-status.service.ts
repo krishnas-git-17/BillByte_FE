@@ -1,20 +1,27 @@
 import { Injectable, NgZone } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { API_CONFIG } from '../core/api.config';
 
 @Injectable({ providedIn: 'root' })
 export class TableStatusService {
 
-  private STATUS_KEY = 'table_status';
-  private TIMER_KEY = 'table_timers';
   private ORDER_KEY = 'table_orders';
 
-  private liveTimers: { [id: string]: string } = {};
+  private liveTimers: { [id: string]: number } = {};
+  private uiTimers: { [id: string]: string } = {};
   private interval: any;
 
-  constructor(private zone: NgZone) {
+  private occupiedTablesSubject = new BehaviorSubject<Set<string>>(new Set());
+  occupiedTables$ = this.occupiedTablesSubject.asObservable();
+
+  constructor(
+    private http: HttpClient,
+    private zone: NgZone
+  ) {
     this.startGlobalTimer();
   }
 
-  // ---------- ORDER SAVE / LOAD ----------
   saveOrder(tableId: string, data: any) {
     const all = JSON.parse(localStorage.getItem(this.ORDER_KEY) || '{}');
     all[tableId] = data;
@@ -32,60 +39,71 @@ export class TableStatusService {
     localStorage.setItem(this.ORDER_KEY, JSON.stringify(all));
   }
 
-  // ---------- STATUS (GREEN / ORANGE) ----------
-  getStatus(id: string): 'available' | 'occupied' {
-    const map = JSON.parse(localStorage.getItem(this.STATUS_KEY) || '{}');
-    return map[id] || 'available';
+  startTable(tableId: string): Observable<any> {
+    return this.http.post(
+      API_CONFIG.BASE_URL + API_CONFIG.TABLE_STATE.START(tableId),
+      {}
+    );
   }
 
-  setStatus(id: string, status: 'available' | 'occupied') {
-    const map = JSON.parse(localStorage.getItem(this.STATUS_KEY) || '{}');
-    map[id] = status;
-    localStorage.setItem(this.STATUS_KEY, JSON.stringify(map));
+  stopTable(tableId: string): Observable<any> {
+    return this.http.post(
+      API_CONFIG.BASE_URL + API_CONFIG.TABLE_STATE.STOP(tableId),
+      {}
+    );
   }
 
-  // ---------- TIMERS (START / STOP) ----------
-  private loadTimers(): { [id: string]: number } {
-    return JSON.parse(localStorage.getItem(this.TIMER_KEY) || '{}');
+  loadActiveTables(): Observable<any[]> {
+    return this.http.get<any[]>(
+      API_CONFIG.BASE_URL + API_CONFIG.TABLE_STATE.GET_ALL
+    );
   }
 
-  private saveTimers(map: { [id: string]: number }) {
-    localStorage.setItem(this.TIMER_KEY, JSON.stringify(map));
+  markOccupied(tableId: string, startTime: string) {
+    const set = new Set(this.occupiedTablesSubject.value);
+    set.add(tableId);
+    this.occupiedTablesSubject.next(set);
+
+    this.initTimer(tableId, startTime);
   }
 
-  startTimer(id: string) {
-    const timers = this.loadTimers();
-    timers[id] = Date.now();
-    this.saveTimers(timers);
+  markAvailable(tableId: string) {
+    const set = new Set(this.occupiedTablesSubject.value);
+    set.delete(tableId);
+    this.occupiedTablesSubject.next(set);
+
+    delete this.liveTimers[tableId];
+    delete this.uiTimers[tableId];
   }
 
-  stopTimer(id: string) {
-    const timers = this.loadTimers();
-    delete timers[id];
-    this.saveTimers(timers);
-    delete this.liveTimers[id];
+  isOccupied(tableId: string): boolean {
+    return this.occupiedTablesSubject.value.has(tableId);
   }
 
-  getElapsedMinutes(tableId: string): number {
-  const timers = JSON.parse(localStorage.getItem(this.TIMER_KEY) || '{}');
+  initTimer(tableId: string, startTime: string) {
+    const diffSec = Math.floor(
+      (Date.now() - new Date(startTime).getTime()) / 1000
+    );
+    this.liveTimers[tableId] = diffSec;
+    this.uiTimers[tableId] = this.format(diffSec);
+  }
 
-  if (!timers[tableId]) return 0;
+  getAllTimers() {
+    return { ...this.uiTimers };
+  }
 
-  const diffMs = Date.now() - timers[tableId];
-  return Math.floor(diffMs / 60000); // minutes
-}
+  getTimer(id: string) {
+    return this.uiTimers[id];
+  }
 
-  // ---------- GLOBAL TICKER (EVERY 1 SEC) ----------
   private startGlobalTimer() {
     if (this.interval) return;
 
     this.interval = setInterval(() => {
       this.zone.run(() => {
-        const timers = this.loadTimers();
-
-        Object.keys(timers).forEach(tableId => {
-          const diffSec = Math.floor((Date.now() - timers[tableId]) / 1000);
-          this.liveTimers[tableId] = this.format(diffSec);
+        Object.keys(this.liveTimers).forEach(id => {
+          this.liveTimers[id]++;
+          this.uiTimers[id] = this.format(this.liveTimers[id]);
         });
       });
     }, 1000);
@@ -95,14 +113,5 @@ export class TableStatusService {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
     return `${m}m ${s}s`;
-  }
-
-  // ---------- PUBLIC GETTERS ----------
-  getAllTimers() {
-    return { ...this.liveTimers };
-  }
-
-  getTimer(id: string) {
-    return this.liveTimers[id];
   }
 }

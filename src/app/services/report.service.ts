@@ -16,7 +16,6 @@ export class ReportService {
     );
   }
 
-  // ✔ Orders Yesterday
   getYesterdayOrders() {
     const d = new Date();
     d.setDate(d.getDate() - 1);
@@ -27,7 +26,6 @@ export class ReportService {
     );
   }
 
-  // ✔ Revenue Today
   getTodayRevenue() {
     return this.getTodayOrders().reduce((sum: number, o: any) => sum + o.total, 0);
   }

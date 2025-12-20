@@ -48,7 +48,7 @@ export class OrdersComponent implements AfterViewInit {
         private tableStatus: TableStatusService,
         private completedOrders: CompletedOrdersService,
         private cdr: ChangeDetectorRef,
-        private router: Router 
+        private router: Router
     ) {
         window.onbeforeunload = () => {
             if (this.cartCount > 0 && !this.isOccupied) {
@@ -62,7 +62,7 @@ export class OrdersComponent implements AfterViewInit {
         this.tableId = this.route.snapshot.params['tableId'];
         this.tableType = this.route.snapshot.params['type'];
 
-        this.isOccupied = this.tableStatus.getStatus(this.tableId) === 'occupied';
+        this.isOccupied = false;
         const saved = this.tableStatus.loadOrder(this.tableId);
         if (saved) {
             this.cart = saved.items || {};
@@ -83,7 +83,6 @@ export class OrdersComponent implements AfterViewInit {
 
             if (!confirmLeave) return;
 
-            // Clear items
             this.cart = {};
             this.quantities = {};
             this.tableStatus.clearOrder(this.tableId);
@@ -110,7 +109,7 @@ export class OrdersComponent implements AfterViewInit {
     }
 
     onQuantityChange(ev: { item: MenuItem; qty: number }) {
-        if (this.isCheckoutMode) return; 
+        if (this.isCheckoutMode) return;
         const { item, qty } = ev;
 
         if (qty === 0) {
@@ -134,7 +133,7 @@ export class OrdersComponent implements AfterViewInit {
         const updatedQty = (this.quantities[item.id] || 0) - 1;
 
         if (updatedQty <= 0) {
-            this.removeFromCart(item.id); // auto-remove item
+            this.removeFromCart(item.id);
             return;
         }
 
@@ -163,7 +162,7 @@ export class OrdersComponent implements AfterViewInit {
 
         const afterDiscount = this.subtotal - this.discountAmount;
 
-        this.tax = Math.round(afterDiscount * 0.05);   // 5% tax
+        this.tax = Math.round(afterDiscount * 0.05); 
 
         this.total = afterDiscount + this.tax;
     }
@@ -183,13 +182,23 @@ export class OrdersComponent implements AfterViewInit {
     onProceedClick() {
         if (this.isOccupied) return;
 
+        console.log('[Orders] Proceed clicked → START table', this.tableId);
+
         this.isOccupied = true;
         this.isCheckoutMode = false;
 
-        this.tableStatus.setStatus(this.tableId, 'occupied');
-        this.tableStatus.startTimer(this.tableId);
-        this.saveOrder();
+        this.tableStatus.startTable(this.tableId).subscribe({
+            next: () => {
+                // console.log('[Orders] Table STARTED in backend');
+                this.saveOrder();
+            },
+            error: err => {
+                // console.error('[Orders] Failed to start table', err);
+                this.isOccupied = false;
+            }
+        });
     }
+
 
     checkout() {
         this.isCheckoutMode = true;
@@ -200,20 +209,30 @@ export class OrdersComponent implements AfterViewInit {
         this.isOccupied = false;
         this.isCheckoutMode = false;
 
-        this.tableStatus.setStatus(this.tableId, 'available');
-        this.tableStatus.stopTimer(this.tableId);
+        this.tableStatus.stopTable(this.tableId).subscribe({
+            next: () => {
+                this.tableStatus.markAvailable(this.tableId);
 
-        this.cart = {};
-        this.quantities = {};
-        this.subtotal = this.tax = this.total = 0;
-        this.discountPercent = 0;
+                this.cart = {};
+                this.quantities = {};
+                this.subtotal = this.tax = this.total = 0;
+                this.discountPercent = 0;
 
-        if (this.menuList) this.menuList.applyFilters();
+                if (this.menuList) {
+                    this.menuList.applyFilters();
+                }
 
-        this.tableStatus.clearOrder(this.tableId);
-        this.cdr.detectChanges()
-        this.router.navigate(['/dashboard']);
+                this.tableStatus.clearOrder(this.tableId);
+                this.cdr.detectChanges();
+
+                this.router.navigate(['/dashboard']);
+            },
+            error: err => {
+                console.error('Failed to stop table', err);
+            }
+        });
     }
+
 
 
 
@@ -227,42 +246,42 @@ export class OrdersComponent implements AfterViewInit {
 
 
 
-onCheckoutComplete(ev: { paymentMode: 'CASH' | 'CARD' | 'UPI' }) {
+    onCheckoutComplete(ev: { paymentMode: 'CASH' | 'CARD' | 'UPI' }) {
 
-  const timers = JSON.parse(localStorage.getItem('table_timers') || '{}');
-  const startTime = timers[this.tableId];
-  const tableTimeMinutes = startTime
-    ? Math.floor((Date.now() - startTime) / 60000)
-    : 0;
+        const timers = JSON.parse(localStorage.getItem('table_timers') || '{}');
+        const startTime = timers[this.tableId];
+        const tableTimeMinutes = startTime
+            ? Math.floor((Date.now() - startTime) / 60000)
+            : 0;
 
-  const items = Object.values(this.cart).map((item: any) => ({
-    itemName: item.name,   // ✅ matches backend
-    price: item.price,
-    qty: item.qty
-  }));
+        const items = Object.values(this.cart).map((item: any) => ({
+            itemName: item.name, 
+            price: item.price,
+            qty: item.qty
+        }));
 
-  const orderData = {
-    tableId: this.tableId,
-    orderType: this.orderType,
-    subtotal: this.subtotal,
-    tax: this.tax,
-    discount: this.discountPercent,
-    total: this.total,
-    paymentMode: ev.paymentMode,
-    tableTimeMinutes,   // ✅ REQUIRED
-    items               // ✅ List<>
-  };
+        const orderData = {
+            tableId: this.tableId,
+            orderType: this.orderType,
+            subtotal: this.subtotal,
+            tax: this.tax,
+            discount: this.discountPercent,
+            total: this.total,
+            paymentMode: ev.paymentMode,
+            tableTimeMinutes,   
+            items              
+        };
 
-  this.completedOrders.saveOrder(orderData).subscribe({
-    next: () => {
-  console.log('API SUCCESS');
-  this.completeOrder();
-},
-error: err => {
-  console.log('API FAILED');
-}
-  });
-}
+        this.completedOrders.saveOrder(orderData).subscribe({
+            next: () => {
+                // console.log('API SUCCESS');
+                this.completeOrder();
+            },
+            error: err => {
+                // console.log('API FAILED');
+            }
+        });
+    }
 
 
 

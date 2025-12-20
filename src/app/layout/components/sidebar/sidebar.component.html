@@ -1,38 +1,20 @@
 <mat-sidenav-container class="sidenav-container">
-    <mat-sidenav mode="side" opened class="sidebar">
+  <mat-sidenav mode="side" opened class="sidebar">
 
-        <div class="logo">BillByte</div>
-        <div class="divider"></div>
+    <div class="logo">BillByte</div>
+    <div class="divider"></div>
 
-        <div class="nav-section">
+    <div class="nav-section">
+      <div
+        class="nav-item"
+        *ngFor="let item of items"
+        [routerLink]="item.route"
+        routerLinkActive="active">
 
-            <div class="nav-item" routerLink="/dashboard" routerLinkActive="active">
-                <mat-icon>dashboard</mat-icon>
-                <span>Dashboard</span>
-            </div>
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <span>{{ item.label }}</span>
+      </div>
+    </div>
 
-
-            <div class="nav-item" routerLink="/menu-items" routerLinkActive="active">
-                <mat-icon>restaurant_menu</mat-icon>
-                <span>Menu Items</span>
-            </div>
-
-
-
-            <div class="nav-item" routerLink="/billing" routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }">
-                <mat-icon>point_of_sale</mat-icon>
-                <span>Billing</span>
-            </div>
-
-            <div class="nav-item" routerLink="/settings" routerLinkActive="active">
-                <mat-icon>settings</mat-icon>
-                <span>Settings</span>
-            </div>
-
-
-
-        </div>
-
-    </mat-sidenav>
+  </mat-sidenav>
 </mat-sidenav-container>

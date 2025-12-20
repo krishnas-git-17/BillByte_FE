@@ -1,16 +1,54 @@
-<h2 class="report-title">Reports</h2>
+<app-loader *ngIf="loader.loading$ | async"></app-loader>
 
-<div class="report-card">
-  <p class="label">Total Orders Today</p>
-  <h3>{{ todayOrders }}</h3>
-</div>
+<div class="summary-container">
+  <header>
+    <h2>Daily Sales Summary</h2>
+    <p>{{ todaySummary.orderCount }} Orders Processed Today</p>
+  </header>
 
-<div class="report-card">
-  <p class="label">Revenue Today</p>
-  <h3>₹ {{ totalRevenue }}</h3>
-</div>
+  <div class="card revenue">
+    <span class="label">Total Revenue (Net)</span>
+    <div class="val">₹{{ todaySummary.totalRevenue }}</div>
+    <small>Incl. ₹{{ todaySummary.totalTax }} Tax</small>
+  </div>
 
-<div class="report-card">
-  <p class="label">Active Tables</p>
-  <h3>{{ activeTables }}</h3>
+  <div class="dashboard-grid">
+    
+    <div class="payment-section">
+      <h3>Payment Breakdown</h3>
+      <div class="payment-stack">
+        <div class="sub-card">
+          <span class="label">Cash</span>
+          <b>₹{{ todaySummary.cash }}</b>
+        </div>
+        <div class="sub-card">
+          <span class="label">Card</span>
+          <b>₹{{ todaySummary.card }}</b>
+        </div>
+        <div class="sub-card">
+          <span class="label">UPI</span>
+          <b>₹{{ todaySummary.upi }}</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="top-items-card">
+      <div class="card-header">
+        <h3>Top Selling Items</h3>
+        <span class="badge">Qty sold</span>
+      </div>
+      <div class="item-list">
+        <div class="item-row" *ngFor="let item of topItems">
+          <div class="item-info">
+            <span class="name">{{ item.name }}</span>
+            <small>{{ item.qty }} units</small>
+          </div>
+          <div class="item-stats">
+            <b>₹{{ item.revenue }}</b>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>

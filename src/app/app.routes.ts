@@ -29,6 +29,13 @@ export const routes: Routes = [
           import('./pages/menu-items/menu-items/menu-items.component')
             .then(m => m.MenuItemsComponent)
       },
+      {
+        path: 'reports',
+        loadComponent: () =>
+          import('./pages/reports/reports.component')
+            .then(m => m.ReportsComponent)
+      },
+
 
       {
         path: 'settings',

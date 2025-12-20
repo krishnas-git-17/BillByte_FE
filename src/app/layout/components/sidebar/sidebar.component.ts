@@ -1,43 +1,31 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon';
+import { SidebarService } from '../../../services/sidebar.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [
+    CommonModule,
+    RouterModule,
     MatSidenavModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule,
-    RouterModule
+    MatIconModule
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
 
-  constructor(private router: Router) {}
+  items: any[] = [];
 
-  goToDashboard() {
-    this.router.navigate(['/dashboard']);
-  }
+  constructor(private sidebarService: SidebarService) {}
 
- goToMenuItems() {
-  this.router.navigate(['/menu-items']);
-}
-
-
-  goToBilling() {
-    this.router.navigate(['/billing']);
-  }
-
-  goToSettings() {
-    this.router.navigate(['/settings']);
+  ngOnInit(): void {
+    this.sidebarService.getSidebarItems().subscribe(res => {
+      this.items = res;
+    });
   }
 }

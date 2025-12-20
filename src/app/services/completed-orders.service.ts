@@ -14,6 +14,7 @@ export class CompletedOrdersService {
   }
 
   getAll() {
-    return this.http.get(API_CONFIG.BASE_URL + API_CONFIG.COMPLETED_ORDERS.GET_ALL);
-  }
+  return this.http.get<any[]>(API_CONFIG.BASE_URL + API_CONFIG.COMPLETED_ORDERS.GET_ALL);
+}
+
 }

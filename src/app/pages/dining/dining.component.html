@@ -3,37 +3,58 @@
   <!-- LEFT TABLES -->
   <div class="tables-section">
 
-    <div
-      class="zone-box"
-      *ngFor="let section of tablesBySection"
-      [class.full-height]="tablesBySection.length === 1">
+     <div class="empty-state" *ngIf="!hasTables()">
+    <p>No tables found.</p>
+    <p>Please create sections and tables.</p>
 
-      <h2 class="zone-title">{{ section.name }}</h2>
+<button class="create-btn" (click)="goToSettings()">
+      Create Sections & Tables
+    </button>
+  </div>
+<div class="zone-nav" *ngIf="tablesBySection.length > 2">
+  <button (click)="prevPage()" [disabled]="currentPage === 0">←</button>
+  <span>{{ currentPage + 1 }} / {{ totalPages }}</span>
+  <button (click)="nextPage()" [disabled]="currentPage === totalPages - 1">→</button>
+</div>
 
-      <div class="table-scroll">
-        <div class="table-grid">
+    <ng-container *ngIf="hasTables()">
 
-          <div class="table-card"
-               *ngFor="let t of section.tables"
-               (click)="openOrders(t, section.name)"
-               [class.occupied]="isOccupied(t)">
+  <div
+    class="zone-box"
+    *ngFor="let section of pagedSections"
+    [class.full-height]="pagedSections.length === 1">
 
-            {{ getDisplayName(t) }}
+    <h2 class="zone-title">{{ section.name }}</h2>
 
-            <div class="timer" *ngIf="getTimer(t)">
-              ⏱ {{ getTimer(t) }}
-            </div>
+    <div class="table-scroll">
+      <div class="table-grid">
 
+        <div class="table-card"
+             *ngFor="let t of section.tables"
+             (click)="openOrders(t, section.name)"
+             [class.occupied]="isOccupied(t)">
+
+          {{ getDisplayName(t) }}
+
+          <div class="timer" *ngIf="getTimer(t)">
+            ⏱ {{ getTimer(t) }}
           </div>
 
         </div>
-      </div>
 
+      </div>
     </div>
 
   </div>
 
+</ng-container>
+
+
+  </div>
+
   <!-- RIGHT REPORTS -->
-  <app-reports class="reports-panel"></app-reports>
+   <ng-container *ngIf="hasTables()">
+  <!-- <app-reports class="reports-panel"></app-reports> -->
+  </ng-container>
 
 </div>
