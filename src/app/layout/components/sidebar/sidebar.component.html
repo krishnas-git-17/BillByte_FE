@@ -5,15 +5,28 @@
     <div class="divider"></div>
 
     <div class="nav-section">
-      <div
-        class="nav-item"
-        *ngFor="let item of items"
-        [routerLink]="item.route"
-        routerLinkActive="active">
 
-        <mat-icon>{{ item.icon }}</mat-icon>
-        <span>{{ item.label }}</span>
-      </div>
+      <!-- 🔹 SKELETON MENU -->
+      <ng-container *ngIf="loading">
+        <div class="nav-item skeleton-item" *ngFor="let i of [1,2,3,4,5]">
+          <div class="skeleton skeleton-icon"></div>
+          <div class="skeleton skeleton-text"></div>
+        </div>
+      </ng-container>
+
+      <!-- 🔹 REAL MENU -->
+      <ng-container *ngIf="!loading">
+        <div
+          class="nav-item"
+          *ngFor="let item of items"
+          [routerLink]="item.route"
+          routerLinkActive="active">
+
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
+        </div>
+      </ng-container>
+
     </div>
 
   </mat-sidenav>

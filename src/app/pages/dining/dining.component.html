@@ -3,155 +3,208 @@
   <!-- LEFT TABLES -->
   <div class="tables-section">
 
-     <div class="empty-state" *ngIf="!hasTables()">
-    <p>No tables found.</p>
-    <p>Please create sections and tables.</p>
+    <div class="empty-state" *ngIf="!loadingTables && !hasTables()">
+      <p>No tables found.</p>
+      <p>Please create sections and tables.</p>
 
-<button class="create-btn" (click)="goToSettings()">
-      Create Sections & Tables
-    </button>
-  </div>
-<div class="zone-nav" *ngIf="tablesBySection.length > 2">
-  <button (click)="prevPage()" [disabled]="currentPage === 0">←</button>
-  <span>{{ currentPage + 1 }} / {{ totalPages }}</span>
-  <button (click)="nextPage()" [disabled]="currentPage === totalPages - 1">→</button>
-</div>
+      <button class="create-btn" (click)="goToSettings()">
+        Create Sections & Tables
+      </button>
+    </div>
+    <div class="zone-nav" *ngIf="tablesBySection.length > 2">
+      <button (click)="prevPage()" [disabled]="currentPage === 0">←</button>
+      <span>{{ currentPage + 1 }} / {{ totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages - 1">→</button>
+    </div>
 
-    <ng-container *ngIf="hasTables()">
+    <div *ngIf="loadingTables" class="zone-box">
 
-  <div
-    class="zone-box"
-    *ngFor="let section of pagedSections"
-    [class.full-height]="pagedSections.length === 1">
-
-    <h2 class="zone-title">{{ section.name }}</h2>
-
-    <div class="table-scroll">
       <div class="table-grid">
+        <div class="table-card skeleton" *ngFor="let _ of skeletonArray">
 
-        <div class="table-card"
-             *ngFor="let t of section.tables"
-             (click)="openOrders(t, section.name)"
-             [class.occupied]="isOccupied(t)">
+        </div>
+      </div>
+    </div>
+    <ng-container *ngIf="!loadingTables && hasTables()">
+      <div class="zone-box" *ngFor="let section of pagedSections" [class.full-height]="pagedSections.length === 1">
 
-          {{ getDisplayName(t) }}
+        <h2 class="zone-title">{{ section.name }}</h2>
 
-          <div class="timer" *ngIf="getTimer(t)">
-            ⏱ {{ getTimer(t) }}
+        <div class="table-scroll">
+          <div class="table-grid">
+
+            <div class="table-card" *ngFor="let t of section.tables" (click)="openOrders(t, section.name)"
+              [class.occupied]="isOccupied(t)">
+
+              {{ getDisplayName(t) }}
+
+              <div class="timer" *ngIf="getTimer(t)">
+                ⏱ {{ getTimer(t) }}
+              </div>
+
+            </div>
+
           </div>
-
         </div>
 
+      </div>
+
+    </ng-container>
+
+
+  </div>
+
+  <!-- RIGHT REPORTS PANEL -->
+
+  <!-- ================= REPORTS PANEL ================= -->
+
+  <!-- ===== SKELETON STATE ===== -->
+  <div *ngIf="loadingReports" class="reports-panel">
+
+    <!-- HEADER -->
+    <div class="reports-header">
+      <h3 class="reports-title skeleton skeleton-title"></h3>
+    </div>
+
+    <!-- TOTAL ORDERS -->
+    <div class="report-card">
+      <span class="label skeleton skeleton-label"></span>
+      <div class="value-row">
+        <span class="value skeleton skeleton-value"></span>
+        <span class="trend skeleton skeleton-trend"></span>
+      </div>
+    </div>
+
+    <!-- ACTIVE TABLES -->
+    <div class="report-card">
+      <span class="label skeleton skeleton-label"></span>
+      <span class="value skeleton skeleton-value"></span>
+    </div>
+
+    <!-- TOTAL REVENUE -->
+    <div class="report-card highlight">
+      <span class="label skeleton skeleton-label"></span>
+      <span class="value skeleton skeleton-value"></span>
+    </div>
+
+    <!-- TOP SELLING ITEMS -->
+    <div class="report-card list">
+      <div class="list-header">
+        <span class="label skeleton skeleton-label"></span>
+        <div class="skeleton skeleton-dropdown"></div>
+      </div>
+
+      <ul>
+        <li *ngFor="let i of [1,2,3,4,5]">
+          <span class="skeleton skeleton-item-name"></span>
+          <span class="skeleton skeleton-item-qty"></span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- ORDERS COMPARISON -->
+    <div class="report-card chart">
+      <span class="label skeleton skeleton-label"></span>
+
+      <div class="mini-chart">
+        <div class="bar">
+          <span class="skeleton skeleton-bar-label"></span>
+          <div class="track skeleton"></div>
+          <span class="skeleton skeleton-bar-value"></span>
+        </div>
+
+        <div class="bar">
+          <span class="skeleton skeleton-bar-label"></span>
+          <div class="track skeleton"></div>
+          <span class="skeleton skeleton-bar-value"></span>
+        </div>
       </div>
     </div>
 
   </div>
 
-</ng-container>
+  <!-- ===== REAL DATA STATE ===== -->
+  <div *ngIf="!loadingReports" class="reports-panel">
 
+    <!-- REPORTS HEADER -->
+    <div class="reports-header">
+      <h3 class="reports-title">
+        Reports
+        <button class="nav-icon inline" title="Open Reports" (click)="goToReports()">
+          ↗
+        </button>
+      </h3>
+    </div>
 
-  </div>
+    <!-- TOTAL ORDERS -->
+    <div class="report-card">
+      <span class="label">Total Orders</span>
 
- <!-- RIGHT REPORTS PANEL -->
-<div class="reports-panel">
+      <div class="value-row">
+        <span class="value">{{ totalOrders }}</span>
 
-<!-- REPORTS HEADER -->
-<div class="reports-header">
-  <h3 class="reports-title">
-    Reports
-    <button
-      class="nav-icon inline"
-      title="Open Reports"
-      (click)="goToReports()">
-      ↗
-    </button>
-  </h3>
-</div>
-
-
-
-  <!-- TOTAL ORDERS -->
-<div class="report-card">
-  <span class="label">Total Orders</span>
-
-  <div class="value-row">
-    <span class="value">{{ totalOrders }}</span>
-
-    <span
-      class="trend"
-      [ngClass]="orderTrendDirection">
-      <span *ngIf="orderTrendDirection === 'up'">▲</span>
-      <span *ngIf="orderTrendDirection === 'down'">▼</span>
-      <span *ngIf="orderTrendDirection === 'same'">—</span>
-
-      {{ orderTrendPercent | number:'1.0-0' }}%
-    </span>
-  </div>
-</div>
-
-
-  <!-- ACTIVE TABLES -->
-  <div class="report-card">
-    <span class="label">Active Tables</span>
-    <span class="value">{{ activeTables }}</span>
-  </div>
-
-  <!-- TOTAL REVENUE -->
-  <div class="report-card highlight">
-    <span class="label">Total Revenue</span>
-    <span class="value">₹ {{ totalRevenue }}</span>
-  </div>
-
-  
-  <!-- TOP SELLING ITEMS -->
-  <!-- TOP SELLING ITEMS -->
-<div class="report-card list">
-
-  <div class="list-header">
-    <span class="label">Top Selling Items</span>
-
-    <select
-      class="range-select"
-      [(ngModel)]="topItemsRange"
-      (change)="loadTodayReports()">
-      <option value="today">Today</option>
-      <option value="week">This Week</option>
-      <option value="month">This Month</option>
-    </select>
-  </div>
-
-  <ul>
-    <li *ngFor="let item of topItems">
-      <span class="item-name">{{ item.name }}</span>
-      <span class="item-qty">{{ item.qty }}</span>
-    </li>
-  </ul>
-
-</div>
-
-<!-- ORDERS COMPARISON -->
-  <div class="report-card chart">
-    <span class="label">Orders Comparison</span>
-
-    <div class="mini-chart">
-      <div class="bar">
-        <span>Yesterday</span>
-        <div class="track">
-          <div class="fill yesterday" [style.width.%]="yesterdayPercent"></div>
-        </div>
-        <strong>{{ yesterdayOrders }}</strong>
-      </div>
-
-      <div class="bar">
-        <span>Today</span>
-        <div class="track">
-          <div class="fill today" [style.width.%]="todayPercent"></div>
-        </div>
-        <strong>{{ totalOrders }}</strong>
+        <span class="trend" [ngClass]="orderTrendDirection">
+          <span *ngIf="orderTrendDirection === 'up'">▲</span>
+          <span *ngIf="orderTrendDirection === 'down'">▼</span>
+          <span *ngIf="orderTrendDirection === 'same'">—</span>
+          {{ orderTrendPercent | number:'1.0-0' }}%
+        </span>
       </div>
     </div>
+
+    <!-- ACTIVE TABLES -->
+    <div class="report-card">
+      <span class="label">Active Tables</span>
+      <span class="value">{{ activeTables }}</span>
+    </div>
+
+    <!-- TOTAL REVENUE -->
+    <div class="report-card highlight">
+      <span class="label">Total Revenue</span>
+      <span class="value">₹ {{ totalRevenue }}</span>
+    </div>
+
+    <!-- TOP SELLING ITEMS -->
+    <div class="report-card list">
+      <div class="list-header">
+        <span class="label">Top Selling Items</span>
+
+        <select class="range-select" [(ngModel)]="topItemsRange" (change)="loadTodayReports()">
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+        </select>
+      </div>
+
+      <ul>
+        <li *ngFor="let item of topItems">
+          <span class="item-name">{{ item.name }}</span>
+          <span class="item-qty">{{ item.qty }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- ORDERS COMPARISON -->
+    <div class="report-card chart">
+      <span class="label">Orders Comparison</span>
+
+      <div class="mini-chart">
+        <div class="bar">
+          <span>Yesterday</span>
+          <div class="track">
+            <div class="fill yesterday" [style.width.%]="yesterdayPercent"></div>
+          </div>
+          <strong>{{ yesterdayOrders }}</strong>
+        </div>
+
+        <div class="bar">
+          <span>Today</span>
+          <div class="track">
+            <div class="fill today" [style.width.%]="todayPercent"></div>
+          </div>
+          <strong>{{ totalOrders }}</strong>
+        </div>
+      </div>
+    </div>
+
   </div>
-
-</div>
-
-</div>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, Input, OnChanges, SimpleChanges, OnInit,ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnChanges, SimpleChanges, OnInit,ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MenuItemsService } from '../../../services/menu-items.service';
@@ -33,7 +33,8 @@ export class MenuListComponent implements OnInit, OnChanges {
 
   menu: any[] = [];
   filteredMenu: any[] = [];
-
+  loadingMenu = true; 
+  skeletonMenu = Array.from({ length: 12 });
   allCategories: string[] = [];
   visibleCategories: string[] = [];
   extraCategories: string[] = [];
@@ -42,7 +43,8 @@ export class MenuListComponent implements OnInit, OnChanges {
   constructor(
     private menuService: MenuItemsService,
     private loader: LoaderService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef 
   ) { }
 
   ngOnInit() {
@@ -75,33 +77,37 @@ scrollLeft() {
 scrollRight() {
   this.catScroll.nativeElement.scrollBy({ left: 200, behavior: 'smooth' });
 }
-  loadMenuFromApi() {
-    this.loader.show();
+ loadMenuFromApi() {
+  this.loadingMenu = true;
 
-    this.menuService.getAll().subscribe({
-      next: (res: any[]) => {
-        this.menu = res.map((item, index) => ({
-          id: index + 1,
-          menuId: item.menuId,
-          name: item.name,
-          price: item.price || 0,
-          img: item.imageUrl && item.imageUrl !== "" ? item.imageUrl : IMAGES.MENU_THUMBNAIL,
-          category: item.type || 'Others',
-          veg: item.vegType === "Veg",
-          status: item.status
-        }));
+  this.menuService.getAll().subscribe({
+    next: (res: any[]) => {
+      this.menu = res.map((item, index) => ({
+        id: index + 1,
+        menuId: item.menuId,
+        name: item.name,
+        price: item.price || 0,
+        img: item.imageUrl && item.imageUrl !== ""
+          ? item.imageUrl
+          : IMAGES.MENU_THUMBNAIL,
+        category: item.type || 'Others',
+        veg: item.vegType === "Veg",
+        status: item.status
+      }));
 
-        this.buildCategoryList();
-        this.applyFilters();
-      },
-      error: () => {
-        console.error("Failed to load menu");
-      },
-      complete: () => {
-        this.loader.hide();
-      }
-    });
-  }
+      this.buildCategoryList();
+      this.applyFilters();
+      this.loadingMenu = false;
+
+      this.cdr.detectChanges(); // ✅ FORCE UI REFRESH
+    },
+    error: () => {
+      this.loadingMenu = false;
+      this.cdr.detectChanges(); // ✅
+    }
+  });
+}
+
   openAddMenu() {
     this.router.navigate(['/menu-items']);
   }

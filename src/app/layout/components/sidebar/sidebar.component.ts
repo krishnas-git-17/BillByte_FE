@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -20,12 +20,25 @@ import { SidebarService } from '../../../services/sidebar.service';
 export class SidebarComponent implements OnInit {
 
   items: any[] = [];
+  loading = true;
 
-  constructor(private sidebarService: SidebarService) {}
+  constructor(
+    private sidebarService: SidebarService,
+    private cdr: ChangeDetectorRef   // 🔴 REQUIRED (zoneless)
+  ) {}
 
   ngOnInit(): void {
-    this.sidebarService.getSidebarItems().subscribe(res => {
-      this.items = res;
+    this.sidebarService.getSidebarItems().subscribe({
+      next: res => {
+        this.items = res;
+        this.loading = false;
+        this.cdr.detectChanges(); // 🔴 IMPORTANT
+      },
+      error: err => {
+        console.error('Sidebar API error', err);
+        this.loading = false;
+        this.cdr.detectChanges(); // 🔴 IMPORTANT
+      }
     });
   }
 }

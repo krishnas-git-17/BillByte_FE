@@ -1,6 +1,6 @@
 .sidenav-container {
   height: 100vh;
-   border-radius: 0 !important;
+  border-radius: 0 !important;
 }
 
 .sidebar {
@@ -9,10 +9,9 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-border-radius: 0 !important;
+  border-radius: 0 !important;
   border-right: none !important;
 }
-
 
 .logo {
   font-size: 26px;
@@ -37,17 +36,16 @@ border-radius: 0 !important;
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 14px 10px;     
-  margin: 10px 0;        
+  padding: 14px 10px;
+  margin: 10px 0;
   cursor: pointer;
   border-radius: 8px;
   transition: background 0.2s ease-in-out;
   font-family: 'Inter', sans-serif;
 }
 
-/* ACTIVE MENU ITEM */
 .nav-item.active {
-  background: #ffb97c !important;   
+  background: #ffb97c !important;
   border-left: 4px solid #ff8f2e;
 }
 
@@ -55,7 +53,6 @@ border-radius: 0 !important;
 .nav-item.active span {
   color: #ffffff !important;
 }
-
 
 .nav-item:hover {
   background: #f5f7fb;
@@ -71,4 +68,26 @@ border-radius: 0 !important;
   font-size: 15px;
   font-weight: 500;
   color: #333;
+}
+
+/* ---------- SKELETON STYLES ---------- */
+
+.skeleton-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 10px;
+  margin: 10px 0;
+}
+
+.skeleton-icon {
+  width: 22px;
+  height: 22px;
+  margin-right: 16px;
+  border-radius: 50%;
+}
+
+.skeleton-text {
+  height: 14px;
+  width: 120px;
+  border-radius: 4px;
 }

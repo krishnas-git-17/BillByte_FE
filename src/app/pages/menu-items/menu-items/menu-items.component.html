@@ -1,182 +1,224 @@
 <div class="menu-wrapper">
 
-    <!-- HEADER -->
-    <div class="header">
-        <h2>Menu Items</h2>
+  <!-- ================= HEADER ================= -->
+
+  <!-- HEADER SKELETON -->
+  <div class="header" *ngIf="loading">
+    <h2 class="skeleton skeleton-title"></h2>
+  </div>
+
+  <!-- REAL HEADER -->
+  <div class="header" *ngIf="!loading">
+    <h2>Menu Items</h2>
+  </div>
+
+  <!-- ================= ACTION SECTION ================= -->
+
+  <!-- ACTION SKELETON -->
+  <div class="action-section" *ngIf="loading">
+    <div class="button-row">
+      <div class="skeleton skeleton-btn"></div>
+      <div class="skeleton skeleton-btn"></div>
+      <div class="skeleton skeleton-btn add"></div>
     </div>
 
-    <!-- ACTION SECTION -->
-    <div class="action-section">
+    <div class="search-container">
+      <div class="skeleton skeleton-search"></div>
+    </div>
+  </div>
 
-        <div class="button-row">
+  <!-- REAL ACTION SECTION -->
+  <div class="action-section" *ngIf="!loading">
 
-            <button class="btn outline" (click)="fileInput.click()">⬇ Import</button>
-            <input type="file" #fileInput hidden (change)="importExcel($event)" accept=".xlsx,.xls" />
+    <div class="button-row">
 
+      <button class="btn outline" (click)="fileInput.click()">⬇ Import</button>
+      <input
+        type="file"
+        #fileInput
+        hidden
+        (change)="importExcel($event)"
+        accept=".xlsx,.xls" />
 
-            <div class="button-row">
+      <div class="button-row">
 
-                <button class="btn outline" (click)="toggleExportPopup()">
-                    ⬆ Export
-                </button>
+        <button class="btn outline" (click)="toggleExportPopup()">⬆ Export</button>
 
-                <!-- EXPORT POPUP -->
-                <div class="export-popup" *ngIf="showExportPopup">
-                    <div class="export-item" (click)="exportExcel()">
-                        📊 Export as Excel
-                    </div>
-                    <div class="export-item" (click)="exportPDF()">
-                        📄 Export as PDF
-                    </div>
-                </div>
-
-                <button class="btn add" (click)="showAddPopup = true">+ Add Item</button>
-
-            </div>
-            <!-- <button class="btn add" (click)="showAddPopup = true">+ Add Item</button> -->
-
+        <!-- EXPORT POPUP -->
+        <div class="export-popup" *ngIf="showExportPopup">
+          <div class="export-item" (click)="exportExcel()">📊 Export as Excel</div>
+          <div class="export-item" (click)="exportPDF()">📄 Export as PDF</div>
         </div>
 
-        <div class="search-container">
-            <span class="search-icon">🔍</span>
-            <input type="text" [(ngModel)]="searchText" (input)="onSearch()" placeholder="Search items..."
-                class="search-input" />
-            <!-- Suggestion Dropdown -->
-            <div class="suggest-box" *ngIf="searchText && filteredItems.length > 0">
-                <div class="suggest-item" *ngFor="let s of filteredItems | slice:0:5" (click)="selectSuggestion(s)">
-                    {{ s.menuId }} - {{ s.name }}
-                </div>
-            </div>
-        </div>
+        <button class="btn add" (click)="showAddPopup = true">+ Add Item</button>
 
-
-
+      </div>
     </div>
 
-    <!-- MAIN CONTENT AREA -->
-    <div class="content-area">
+    <div class="search-container">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (input)="onSearch()"
+        placeholder="Search items..."
+        class="search-input" />
 
-        <!-- EMPTY STATE -->
-        <div *ngIf="items.length === 0" class="empty-box">
-            <h3>No Menu Items Found</h3>
-            <button class="btn add" (click)="showAddPopup = true">+ Add Item</button>
+      <!-- SUGGESTIONS -->
+      <div class="suggest-box" *ngIf="searchText && filteredItems.length > 0">
+        <div
+          class="suggest-item"
+          *ngFor="let s of filteredItems | slice:0:5"
+          (click)="selectSuggestion(s)">
+          {{ s.menuId }} - {{ s.name }}
         </div>
-
-        <!-- TABLE WHEN ITEMS EXIST -->
-        <div *ngIf="items.length > 0" class="table-box">
-
-            <div class="table-box">
-
-                <div class="table-container">
-                    <table class="menu-table">
-                        <thead>
-                            <tr>
-                                <th>Menu ID</th>
-                                <th>Item Name</th>
-                                <th>Type</th>
-                                <th>Veg / Non-Veg</th>
-                                <th>Status</th>
-                                <th>Price</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr *ngFor="let item of filteredItems; let i = index; trackBy: trackByMenuId">
-
-                                <td>{{ item.menuId }}</td>
-
-                                <td>
-                                    <ng-container *ngIf="editIndex === i; else viewName">
-                                        <input class="edit-input" [(ngModel)]="tempEditData.name" />
-                                    </ng-container>
-                                    <ng-template #viewName>{{ item.name }}</ng-template>
-                                </td>
-
-                                <td>
-                                    <ng-container *ngIf="editIndex === i; else viewType">
-                                        <input class="edit-input" [(ngModel)]="tempEditData.type" />
-                                    </ng-container>
-                                    <ng-template #viewType>{{ item.type }}</ng-template>
-                                </td>
-
-                                <td>
-                                    <ng-container *ngIf="editIndex === i; else viewVeg">
-                                        <select class="edit-select" [(ngModel)]="tempEditData.vegType">
-
-                                            <option>Veg</option>
-                                            <option>Non-Veg</option>
-                                        </select>
-                                    </ng-container>
-
-                                    <ng-template #viewVeg>
-                                        <span [class.veg]="item.vegType === 'Veg'"
-                                            [class.nonveg]="item.vegType === 'Non-Veg'">
-                                            {{ item.vegType }}
-                                        </span>
-                                    </ng-template>
-                                </td>
-
-                                <td>
-                                    <ng-container *ngIf="editIndex === i; else viewStatus">
-                                        <select class="edit-select" [(ngModel)]="tempEditData.status">
-                                            <option>Available</option>
-                                            <option>Out of Stock</option>
-                                        </select>
-                                    </ng-container>
-
-                                    <ng-template #viewStatus>
-                                        <span class="status" [class.available]="item.status === 'Available'"
-                                            [class.out]="item.status === 'Out of Stock'">
-                                            {{ item.status }}
-                                        </span>
-                                    </ng-template>
-                                </td>
-
-                                <td>
-                                    <ng-container *ngIf="editIndex === i; else viewPrice">
-                                        <input class="edit-input" type="number" [(ngModel)]="tempEditData.price" />
-                                    </ng-container>
-                                    <ng-template #viewPrice>₹ {{ item.price }}</ng-template>
-                                </td>
-
-                                <!-- ACTIONS -->
-                                <td class="actions">
-
-                                    <!-- NON-EDIT MODE -->
-                                    <ng-container *ngIf="editIndex !== i">
-                                        <button class="icon-btn" (click)="enableEdit(i)">🖉</button>
-                                        <button class="icon-btn" (click)="deleteConfirm(item)">🗑️</button>
-
-                                    </ng-container>
-
-                                    <!-- EDIT MODE -->
-                                    <ng-container *ngIf="editIndex === i">
-                                        <button class="icon-btn" (click)="saveEdit(i)">✔</button>
-                                        <button class="icon-btn" (click)="cancelEdit()">✖</button>
-                                    </ng-container>
-
-                                </td>
-
-                            </tr>
-                        </tbody>
-
-                    </table>
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- POPUP -->
-        <app-menu-item-add *ngIf="showAddPopup" (close)="showAddPopup = false" (save)="saveNewItem($event)">
-        </app-menu-item-add>
-
+      </div>
     </div>
 
-    <app-snackbar 
-  [message]="snackMessage" 
-  [show]="showSnack">
-</app-snackbar>
+  </div>
+
+  <!-- ================= MAIN CONTENT ================= -->
+
+  <div class="content-area">
+
+    <!-- TABLE SKELETON -->
+    <div class="table-box" *ngIf="loading">
+      <div class="table-container">
+        <table class="menu-table">
+          <thead>
+            <tr>
+              <th *ngFor="let i of [1,2,3,4,5,6,7]">
+                <div class="skeleton skeleton-th"></div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let i of [1,2,3,4,5,6]">
+              <td *ngFor="let j of [1,2,3,4,5,6,7]">
+                <div class="skeleton skeleton-td"></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div *ngIf="!loading && items.length === 0" class="empty-box">
+      <h3>No Menu Items Found</h3>
+      <button class="btn add" (click)="showAddPopup = true">+ Add Item</button>
+    </div>
+
+    <!-- TABLE WITH DATA -->
+    <div *ngIf="!loading && items.length > 0" class="table-box">
+      <div class="table-container">
+        <table class="menu-table">
+
+          <thead>
+            <tr>
+              <th>Menu ID</th>
+              <th>Item Name</th>
+              <th>Type</th>
+              <th>Veg / Non-Veg</th>
+              <th>Status</th>
+              <th>Price</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let item of filteredItems; let i = index; trackBy: trackByMenuId">
+
+              <td>{{ item.menuId }}</td>
+
+              <td>
+                <ng-container *ngIf="editIndex === i; else viewName">
+                  <input class="edit-input" [(ngModel)]="tempEditData.name" />
+                </ng-container>
+                <ng-template #viewName>{{ item.name }}</ng-template>
+              </td>
+
+              <td>
+                <ng-container *ngIf="editIndex === i; else viewType">
+                  <input class="edit-input" [(ngModel)]="tempEditData.type" />
+                </ng-container>
+                <ng-template #viewType>{{ item.type }}</ng-template>
+              </td>
+
+              <td>
+                <ng-container *ngIf="editIndex === i; else viewVeg">
+                  <select class="edit-select" [(ngModel)]="tempEditData.vegType">
+                    <option>Veg</option>
+                    <option>Non-Veg</option>
+                  </select>
+                </ng-container>
+
+                <ng-template #viewVeg>
+                  <span
+                    [class.veg]="item.vegType === 'Veg'"
+                    [class.nonveg]="item.vegType === 'Non-Veg'">
+                    {{ item.vegType }}
+                  </span>
+                </ng-template>
+              </td>
+
+              <td>
+                <ng-container *ngIf="editIndex === i; else viewStatus">
+                  <select class="edit-select" [(ngModel)]="tempEditData.status">
+                    <option>Available</option>
+                    <option>Out of Stock</option>
+                  </select>
+                </ng-container>
+
+                <ng-template #viewStatus>
+                  <span
+                    class="status"
+                    [class.available]="item.status === 'Available'"
+                    [class.out]="item.status === 'Out of Stock'">
+                    {{ item.status }}
+                  </span>
+                </ng-template>
+              </td>
+
+              <td>
+                <ng-container *ngIf="editIndex === i; else viewPrice">
+                  <input class="edit-input" type="number" [(ngModel)]="tempEditData.price" />
+                </ng-container>
+                <ng-template #viewPrice>₹ {{ item.price }}</ng-template>
+              </td>
+
+              <td class="actions">
+                <ng-container *ngIf="editIndex !== i">
+                  <button class="icon-btn" (click)="enableEdit(i)">🖉</button>
+                  <button class="icon-btn" (click)="deleteConfirm(item)">🗑️</button>
+                </ng-container>
+
+                <ng-container *ngIf="editIndex === i">
+                  <button class="icon-btn" (click)="saveEdit(i)">✔</button>
+                  <button class="icon-btn" (click)="cancelEdit()">✖</button>
+                </ng-container>
+              </td>
+
+            </tr>
+          </tbody>
+
+        </table>
+      </div>
+    </div>
+
+    <!-- ADD POPUP -->
+   <app-menu-item-add
+  *ngIf="showAddPopup && !loading"
+  (close)="showAddPopup = false"
+  (save)="saveNewItem($event)">
+</app-menu-item-add>
+
+  </div>
+
+  <!-- SNACKBAR -->
+  <app-snackbar
+    [message]="snackMessage"
+    [show]="showSnack">
+  </app-snackbar>
 
 </div>

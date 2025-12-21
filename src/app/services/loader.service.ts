@@ -8,7 +8,7 @@ export class LoaderService {
   loading$ = this.loadingSubject.asObservable();
 
   show() {
-    this.loadingSubject.next(true);
+    // this.loadingSubject.next(true);
   }
 
   hide() {

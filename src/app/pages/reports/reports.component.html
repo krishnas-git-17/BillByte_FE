@@ -1,97 +1,151 @@
-<app-loader *ngIf="loader.loading$ | async"></app-loader>
+<!-- ================= SKELETON STATE ================= -->
+<ng-container *ngIf="loading; else reportsContent">
 
-<div class="reports-page">
+  <div class="reports-page skeleton-page">
 
-  <!-- DATE FILTER -->
-  <div class="filter-bar">
-    <div class="date-group">
-      <label>From</label>
-      <input type="date" [(ngModel)]="fromDate" />
+    <!-- FILTER BAR SKELETON -->
+    <div class="filter-bar">
+      <div class="date-group">
+        <div class="skeleton skeleton-input"></div>
+      </div>
+      <div class="date-group">
+        <div class="skeleton skeleton-input"></div>
+      </div>
+      <div class="date-group">
+        <div class="skeleton skeleton-input"></div>
+      </div>
+      <div class="skeleton skeleton-btn"></div>
     </div>
 
-    <div class="date-group">
-      <label>To</label>
-      <input type="date" [(ngModel)]="toDate" />
-    </div>
-    <div class="date-group">
-      <label>Report Type</label>
-      <select [(ngModel)]="reportType" (change)="onReportTypeChange()">
-        <option value="summary">Summary</option>
-        <option value="charts">Visualizations</option>
-        <option value="tables">Tables</option>
-      </select>
-    </div>
-    <button class="apply-btn" (click)="applyDateFilter()">Apply</button>
-  </div>
-
-  <!-- KPI CARDS -->
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <span class="kpi-label">Total Orders</span>
-      <div class="kpi-value">{{ summary.totalOrders }}</div>
-    </div>
-
-    <div class="kpi-card">
-      <span class="kpi-label">Total Revenue</span>
-      <div class="kpi-value">₹{{ summary.totalRevenue }}</div>
-    </div>
-
-    <div class="kpi-card">
-      <span class="kpi-label">Avg Order Value</span>
-      <div class="kpi-value">₹{{ summary.avgOrderValue }}</div>
-    </div>
-
-    <div class="kpi-card">
-      <span class="kpi-label">Total Tax</span>
-      <div class="kpi-value">₹{{ summary.totalTax }} ({{ taxPercent }}%)</div>
-    </div>
-  </div>
-
-  <!-- REPORT GRID -->
-  <div *ngIf="reportType === 'summary'" class="report-grid">
-
-    <div class="card">
-      <h3>Top Selling Items</h3>
-      <div *ngFor="let i of topItems" class="row">
-        <span>{{ i.name }}</span>
-        <b>{{ i.qty }} | ₹{{ i.revenue }}</b>
+    <!-- KPI SKELETON -->
+    <div class="kpi-grid">
+      <div class="kpi-card skeleton" *ngFor="let _ of [1,2,3,4]">
+        <div class="skeleton skeleton-label"></div>
+        <div class="skeleton skeleton-value"></div>
       </div>
     </div>
 
-    <div class="card">
-      <h3>Payment Split</h3>
-      <div class="row"><span>Cash</span><b>₹{{ paymentSplit.CASH }}</b></div>
-      <div class="row"><span>Card</span><b>₹{{ paymentSplit.CARD }}</b></div>
-      <div class="row"><span>UPI</span><b>₹{{ paymentSplit.UPI }}</b></div>
-    </div>
-
-    <div class="card">
-      <h3>Category Performance</h3>
-      <div *ngFor="let c of categoryStats" class="row">
-        <span>{{ c.name }}</span>
-        <b>{{ c.qty }}</b>
+    <!-- REPORT CARDS SKELETON -->
+    <div class="report-grid">
+      <div class="card skeleton" *ngFor="let _ of [1,2,3,4,5]">
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-row" *ngFor="let i of [1,2,3]"></div>
       </div>
-    </div>
-
-    <div class="card">
-      <h3>Table Performance</h3>
-      <div *ngFor="let t of tableStats" class="row">
-        <span>{{ t.table }}</span>
-        <b>{{ t.orders }} orders</b>
-      </div>
-    </div>
-
-    <div class="card full">
-      <h3>Peak Hour</h3>
-      <b>{{ peakHour }}</b>
     </div>
 
   </div>
-  <app-reports-charts *ngIf="reportType === 'charts'" [orders]="orders">
-  </app-reports-charts>
 
-  <!-- <app-reports-table
-  *ngIf="reportType === 'tables'"
-  [orders]="orders">
-</app-reports-table> -->
-</div>
+</ng-container>
+
+<!-- ================= REAL CONTENT ================= -->
+<ng-template #reportsContent>
+
+  <div class="reports-page">
+
+    <!-- DATE FILTER -->
+    <div class="filter-bar">
+      <div class="date-group">
+        <label>From</label>
+        <input type="date" [(ngModel)]="fromDate" />
+      </div>
+
+      <div class="date-group">
+        <label>To</label>
+        <input type="date" [(ngModel)]="toDate" />
+      </div>
+
+      <div class="date-group">
+        <label>Report Type</label>
+        <select [(ngModel)]="reportType" (change)="onReportTypeChange()">
+          <option value="summary">Summary</option>
+          <option value="charts">Visualizations</option>
+          <option value="tables">Tables</option>
+        </select>
+      </div>
+
+      <button class="apply-btn" (click)="applyDateFilter()">Apply</button>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-label">Total Orders</span>
+        <div class="kpi-value">{{ summary.totalOrders }}</div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Total Revenue</span>
+        <div class="kpi-value">₹{{ summary.totalRevenue }}</div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Avg Order Value</span>
+        <div class="kpi-value">₹{{ summary.avgOrderValue }}</div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Total Tax</span>
+        <div class="kpi-value">
+          ₹{{ summary.totalTax }} ({{ taxPercent }}%)
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT GRID -->
+    <div *ngIf="reportType === 'summary'" class="report-grid">
+
+      <div class="card">
+        <h3>Top Selling Items</h3>
+        <div *ngFor="let i of topItems" class="row">
+          <span>{{ i.name }}</span>
+          <b>{{ i.qty }} | ₹{{ i.revenue }}</b>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Payment Split</h3>
+        <div class="row"><span>Cash</span><b>₹{{ paymentSplit.CASH }}</b></div>
+        <div class="row"><span>Card</span><b>₹{{ paymentSplit.CARD }}</b></div>
+        <div class="row"><span>UPI</span><b>₹{{ paymentSplit.UPI }}</b></div>
+      </div>
+
+      <div class="card">
+        <h3>Category Performance</h3>
+        <div *ngFor="let c of categoryStats" class="row">
+          <span>{{ c.name }}</span>
+          <b>{{ c.qty }}</b>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Table Performance</h3>
+        <div *ngFor="let t of tableStats" class="row">
+          <span>{{ t.table }}</span>
+          <b>{{ t.orders }} orders</b>
+        </div>
+      </div>
+
+      <div class="card full">
+        <h3>Peak Hour</h3>
+        <b>{{ peakHour }}</b>
+      </div>
+
+    </div>
+
+    <!-- CHARTS -->
+    <app-reports-charts
+      *ngIf="reportType === 'charts'"
+      [orders]="orders">
+    </app-reports-charts>
+
+    <!-- TABLES (optional) -->
+    <!--
+    <app-reports-table
+      *ngIf="reportType === 'tables'"
+      [orders]="orders">
+    </app-reports-table>
+    -->
+
+  </div>
+
+</ng-template>

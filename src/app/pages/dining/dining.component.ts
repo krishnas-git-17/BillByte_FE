@@ -42,6 +42,9 @@ export class DiningComponent implements OnInit, OnDestroy {
 
   timers: { [id: string]: string } = {};
   occupiedTables = new Set<string>();
+  loadingTables = true;
+  loadingReports = true;
+  skeletonArray = Array.from({ length: 60 });
 
   private subs: Subscription[] = [];
   private timerInterval: any;
@@ -74,12 +77,22 @@ export class DiningComponent implements OnInit, OnDestroy {
     this.subs.push(sub);
   }
 
-  loadTodayReports() {
-    this.completedOrders.getAll().subscribe((orders: any[]) => {
-      this.calculateTodaySummary(orders);
-      this.cdr.detectChanges();
+ loadTodayReports() {
+    this.loadingReports = true;
+
+    this.completedOrders.getAll().subscribe({
+      next: orders => {
+        this.calculateTodaySummary(orders);
+        this.loadingReports = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loadingReports = false;
+        this.cdr.detectChanges();
+      }
     });
   }
+
 
   goToReports() {
     this.router.navigate(['/reports']);
@@ -191,8 +204,7 @@ export class DiningComponent implements OnInit, OnDestroy {
   }
 
   loadSections() {
-    this.loader.show();
-
+    this.loadingTables = true;
     this.tablePreferenceService.getAll().subscribe({
       next: (res: any[]) => {
         this.sections = res;
@@ -206,8 +218,10 @@ export class DiningComponent implements OnInit, OnDestroy {
         }));
 
         this.currentPage = 0;
+        this.loadingTables = false;
       },
       error: () => {
+        this.loadingTables = false;
         this.sections = [];
         this.tablesBySection = [];
       },
