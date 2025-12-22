@@ -2,7 +2,6 @@ export const API_CONFIG = {
     // BASE_URL: "https://localhost:7117/api",
      BASE_URL: "https://billbyte-be-4.onrender.com/api",
 
-
     MENU: {
         GET_ALL: "/MenuItems",
         CREATE: "/MenuItems",
