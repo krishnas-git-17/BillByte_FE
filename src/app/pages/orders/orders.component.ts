@@ -1,4 +1,4 @@
-import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, AfterViewInit,ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MenuListComponent, MenuItem } from '../../layout/components/menu-list/menu-list.component';
@@ -8,7 +8,6 @@ import { Location } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { CheckoutComponent } from '../../layout/components/checkout/checkout.component';
 import { CompletedOrdersService } from '../../services/completed-orders.service';
-import { ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 @Component({
     selector: 'app-orders',
@@ -21,9 +20,9 @@ import { Router } from '@angular/router';
 export class OrdersComponent implements AfterViewInit {
 
 
-    @ViewChild(MenuListComponent)
+    @ViewChild(MenuListComponent, { static: false })
     menuList!: MenuListComponent;
-
+    loadingOrders = true
     tableId = '';
     tableType = '';
     searchText: string = "";
@@ -99,17 +98,20 @@ export class OrdersComponent implements AfterViewInit {
         this.menuList.applyFilters();
     }
 
-
     ngAfterViewInit() {
-        setTimeout(() => {
-            if (this.menuList) {
-                this.menuList.quantities = { ...this.quantities };
-            }
-        });
+        if (this.menuList) {
+            this.menuList.quantities = { ...this.quantities };
+        }
+
+        this.loadingOrders = false;
+
+        this.cdr.detectChanges();
     }
+
 
     onQuantityChange(ev: { item: MenuItem; qty: number }) {
         if (this.isCheckoutMode) return;
+
         const { item, qty } = ev;
 
         if (qty === 0) {
@@ -122,6 +124,8 @@ export class OrdersComponent implements AfterViewInit {
 
         this.calculateTotals();
         this.saveOrder();
+
+        this.cdr.detectChanges(); // ✅ ADD THIS
     }
 
     increaseQty(item: any) {

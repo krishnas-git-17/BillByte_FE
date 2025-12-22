@@ -2,27 +2,34 @@
 
   <div class="category-wrapper">
 
-    <!-- LEFT ARROW -->
+    <div class="category-scroll" *ngIf="loadingMenu">
+      <div
+        class="category-item skeleton skeleton-category"
+        *ngFor="let i of [1,2,3,4,5,6]">
+      </div>
+    </div>
 
-
-    <!-- SCROLL CONTAINER -->
-    <div class="category-scroll" #catScroll>
-      <div class="category-item" *ngFor="let cat of allCategories" [class.active]="selectedCategory === cat"
-           [class.disabled]="disabled"
+    <div class="category-scroll" #catScroll *ngIf="!loadingMenu">
+      <div
+        class="category-item"
+        *ngFor="let cat of allCategories"
+        [class.active]="selectedCategory === cat"
+        [class.disabled]="disabled"
         (click)="selectCategory(cat)">
         {{ cat }}
       </div>
     </div>
-    <button class="arrow-btn" (click)="scrollLeft()">
-     ←</button>
-    <!-- RIGHT ARROW -->
-    <button class="arrow-btn" (click)="scrollRight()">
-     →</button>
 
-    <!-- VEG TOGGLE (aligned right) -->
+    <button class="arrow-btn" (click)="scrollLeft()">←</button>
+    <button class="arrow-btn" (click)="scrollRight()">→</button>
+
     <div class="veg-toggle">
       <label class="switch">
-        <input type="checkbox" [(ngModel)]="vegOnly" (change)="applyFilters()" />
+        <input
+          type="checkbox"
+          [(ngModel)]="vegOnly"
+          (change)="applyFilters()"
+          [disabled]="disabled" />
         <span class="slider round"></span>
       </label>
       <span class="veg-label">Veg</span>
@@ -31,39 +38,65 @@
   </div>
 
 
+  <div class="menu-grid" *ngIf="loadingMenu">
+    <div class="menu-card skeleton" *ngFor="let _ of skeletonMenu">
+      <div class="skeleton skeleton-img"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-price"></div>
+      <div class="skeleton skeleton-btn"></div>
+    </div>
+  </div>
 
-  <!-- MENU GRID -->
-  <div class="menu-grid" [ngClass]="{ 'wide': cartCount === 0 }" *ngIf="filteredMenu.length > 0">
-    <div class="menu-card" *ngFor="let m of filteredMenu" [class.out-of-stock]="m.status === 'Out of Stock'">
+  <div
+    class="menu-grid"
+    [ngClass]="{ 'wide': cartCount === 0 }"
+    *ngIf="!loadingMenu && filteredMenu.length > 0">
+
+    <div
+      class="menu-card"
+      *ngFor="let m of filteredMenu"
+      [class.out-of-stock]="m.status === 'Out of Stock'">
 
       <img [src]="m.img" class="item-img" />
+
       <div class="item-name">{{ m.name }}</div>
       <div class="item-price">₹ {{ m.price }}</div>
 
-      <div class="add-btn" *ngIf="(quantities[m.id] || 0) === 0 && m.status === 'Available'">
-        <button class="add-button" [disabled]="disabled" (click)="increaseQty(m)">Add</button>
+      <div
+        class="add-btn"
+        *ngIf="(quantities[m.id] || 0) === 0 && m.status === 'Available'">
+        <button
+          class="add-button"
+          [disabled]="disabled"
+          (click)="increaseQty(m)">
+          Add
+        </button>
       </div>
 
-      <div class="qty-controls" *ngIf="(quantities[m.id] || 0) > 0 && m.status === 'Available'">
-        <button class="qty-btn" [disabled]="disabled" (click)="decreaseQty(m)">-</button>
+      <div
+        class="qty-controls"
+        *ngIf="(quantities[m.id] || 0) > 0 && m.status === 'Available'">
+        <button class="qty-btn" (click)="decreaseQty(m)">-</button>
         <span class="qty-value">{{ quantities[m.id] }}</span>
         <button class="qty-btn" (click)="increaseQty(m)">+</button>
       </div>
+      <div class="out-label" *ngIf="m.status === 'Out of Stock'">
+        Out of Stock
+      </div>
 
-      <div class="out-label" *ngIf="m.status === 'Out of Stock'">Out of Stock</div>
     </div>
   </div>
-
-
-  <!-- EMPTY STATES -->
-  <div *ngIf="menu.length === 0" class="empty-wrapper">
+  <div *ngIf="!loadingMenu && menu.length === 0" class="empty-wrapper">
     <div class="empty-card">
       <p class="empty-text">No menu items available.</p>
-      <button class="add-menu-btn" (click)="openAddMenu()">Add New Item</button>
+      <button class="add-menu-btn" (click)="openAddMenu()">
+        Add New Item
+      </button>
     </div>
   </div>
-
-  <div *ngIf="menu.length > 0 && filteredMenu.length === 0" class="empty-wrapper">
+  <div
+    *ngIf="!loadingMenu && menu.length > 0 && filteredMenu.length === 0"
+    class="empty-wrapper">
     <div class="empty-card">
       <p class="empty-text">Oops! No items match your search.</p>
     </div>

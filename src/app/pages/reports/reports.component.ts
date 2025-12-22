@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CompletedOrdersService } from '../../services/completed-orders.service';
-import { LoaderService } from '../../services/loader.service';
+// import { LoaderService } from '../../services/loader.service';
 import { LoaderComponent } from '../../layout/components/loader.component';
 import { ReportsChartsComponent } from './reports-charts/reports-charts.component';
 type PaymentMode = 'CASH' | 'CARD' | 'UPI';
@@ -18,7 +18,7 @@ export class ReportsComponent implements OnInit {
 
   chartRange: 'week' | 'month' = 'week';
   reportType: 'summary' | 'charts' | 'tables' = 'summary';
-
+loading = true;
   allOrders: any[] = [];
   orders: any[] = [];
   filteredOrders: any[] = [];
@@ -49,7 +49,8 @@ export class ReportsComponent implements OnInit {
 
   constructor(
     private orderService: CompletedOrdersService,
-    public loader: LoaderService
+    // public loader: LoaderService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -69,15 +70,26 @@ export class ReportsComponent implements OnInit {
   }
 
   loadReports() {
-    this.loader.show();
-    this.orderService.getAll().subscribe({
-      next: orders => {
-        this.allOrders = orders.filter(o => o.total > 0);
-        this.applyDateFilter();
-      },
-      complete: () => this.loader.hide()
-    });
-  }
+  this.loading = true;
+  this.cdr.detectChanges(); // 👈 show skeleton immediately
+
+  this.orderService.getAll().subscribe({
+    next: orders => {
+      this.allOrders = orders.filter(o => o.total > 0);
+      this.applyDateFilter();
+      this.cdr.detectChanges(); // 👈 render data
+    },
+    complete: () => {
+    this.loading = false;
+      this.cdr.detectChanges(); // 👈 hide skeleton
+    },
+    error: () => {
+      this.loading = false;
+      this.cdr.detectChanges();
+    }
+  });
+}
+
 
   applyDateFilter() {
     const from = new Date(this.fromDate);

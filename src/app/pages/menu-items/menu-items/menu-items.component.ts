@@ -8,7 +8,6 @@ import { forkJoin } from 'rxjs';
 import autoTable from 'jspdf-autotable';
 import Swal from 'sweetalert2';
 import { MenuItemsService } from '../../../services/menu-items.service';
-import { LoaderService } from '../../../services/loader.service';
 import { SnackbarComponent } from '../../../layout/components/snackbar.component';
 import { MenuItemImageService } from '../../../services/menu-item-image.service';
 
@@ -21,8 +20,10 @@ import { MenuItemImageService } from '../../../services/menu-item-image.service'
 })
 export class MenuItemsComponent implements OnInit {
 
-    constructor(private menuService: MenuItemsService, private imageService: MenuItemImageService, private loader: LoaderService, private cdr: ChangeDetectorRef) { }
+    constructor(private menuService: MenuItemsService, private imageService: MenuItemImageService, private cdr: ChangeDetectorRef) { }
 
+    loading = true;
+    
     showSnack = false;
     snackMessage = "";
     searchText = '';
@@ -32,9 +33,11 @@ export class MenuItemsComponent implements OnInit {
     showExportPopup = false;
     editIndex: number | null = null;
     tempEditData: any = {};
-    ngOnInit(): void {
-        this.loadItems();
-    }
+  ngOnInit(): void {
+  console.log('MenuItemsComponent INIT');
+  this.loadItems();
+}
+
 
     showSnackbar(msg: string) {
         this.snackMessage = msg;
@@ -42,23 +45,29 @@ export class MenuItemsComponent implements OnInit {
 
         setTimeout(() => (this.showSnack = false), 2500);
     }
-    loadItems() {
-        this.loader.show();
+  loadItems() {
+  this.loading = true;
+  this.cdr.detectChanges(); // 👈 show skeleton immediately
 
-        this.menuService.getAll().subscribe({
-            next: (res: any) => {
-                this.items = res;
-                this.filteredItems = [...this.items];
-            },
-            error: (err) => {
-                console.error(err);
-                Swal.fire("Error", "Failed to load items", "error");
-            },
-            complete: () => {
-                this.loader.hide();
-            }
-        });
+  this.menuService.getAll().subscribe({
+    next: res => {
+      this.items = res;
+      this.filteredItems = [...res];
+      this.loading = false;
+      this.cdr.detectChanges(); // 👈 show data immediately
+    },
+    error: err => {
+      console.error(err);
+      this.loading = false;
+      this.cdr.detectChanges();
+      Swal.fire("Error", "Failed to load items", "error");
     }
+  });
+}
+
+
+
+
 
     toggleExportPopup() {
         this.showExportPopup = !this.showExportPopup;
@@ -118,7 +127,8 @@ export class MenuItemsComponent implements OnInit {
         const file = event.target.files[0];
         if (!file) return;
 
-        this.loader.show();
+        this.loading = true;
+
 
         const reader = new FileReader();
 
@@ -128,7 +138,8 @@ export class MenuItemsComponent implements OnInit {
             const excelRows: any[] = XLSX.utils.sheet_to_json(sheet);
 
             if (excelRows.length === 0) {
-                this.loader.hide();
+              this.loading = false;
+
                 Swal.fire("No Data", "Excel file is empty.", "warning");
                 return;
             }
@@ -166,7 +177,7 @@ export class MenuItemsComponent implements OnInit {
                 });
 
                 if (newItems.length === 0) {
-                    this.loader.hide();
+                    this.loading = true;
                     Swal.fire("No New Items", "All records already exist.", "info");
                     return;
                 }
@@ -175,8 +186,7 @@ export class MenuItemsComponent implements OnInit {
 
                 forkJoin(apiCalls).subscribe({
                     next: () => {
-                        this.loader.hide();
-
+                        this.loading = false;
                         let message = "Imported successfully!";
                         if (skippedItems.length > 0) {
                             message += `\nSkipped ${skippedItems.length} duplicate record(s).`;
@@ -186,7 +196,7 @@ export class MenuItemsComponent implements OnInit {
                         this.loadItems();
                     },
                     error: () => {
-                        this.loader.hide();
+                        this.loading = false;
                         Swal.fire("Error", "Failed to import records.", "error");
                     }
                 });
@@ -313,7 +323,7 @@ export class MenuItemsComponent implements OnInit {
 
 
     deleteItem(item: any) {
-        this.loader.show();
+       this.loading = true;
         this.menuService.deleteMenuItem(item.menuId).subscribe({
             next: () => {
                 this.loadItems();
@@ -322,7 +332,8 @@ export class MenuItemsComponent implements OnInit {
                 Swal.fire("Error", "Failed to delete item", "error");
             },
             complete: () => {
-                this.loader.hide();
+this.loading = false;
+
             }
         });
     }

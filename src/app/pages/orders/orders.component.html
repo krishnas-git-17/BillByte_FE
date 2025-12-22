@@ -1,97 +1,173 @@
-<div class="order-header">
+<!-- ================= HEADER ================= -->
+
+<!-- HEADER SKELETON -->
+<div class="order-header" *ngIf="loadingOrders">
+  <div class="skeleton skeleton-back"></div>
+  <div class="skeleton skeleton-title"></div>
+  <div class="skeleton skeleton-search"></div>
+</div>
+
+<!-- REAL HEADER -->
+<div class="order-header" *ngIf="!loadingOrders">
   <button class="back-btn" (click)="goBack()">
     <mat-icon>arrow_back</mat-icon>
   </button>
 
-  <h2 class="header-title">Orders - Table {{ tableId.replace('T','') }}</h2>
+  <h2 class="header-title">
+    Orders - Table {{ tableId.replace('T','') }}
+  </h2>
 
   <div class="search-container">
     <span class="search-icon">🔍</span>
-    <input type="text" class="search-input" placeholder="Search items..."
-           [(ngModel)]="searchText" (input)="filterMenu(searchText)" />
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Search items..."
+      [(ngModel)]="searchText"
+      (input)="filterMenu(searchText)" />
   </div>
 </div>
 
+<!-- ================= MAIN LAYOUT ================= -->
 
 <div class="orders-layout" [class.full-width]="cartCount === 0">
 
-  <!-- LEFT SIDE MENU -->
+  <!-- ================= LEFT MENU ================= -->
   <div class="menu-box">
     <div class="menu-scroll">
-      <app-menu-list 
+      <!-- menu-list already has skeleton internally -->
+      <app-menu-list
         [quantities]="quantities"
-          [disabled]="isCheckoutMode"
+        [disabled]="isCheckoutMode"
         [cartCount]="cartCount"
         (quantityChange)="onQuantityChange($event)">
       </app-menu-list>
     </div>
   </div>
 
-  <!-- RIGHT SIDE ORDER PANEL -->
-<div class="order-box" *ngIf="cartCount > 0 || isCheckoutMode">
+  <!-- ================= RIGHT ORDER PANEL ================= -->
 
-  <!-- ================= ORDER SCREEN ================= -->
-  <ng-container *ngIf="!isCheckoutMode">
+  <!-- ORDER PANEL SKELETON -->
+  <div class="order-box" *ngIf="loadingOrders">
 
-    <h2 class="section-title">Order Items</h2>
+    <h2 class="section-title skeleton skeleton-section-title"></h2>
 
     <div class="order-scroll">
-      <div class="order-row" *ngFor="let c of cart | keyvalue">
-        <div class="order-name">{{ $any(c.value).name }}</div>
-
-        <div class="qty-box">
-          <button class="qty-btn" (click)="decreaseQty($any(c.value))">−</button>
-          <span class="qty-value">{{ $any(c.value).qty }}</span>
-          <button class="qty-btn" (click)="increaseQty($any(c.value))">+</button>
-        </div>
-
-        <div class="order-price">
-          ₹ {{ $any(c.value).price * $any(c.value).qty }}
-        </div>
+      <div class="order-row" *ngFor="let i of [1,2,3,4]">
+        <div class="skeleton skeleton-item-name"></div>
+        <div class="skeleton skeleton-qty"></div>
+        <div class="skeleton skeleton-price"></div>
       </div>
     </div>
 
     <div class="order-bottom">
 
-      <!-- Order type -->
-      <div class="order-type-row">
-        <button class="type-btn" [class.active]="orderType==='Dine'" (click)="orderType='Dine'">Dine</button>
-        <button class="type-btn" [class.active]="orderType==='Parcel'" (click)="orderType='Parcel'">Parcel</button>
-        <button class="type-btn" [class.active]="orderType==='Delivery'" (click)="orderType='Delivery'">Delivery</button>
-      </div>
-
-      <!-- Bill -->
       <div class="bill-details">
-        <div class="bill-line"><span>Item Total</span><span>₹ {{ subtotal }}</span></div>
-        <div class="bill-line"><span>Tax (5%)</span><span>₹ {{ tax }}</span></div>
+        <div class="bill-line">
+          <span class="skeleton skeleton-bill-label"></span>
+          <span class="skeleton skeleton-bill-value"></span>
+        </div>
+        <div class="bill-line">
+          <span class="skeleton skeleton-bill-label"></span>
+          <span class="skeleton skeleton-bill-value"></span>
+        </div>
         <div class="divider"></div>
-        <div class="bill-pay"><span>TO PAY</span><span>₹ {{ total }}</span></div>
+        <div class="bill-pay">
+          <span class="skeleton skeleton-bill-label"></span>
+          <span class="skeleton skeleton-bill-value"></span>
+        </div>
       </div>
 
-      <!-- BUTTONS -->
-      <button class="proceed-btn" *ngIf="!isOccupied" (click)="onProceedClick()">
-        Proceed
-      </button>
-
-      <button class="proceed-btn checkout" *ngIf="isOccupied" (click)="checkout()">
-        Checkout
-      </button>
-
+      <div class="skeleton skeleton-btn-large"></div>
     </div>
-  </ng-container>
+  </div>
 
-  <!-- ================= CHECKOUT SCREEN ================= -->
-  <ng-container *ngIf="isCheckoutMode">
-    <app-checkout
-      [cart]="cart"
-      [total]="total"
-      (back)="isCheckoutMode = false"
-      (complete)="onCheckoutComplete($event)">
-    </app-checkout>
-  </ng-container>
+  <!-- ================= REAL ORDER PANEL ================= -->
+  <div
+    class="order-box"
+    *ngIf="!loadingOrders && (cartCount > 0 || isCheckoutMode)">
 
-</div>
+    <!-- ========== ORDER SCREEN ========== -->
+    <ng-container *ngIf="!isCheckoutMode">
 
+      <h2 class="section-title">Order Items</h2>
 
+      <div class="order-scroll">
+        <div class="order-row" *ngFor="let c of cart | keyvalue">
+          <div class="order-name">{{ $any(c.value).name }}</div>
+
+          <div class="qty-box">
+            <button class="qty-btn" (click)="decreaseQty($any(c.value))">−</button>
+            <span class="qty-value">{{ $any(c.value).qty }}</span>
+            <button class="qty-btn" (click)="increaseQty($any(c.value))">+</button>
+          </div>
+
+          <div class="order-price">
+            ₹ {{ $any(c.value).price * $any(c.value).qty }}
+          </div>
+        </div>
+      </div>
+
+      <div class="order-bottom">
+
+        <!-- ORDER TYPE -->
+        <div class="order-type-row">
+          <button class="type-btn" [class.active]="orderType==='Dine'" (click)="orderType='Dine'">
+            Dine
+          </button>
+          <button class="type-btn" [class.active]="orderType==='Parcel'" (click)="orderType='Parcel'">
+            Parcel
+          </button>
+          <button class="type-btn" [class.active]="orderType==='Delivery'" (click)="orderType='Delivery'">
+            Delivery
+          </button>
+        </div>
+
+        <!-- BILL -->
+        <div class="bill-details">
+          <div class="bill-line">
+            <span>Item Total</span>
+            <span>₹ {{ subtotal }}</span>
+          </div>
+          <div class="bill-line">
+            <span>Tax (5%)</span>
+            <span>₹ {{ tax }}</span>
+          </div>
+          <div class="divider"></div>
+          <div class="bill-pay">
+            <span>TO PAY</span>
+            <span>₹ {{ total }}</span>
+          </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <button
+          class="proceed-btn"
+          *ngIf="!isOccupied"
+          (click)="onProceedClick()">
+          Proceed
+        </button>
+
+        <button
+          class="proceed-btn checkout"
+          *ngIf="isOccupied"
+          (click)="checkout()">
+          Checkout
+        </button>
+
+      </div>
+    </ng-container>
+
+    <!-- ========== CHECKOUT SCREEN ========== -->
+    <ng-container *ngIf="isCheckoutMode">
+      <app-checkout
+        [cart]="cart"
+        [total]="total"
+        (back)="isCheckoutMode = false"
+        (complete)="onCheckoutComplete($event)">
+      </app-checkout>
+    </ng-container>
+
+  </div>
 
 </div>
