@@ -71,14 +71,14 @@ onFileSelect(event: any) {
   setTimeout(() => {
     const payload = {
       menuId: this.model.menuId,
-      name: this.model.name,
+      name: this.model.name.trim(),
       type: this.model.type,
       vegType: this.model.vegType,
-      status: this.model.status,
-      price: this.model.price,
-      imageUrl: this.model.image || null, // <-- IMPORTANT FIX
-      createdBy: "System"
+      status: this.model.status,   // ✅ FIX HERE
+      price: Number(this.model.price),
+      imageUrl: this.model.image || null
     };
+
 
     this.save.emit(payload);  // <-- sending correct shape
   }, 500);

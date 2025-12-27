@@ -1,0 +1,70 @@
+<div *ngIf="order" id="receipt">
+
+  <!-- TITLE -->
+  <div class="center title">BillByte</div>
+
+  <!-- META -->
+  <div class="meta">
+    <div>Date: {{ order.createdAt | date:'dd/MM/yy HH:mm' }}</div>
+    <div>DineIn: {{ order.tableId || '-' }}</div>
+  </div>
+
+  <div class="meta">
+    <div>Invoice No:</div>
+    <div>{{ order.invoiceNo || 'AUTO' }}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- HEADER -->
+  <div class="row header">
+    <span class="item">Item</span>
+    <span class="qty">Qty</span>
+    <span class="price">Price</span>
+    <span class="amt">Amount</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ITEMS -->
+  <div *ngFor="let i of order.items" class="row">
+    <span class="item">{{ i.itemName }}</span>
+    <span class="qty">{{ i.qty }}</span>
+    <span class="price">{{ i.price }}</span>
+    <span class="amt">{{ i.price * i.qty }}</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TOTALS -->
+  <div class="row">
+    <span class="item">Total Qty</span>
+    <span class="amt right">{{ getTotalQty(order.items) }}</span>
+  </div>
+
+  <div class="row">
+    <span class="item">Subtotal</span>
+    <span class="amt right">{{ order.subtotal }}</span>
+  </div>
+
+  <div class="row">
+    <span class="item">Tax</span>
+    <span class="amt right">{{ order.tax }}</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- GRAND TOTAL -->
+  <div class="row grand">
+    <span class="item">Grand Total</span>
+    <span class="amt right">₹ {{ order.total }}/-</span>
+  </div>
+<div class="divider"></div>
+
+<div class="center qr-section">
+  <img [src]="upiQrDataUrl" class="upi-qr" />
+  <div class="qr-text">Scan & Pay via UPI</div>
+</div>
+
+
+</div>

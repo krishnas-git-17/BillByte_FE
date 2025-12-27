@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { UnsavedOrderGuard } from './pages/orders/unsaved-order.guard';
+// import { UnsavedOrderGuard } from './pages/orders/unsaved-order.guard';
 import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -39,8 +39,15 @@ export const routes: Routes = [
         path: 'dashboard/orders/:tableId/:type',
         loadComponent: () =>
           import('./pages/orders/orders.component')
-            .then(m => m.OrdersComponent),
-        canDeactivate: [UnsavedOrderGuard]
+            .then(m => m.OrdersComponent)
+        // canDeactivate: [UnsavedOrderGuard]
+      },
+      {
+        path: 'dashboard/orders/parcel',
+        loadComponent: () =>
+          import('./pages/orders/orders.component')
+            .then(m => m.OrdersComponent)
+        // canDeactivate: [UnsavedOrderGuard]
       },
 
       {
@@ -76,6 +83,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/TablePreference/table-preference.component')
             .then(m => m.TablePreferenceComponent)
+      },
+      {
+        path: 'settings/kot-settings',
+        loadComponent: () =>
+          import('./pages/settings/kot-settings/kot-settings.component')
+            .then(m => m.KotSettingsComponent)
+      },
+      {
+        path: 'settings/take-away-settings',
+        loadComponent: () =>
+          import('./pages/settings/takeaway/take-away-settings.component')
+            .then(m => m.TakeAwaySettingsComponent)
       }
     ]
   }

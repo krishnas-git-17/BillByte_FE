@@ -1,26 +1,35 @@
 <div class="topbar">
 
-  <!-- Search box -->
-  <div class="search-box">
-    <mat-icon>search</mat-icon>
-    <input
-      type="text"
-      placeholder="Search..."
-      [(ngModel)]="searchText"
-    />
+  <!-- LEFT -->
+  <div class="actions left-actions">
+    <button
+      class="primary-btn"
+      #newOrderBtn
+      (click)="openNewOrderPopover()">
+     Take Away
+    </button>
+
+    <button class="secondary-btn" (click)="reservation()">
+      Reservation
+    </button>
+
+    <div class="bill-search">
+      <mat-icon>receipt</mat-icon>
+      <input
+        type="text"
+        placeholder="Search Bill No"
+        [(ngModel)]="billNo"
+      />
+    </div>
   </div>
 
-  <!-- Right Icons -->
-  <div class="actions">
-
+  <!-- RIGHT (pushed to end) -->
+  <div class="actions right-actions">
     <button mat-icon-button>
       <mat-icon>notifications</mat-icon>
     </button>
 
-    <!-- Profile Menu -->
-    <button
-      mat-icon-button
-      [matMenuTriggerFor]="profileMenu">
+    <button mat-icon-button [matMenuTriggerFor]="profileMenu">
       <mat-icon>account_circle</mat-icon>
     </button>
 
@@ -30,6 +39,6 @@
         <span>Logout</span>
       </button>
     </mat-menu>
-
   </div>
+
 </div>

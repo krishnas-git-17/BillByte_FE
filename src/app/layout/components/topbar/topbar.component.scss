@@ -1,49 +1,89 @@
 .topbar {
   height: 60px;
-  background: #ffffff; /* SAME AS SIDEBAR */
+  background: #ffffff;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-
   padding: 0 20px;
+}
 
-  /* Keep the bottom border only */
-//   border-bottom: 1px solid #e0e0e0;
+/* Shared actions */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Push right side to end */
+.right-actions {
+  margin-left: auto;   /* ✅ forces right alignment */
 }
 
 
-/* Page Title */
-.title {
-  font-size: 20px;
+/* LEFT side actions */
+.left-actions {
+  gap: 14px;
+}
+
+/* Primary Button */
+/* Primary – New Order (light accent) */
+.primary-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+
+  background: #fff7f0;          /* very light orange */
+  color: #ff7a18;
+
+  border: 1px solid #ffd7b8;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.primary-btn:hover {
+  background: #ffe8d6;
+  border-color: #ff7a18;
+}
+
+/* Secondary – Reservation (neutral light) */
+.secondary-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+
+  background: #f9fafb;          /* light gray */
+  color: #333;
+
+  border: 1px solid #e5e7eb;
   font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* Search box container */
-.search-box {
+.secondary-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* Bill Search */
+.bill-search {
   display: flex;
   align-items: center;
   background: #f5f5f5;
   padding: 6px 12px;
   border-radius: 8px;
-  width: 250px;
+  width: 220px;
 }
 
-.search-box mat-icon {
+.bill-search mat-icon {
   margin-right: 8px;
   color: #757575;
 }
 
-.search-box input {
+.bill-search input {
   border: none;
   outline: none;
   background: transparent;
   width: 100%;
   font-size: 14px;
-}
-
-/* Icons section */
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }

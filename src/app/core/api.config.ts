@@ -1,21 +1,22 @@
 export const API_CONFIG = {
-    // BASE_URL: "https://localhost:7117/api",
-     BASE_URL: "https://billbyte-be-4.onrender.com/api",
+    BASE_URL: "https://localhost:7117/api",
+    //  BASE_URL: "https://billbyte-be-4.onrender.com/api",
 
-    MENU: {
-        GET_ALL: "/MenuItems",
-        CREATE: "/MenuItems",
-        UPDATE: (id: string) => `/MenuItems/${id}`,
-        DELETE: (id: string) => `/MenuItems/${id}`,
-        GET_BY_ID: (id: string) => `/MenuItems/${id}`
-    },
-    MENU_IMAGE: {
-        GET_ALL: "/menu-item-images",
-        CREATE: "/menu-item-images",
-        GET_BY_ID: (id: string) => `/menu-item-images/${id}`,
-        UPDATE: (id: string) => `/menu-item-images/${id}`,
-        DELETE: (id: string) => `/menu-item-images/${id}`
-    },
+  MENU: {
+  GET_ALL: "/menu-items",
+  CREATE: "/menu-items",
+  UPDATE: (id: string) => `/menu-items/${id}`,
+  DELETE: (id: string) => `/menu-items/${id}`,
+  GET_BY_ID: (id: string) => `/menu-items/${id}`
+},
+
+  MENU_IMAGE: {
+  GET_ALL: "/menu-item-images",
+  CREATE: "/menu-item-images",
+   GET_BY_ID: (id: number) => `/menu-item-images/${id}`,
+  UPDATE: (id: number) => `/menu-item-images/${id}`,
+  DELETE: (id: number) => `/menu-item-images/${id}`
+  },
     COMPLETED_ORDERS: {
         GET_ALL: "/completed-orders",
         CREATE: "/completed-orders",
@@ -29,10 +30,38 @@ export const API_CONFIG = {
     GET_BY_ID: (id: number) => `/table-preferences/${id}`,
     DELETE: (id: number) => `/table-preferences/${id}`
   },
-   TABLE_STATE: {
-    GET_ALL: "/table-state",
-    START: (tableId: string) => `/table-state/start/${tableId}`,
-    STOP: (tableId: string) => `/table-state/stop/${tableId}`,
-    SET_STATUS: "/table-state/status"
-  }
+ TABLE_STATE: {
+  GET_ALL: "/table-state",
+
+  OCCUPIED: (tableId: string) =>
+    `/table-state/occupied/${tableId}`,
+
+  KOT: (tableId: string) =>
+    `/kot/${tableId}`,
+
+  BILLING: (tableId: string) =>
+    `/table-state/billing/${tableId}`,
+
+  RESET: (tableId: string) =>
+    `/table-state/reset/${tableId}`
+},
+
+  ACTIVE_TABLE_ITEMS: {
+    GET_BY_TABLE: (tableId: string) =>
+      `/active-table-items/${tableId}`,
+
+    ADD_ITEM: (tableId: string) =>
+      `/active-table-items/${tableId}`,
+
+    UPDATE_ITEM: (tableId: string, itemId: number) =>
+      `/active-table-items/${tableId}/${itemId}`,
+
+    DELETE_ITEM: (tableId: string, itemId: number) =>
+      `/active-table-items/${tableId}/${itemId}`,
+
+    CLEAR_TABLE: (tableId: string) =>
+      `/active-table-items/clear/${tableId}`,
+  },
+  
+
 };

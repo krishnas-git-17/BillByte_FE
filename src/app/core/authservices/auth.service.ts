@@ -23,8 +23,10 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  logout() {
-    localStorage.clear();
-  }
+ logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
+}
+
 }
 

@@ -57,7 +57,7 @@ export class MenuListComponent implements OnInit, OnChanges {
     }
 
     if (changes['quantities']) {
-      this.quantities = { ...this.quantities };
+       this.quantities = { ...this.quantities };
       this.applyFilters();
     }
   }

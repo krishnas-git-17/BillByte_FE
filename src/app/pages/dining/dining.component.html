@@ -1,66 +1,103 @@
-<div class="dining-layout">
+<div class="dining-layout" [class.reports-hidden]="!showReports">
+
 
   <!-- LEFT TABLES -->
   <div class="tables-section">
 
-    <div class="empty-state" *ngIf="!loadingTables && !hasTables()">
-      <p>No tables found.</p>
-      <p>Please create sections and tables.</p>
+    <!-- 🔒 FIXED HEADER -->
+    <div class="tables-header">
 
-      <button class="create-btn" (click)="goToSettings()">
-        Create Sections & Tables
-      </button>
-    </div>
-    <div class="zone-nav" *ngIf="tablesBySection.length > 2">
-      <button (click)="prevPage()" [disabled]="currentPage === 0">←</button>
-      <span>{{ currentPage + 1 }} / {{ totalPages }}</span>
-      <button (click)="nextPage()" [disabled]="currentPage === totalPages - 1">→</button>
-    </div>
+      <div class="header-row">
 
-    <div *ngIf="loadingTables" class="zone-box">
+        <!-- FILTER TABS -->
+        <div class="section-tabs-wrapper">
+          <div class="section-tabs">
 
-      <div class="table-grid">
-        <div class="table-card skeleton" *ngFor="let _ of skeletonArray">
+            <button class="tab" [class.active]="selectedSection === 'ALL'" (click)="selectSection('ALL')">
+              ALL
+            </button>
 
+            <button class="tab" *ngFor="let sec of sections" [class.active]="selectedSection === sec.name"
+              (click)="selectSection(sec.name)">
+              {{ sec.name }}
+            </button>
+
+
+          </div>
         </div>
-      </div>
-    </div>
-    <ng-container *ngIf="!loadingTables && hasTables()">
-      <div class="zone-box" *ngFor="let section of pagedSections" [class.full-height]="pagedSections.length === 1">
 
-        <h2 class="zone-title">{{ section.name }}</h2>
-
-        <div class="table-scroll">
-          <div class="table-grid">
-
-            <div class="table-card" *ngFor="let t of section.tables" (click)="openOrders(t, section.name)"
-              [class.occupied]="isOccupied(t)">
-
-              {{ getDisplayName(t) }}
-
-              <div class="timer" *ngIf="getTimer(t)">
-                ⏱ {{ getTimer(t) }}
-              </div>
-
+        <!-- INFO ICON -->
+        <div class="status-info">
+          ⓘ
+          <div class="status-tooltip">
+            <div class="legend-item">
+              <span class="dot available"></span> Available
             </div>
-
+            <div class="legend-item">
+              <span class="dot occupied"></span> Occupied
+            </div>
+            <div class="legend-item">
+              <span class="dot ordered"></span> Ordered
+            </div>
+            <div class="legend-item">
+              <span class="dot billing"></span> Billing
+            </div>
           </div>
         </div>
 
       </div>
 
-    </ng-container>
+    </div>
 
+    <!-- 🔽 SCROLLABLE TABLES -->
+    <div class="tables-body">
+
+      <ng-container *ngIf="!loadingTables && filteredSections.length">
+
+        <div class="zone-box" *ngFor="let section of filteredSections">
+
+          <h2 class="zone-title">
+            {{ section.name }}
+          </h2>
+
+          <div class="table-grid">
+            <div class="table-card" *ngFor="let t of section.tables" (click)="openOrders(t, section.name)"
+              [class.occupied]="getTableStatus(t) === 'occupied'" [class.ordered]="getTableStatus(t) === 'ordered'"
+              [class.billing]="getTableStatus(t) === 'billing'">
+
+              <div class="table-inner">
+                {{ getDisplayName(t) }}
+
+                <div class="timer" *ngIf="getTimer(t)">
+                  ⏱ {{ getTimer(t) }}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+
+        </div>
+
+      </ng-container>
+
+    </div>
 
   </div>
+
+
+  <!-- ===== RIGHT SIDE VERTICAL REPORTS BUTTON ===== -->
+  <button class="reports-vertical-toggle" *ngIf="!showReports" (click)="toggleReports()">
+    R<br />e<br />p<br />o<br />r<br />t<br />s
+  </button>
 
   <!-- RIGHT REPORTS PANEL -->
 
   <!-- ================= REPORTS PANEL ================= -->
 
   <!-- ===== SKELETON STATE ===== -->
-  <div *ngIf="loadingReports" class="reports-panel">
-
+  <div *ngIf="loadingReports && showReports" class="reports-panel">
     <!-- HEADER -->
     <div class="reports-header">
       <h3 class="reports-title skeleton skeleton-title"></h3>
@@ -124,7 +161,8 @@
   </div>
 
   <!-- ===== REAL DATA STATE ===== -->
-  <div *ngIf="!loadingReports" class="reports-panel">
+  <div *ngIf="!loadingReports && showReports" class="reports-panel">
+
 
     <!-- REPORTS HEADER -->
     <div class="reports-header">
@@ -134,6 +172,7 @@
           ↗
         </button>
       </h3>
+      <button class="reports-close-btn" (click)="toggleReports()">✕</button>
     </div>
 
     <!-- TOTAL ORDERS -->

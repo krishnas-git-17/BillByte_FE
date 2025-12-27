@@ -10,6 +10,8 @@ import Swal from 'sweetalert2';
 import { MenuItemsService } from '../../../services/menu-items.service';
 import { SnackbarComponent } from '../../../layout/components/snackbar.component';
 import { MenuItemImageService } from '../../../services/menu-item-image.service';
+import { NgZone } from '@angular/core';
+import { finalize } from 'rxjs';
 
 @Component({
     selector: 'app-menu-items',
@@ -20,7 +22,11 @@ import { MenuItemImageService } from '../../../services/menu-item-image.service'
 })
 export class MenuItemsComponent implements OnInit {
 
-    constructor(private menuService: MenuItemsService, private imageService: MenuItemImageService, private cdr: ChangeDetectorRef) { }
+    constructor
+    (private menuService: MenuItemsService, 
+        private imageService: MenuItemImageService,
+        private zone: NgZone,
+         private cdr: ChangeDetectorRef) { }
 
     loading = true;
     
@@ -123,90 +129,90 @@ export class MenuItemsComponent implements OnInit {
         });
     }
 
-    importExcel(event: any) {
-        const file = event.target.files[0];
-        if (!file) return;
+importExcel(event: any) {
+  const file = event.target.files[0];
+  if (!file) return;
 
-        this.loading = true;
+  this.loading = true;
 
+  const reader = new FileReader();
 
-        const reader = new FileReader();
+  reader.onload = () => {
 
-        reader.onload = () => {
-            const workbook = XLSX.read(reader.result, { type: 'binary' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const excelRows: any[] = XLSX.utils.sheet_to_json(sheet);
+    const workbook = XLSX.read(reader.result, { type: 'binary' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const excelRows: any[] = XLSX.utils.sheet_to_json(sheet);
 
-            if (excelRows.length === 0) {
-              this.loading = false;
-
-                Swal.fire("No Data", "Excel file is empty.", "warning");
-                return;
-            }
-
-            this.imageService.getAll().subscribe((imgList: any[]) => {
-
-                const newItems: any[] = [];
-                const skippedItems: string[] = [];
-
-                excelRows.forEach(row => {
-
-                    const menuId = row.MenuId || row.menuId;
-                    const name = (row.Name || row.name || "").trim();
-
-                    if (this.items.some(x => x.menuId === menuId)) {
-                        skippedItems.push(menuId);
-                        return;
-                    }
-
-                    const matchedImg = imgList.find(img =>
-                        img.itemName.toLowerCase() === name.toLowerCase()
-                    );
-
-                    newItems.push({
-                        menuId,
-                        name,
-                        type: row.Type || row.type,
-                        vegType: row.VegType || row.vegType,
-                        status: row.Status || row.status,
-                        price: row.Price || row.price,
-                        imageUrl: matchedImg ? matchedImg.itemImage : null,
-                        createdBy: "Excel Import"
-                    });
-
-                });
-
-                if (newItems.length === 0) {
-                    this.loading = true;
-                    Swal.fire("No New Items", "All records already exist.", "info");
-                    return;
-                }
-
-                const apiCalls = newItems.map(item => this.menuService.createMenuItem(item));
-
-                forkJoin(apiCalls).subscribe({
-                    next: () => {
-                        this.loading = false;
-                        let message = "Imported successfully!";
-                        if (skippedItems.length > 0) {
-                            message += `\nSkipped ${skippedItems.length} duplicate record(s).`;
-                        }
-
-                        Swal.fire("Success!", message, "success");
-                        this.loadItems();
-                    },
-                    error: () => {
-                        this.loading = false;
-                        Swal.fire("Error", "Failed to import records.", "error");
-                    }
-                });
-
-            });
-
-        };
-
-        reader.readAsBinaryString(file);
+    // ❌ EMPTY EXCEL
+    if (excelRows.length === 0) {
+      this.zone.run(() => this.loading = false);
+      Swal.fire("No Data", "Excel file is empty.", "warning");
+      return;
     }
+
+    this.imageService.getAll().subscribe(imgList => {
+
+      const newItems: any[] = [];
+      const skippedItems: string[] = [];
+
+      excelRows.forEach(row => {
+        const menuId = row.MenuId || row.menuId;
+        const name = (row.Name ?? row.name ?? '').toString().trim();
+        if (!menuId || !name) return;
+
+        if (this.items.some(x => x.menuId === menuId)) {
+          skippedItems.push(menuId);
+          return;
+        }
+
+        const matchedImg = imgList.find(img =>
+          img?.itemName?.toLowerCase() === name.toLowerCase()
+        );
+
+        newItems.push({
+          menuId,
+          name,
+          type: row.Type || '',
+          vegType: row.VegType || 'Veg',
+          status: row.Status || 'Available',
+          price: Number(row.Price || 0),
+          imageUrl: matchedImg ? matchedImg.itemImage : null
+        });
+      });
+
+     if (newItems.length === 0) {
+  this.loading = false; // ✅ STOP LOADER
+  Swal.fire("No New Items", "All records already exist.", "info");
+  return;
+}
+
+
+      const apiCalls = newItems.map(i => this.menuService.createMenuItem(i));
+
+     forkJoin(apiCalls)
+  .pipe(
+    finalize(() => {
+      this.loading = false;
+    })
+  )
+  .subscribe({
+    next: () => {
+      Swal.fire("Success!", "Imported successfully!", "success");
+      this.loadItems();
+    },
+    error: () => {
+      Swal.fire("Error", "Failed to import records.", "error");
+    }
+  });
+
+    });
+
+  };
+
+  reader.readAsBinaryString(file);
+}
+
+
 
 
 

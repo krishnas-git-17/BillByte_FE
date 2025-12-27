@@ -29,7 +29,7 @@ export class DiningComponent implements OnInit, OnDestroy {
   yesterdayOrders = 0;
   yesterdayPercent = 0;
   todayPercent = 0;
-
+  showReports = false;
   totalOrders = 0;
   totalRevenue = 0;
   activeTables = 0;
@@ -37,11 +37,13 @@ export class DiningComponent implements OnInit, OnDestroy {
 
   sections: Section[] = [];
   tablesBySection: { name: string; tables: string[] }[] = [];
-  currentPage = 0;
-  pageSize = 2;
+  // currentPage = 0;
+  // pageSize = 2;
+  selectedSection: string = 'ALL';
+  filteredSections: { name: string; tables: string[] }[] = [];
 
   timers: { [id: string]: string } = {};
-  occupiedTables = new Set<string>();
+  // occupiedTables = new Set<string>();
   loadingTables = true;
   loadingReports = true;
   skeletonArray = Array.from({ length: 60 });
@@ -60,6 +62,7 @@ export class DiningComponent implements OnInit, OnDestroy {
 
 
   ngOnInit(): void {
+    this.selectedSection = this.tableStatus.getSelectedSection();
     this.loadSections();
     this.loadActiveTables();
     this.loadTodayReports();
@@ -68,16 +71,26 @@ export class DiningComponent implements OnInit, OnDestroy {
       this.timers = this.tableStatus.getAllTimers();
     }, 1000);
 
-    const sub = this.tableStatus.occupiedTables$.subscribe(set => {
-      this.occupiedTables = new Set(set);
-      this.activeTables = set.size;
-    });
+    // const sub = this.tableStatus.occupiedTables$.subscribe(set => {
+    //   this.occupiedTables = new Set(set);
+    //   this.activeTables = set.size;
+    // });
 
 
-    this.subs.push(sub);
+    // this.subs.push(sub);
   }
 
- loadTodayReports() {
+  selectSection(section: string) {
+    this.selectedSection = section;
+    this.tableStatus.setSelectedSection(section);
+    this.applySectionFilter();
+  }
+
+  toggleReports() {
+    this.showReports = !this.showReports;
+  }
+
+  loadTodayReports() {
     this.loadingReports = true;
 
     this.completedOrders.getAll().subscribe({
@@ -182,26 +195,37 @@ export class DiningComponent implements OnInit, OnDestroy {
     return this.tablesBySection.length > 0;
   }
 
-  get pagedSections() {
-    const start = this.currentPage * this.pageSize;
-    return this.tablesBySection.slice(start, start + this.pageSize);
-  }
+  // get pagedSections() {
+  //   const start = this.currentPage * this.pageSize;
+  //   return this.tablesBySection.slice(start, start + this.pageSize);
+  // }
 
-  get totalPages(): number {
-    return Math.ceil(this.tablesBySection.length / this.pageSize);
-  }
+  // get totalPages(): number {
+  //   return Math.ceil(this.tablesBySection.length / this.pageSize);
+  // }
 
-  prevPage() {
-    if (this.currentPage > 0) this.currentPage--;
-  }
+  // prevPage() {
+  //   if (this.currentPage > 0) this.currentPage--;
+  // }
 
-  nextPage() {
-    if (this.currentPage < this.totalPages - 1) this.currentPage++;
-  }
+  // nextPage() {
+  //   if (this.currentPage < this.totalPages - 1) this.currentPage++;
+  // }
 
   goToSettings() {
     this.router.navigate(['settings/table-preferences']);
   }
+
+  applySectionFilter() {
+    if (this.selectedSection === 'ALL') {
+      this.filteredSections = this.tablesBySection;
+    } else {
+      this.filteredSections = this.tablesBySection.filter(
+        s => s.name === this.selectedSection
+      );
+    }
+  }
+
 
   loadSections() {
     this.loadingTables = true;
@@ -217,7 +241,7 @@ export class DiningComponent implements OnInit, OnDestroy {
           )
         }));
 
-        this.currentPage = 0;
+        this.applySectionFilter();
         this.loadingTables = false;
       },
       error: () => {
@@ -237,9 +261,19 @@ export class DiningComponent implements OnInit, OnDestroy {
       next: states => {
         console.log('ACTIVE TABLES:', states);
 
+        // states.forEach(s => {
+        //   this.tableStatus.markOccupied(s.tableId, s.startTime);
+        // });
+
         states.forEach(s => {
-          this.tableStatus.markOccupied(s.tableId, s.startTime);
+          this.tableStatus.setTableState(s.tableId, s.status, s.startTime);
         });
+
+        this.activeTables = states.filter(
+          s => s.status !== 'available'
+        ).length;
+
+
 
         this.timers = this.tableStatus.getAllTimers();
       },
@@ -250,9 +284,16 @@ export class DiningComponent implements OnInit, OnDestroy {
     this.subs.push(sub);
   }
 
-  isOccupied(tableId: string): boolean {
-    return this.occupiedTables.has(tableId);
+  // isOccupied(tableId: string): boolean {
+  //   return this.occupiedTables.has(tableId);
+  // }
+
+  getTableStatus(tableId: string) {
+    return this.tableStatus.getStatus(tableId);
   }
+
+
+
 
   getTimer(id: string): string {
     return this.cleanTimer(this.timers[id]);
@@ -267,8 +308,19 @@ export class DiningComponent implements OnInit, OnDestroy {
   }
 
   openOrders(table: string, section: string) {
-    this.router.navigate(['dashboard/orders', table, section]);
+
+    this.tableStatus.setOccupied(table).subscribe({
+      next: () => {
+        this.router.navigate(['dashboard/orders', table, section]);
+      },
+      error: () => {
+        alert('Failed to occupy table');
+      }
+
+    });
+
   }
+
 
   getDisplayName(id: string): string {
     return id.split('-T')[1];

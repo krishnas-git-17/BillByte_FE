@@ -19,11 +19,7 @@
 
   <div class="search-container">
     <span class="search-icon">🔍</span>
-    <input
-      type="text"
-      class="search-input"
-      placeholder="Search items..."
-      [(ngModel)]="searchText"
+    <input type="text" class="search-input" placeholder="Search items..." [(ngModel)]="searchText"
       (input)="filterMenu(searchText)" />
   </div>
 </div>
@@ -36,10 +32,7 @@
   <div class="menu-box">
     <div class="menu-scroll">
       <!-- menu-list already has skeleton internally -->
-      <app-menu-list
-        [quantities]="quantities"
-        [disabled]="isCheckoutMode"
-        [cartCount]="cartCount"
+      <app-menu-list [quantities]="quantities" [disabled]="isCheckoutMode" [cartCount]="cartCount"
         (quantityChange)="onQuantityChange($event)">
       </app-menu-list>
     </div>
@@ -83,9 +76,7 @@
   </div>
 
   <!-- ================= REAL ORDER PANEL ================= -->
-  <div
-    class="order-box"
-    *ngIf="!loadingOrders && (cartCount > 0 || isCheckoutMode)">
+  <div class="order-box" *ngIf="!loadingOrders && (cartCount > 0 || isCheckoutMode)">
 
     <!-- ========== ORDER SCREEN ========== -->
     <ng-container *ngIf="!isCheckoutMode">
@@ -140,34 +131,38 @@
           </div>
         </div>
 
-        <!-- ACTION BUTTONS -->
-        <button
-          class="proceed-btn"
-          *ngIf="!isOccupied"
-          (click)="onProceedClick()">
-          Proceed
-        </button>
+        <div class="order-actions">
 
-        <button
-          class="proceed-btn checkout"
-          *ngIf="isOccupied"
-          (click)="checkout()">
-          Checkout
-        </button>
+          <button class="btn save" (click)="saveOnly()">
+            SAVE
+          </button>
+
+          <button class="btn kot" (click)="saveAndKOT()">
+            SAVE & KOT
+          </button>
+
+
+
+          <button class="btn settle" (click)="settleOrder('CASH')">
+            SETTLE
+          </button>
+
+        </div>
+
+
 
       </div>
     </ng-container>
 
-    <!-- ========== CHECKOUT SCREEN ========== -->
+    <!-- ========== CHECKOUT SCREEN ==========
     <ng-container *ngIf="isCheckoutMode">
-      <app-checkout
-        [cart]="cart"
-        [total]="total"
-        (back)="isCheckoutMode = false"
+      <app-checkout [cart]="cart" [total]="total" (back)="isCheckoutMode = false"
         (complete)="onCheckoutComplete($event)">
       </app-checkout>
-    </ng-container>
+    </ng-container> -->
 
   </div>
 
 </div>
+<app-receipt *ngIf="receiptData" [order]="receiptData" [mode]="receiptMode" style="display:none">
+</app-receipt>
