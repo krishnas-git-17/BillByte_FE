@@ -1,0 +1,183 @@
+
+
+#receipt {
+  width: 58mm;
+  padding: 4mm 3.5mm;
+  margin: 0;
+
+  font-family: -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 9.2px;
+  line-height: 1.35;
+  box-sizing: border-box;
+}
+
+/* ================= COMMON ================= */
+
+.center {
+  text-align: center;
+}
+
+.right {
+  margin-left: auto;
+  text-align: right;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+/* ================= META ================= */
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  margin: 1px 0;
+}
+
+.meta.two-col {
+  font-weight: 500;
+}
+
+/* KOT Highlight */
+.kot-row {
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.kot-no {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* ================= DIVIDERS ================= */
+
+.divider {
+  height: 1px;
+  background-color: #000;
+  margin: 4px 0;
+}
+
+.item-divider {
+  height: 1px;
+  background-color: #000;
+  opacity: 0.35;
+  margin: 3px 0;
+}
+
+/* ================= ROW ================= */
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  margin: 2px 0;
+}
+
+/* ================= HEADER ================= */
+
+.header {
+  font-weight: 600;
+  font-size: 9.5px;
+}
+
+/* ================= KOT MODE ================= */
+
+.item {
+  flex: 0 0 52%;
+  word-break: break-word;
+}
+
+.note {
+  flex: 0 0 30%;
+  font-size: 8.6px;
+  line-height: 1.25;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.qty {
+  flex: 0 0 18%;
+  text-align: right;
+  font-weight: 600;
+  align-self: flex-start;
+}
+
+.end {
+  margin-left: auto;
+}
+
+/* ================= BILL MODE ================= */
+/* TOTAL = 100% → NO OVERFLOW */
+
+.bill .item {
+  flex: 0 0 46%;
+}
+
+.bill .qty {
+  flex: 0 0 10%;
+  text-align: center;
+}
+
+.bill .price {
+  flex: 0 0 18%;
+  text-align: right;
+  padding-right: 1mm;
+  white-space: nowrap;
+}
+
+.bill .amt {
+  flex: 0 0 26%;
+  text-align: right;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Header widths must MATCH row widths */
+.bill .header .item  { flex: 0 0 46%; }
+.bill .header .qty   { flex: 0 0 10%; }
+.bill .header .price { flex: 0 0 18%; }
+.bill .header .amt   { flex: 0 0 26%; }
+
+/* ================= TOTALS ================= */
+
+.grand {
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+/* ================= QR ================= */
+
+.qr-section {
+  margin-top: 15px;
+}
+
+.upi-qr {
+  width: 100px;
+  height: 100px;
+  display: block;
+  margin: 6px auto 0;
+  page-break-inside: avoid;
+}
+
+.qr-text {
+  font-size: 8.5px;
+  text-align: center;
+}
+
+/* ================= PRINT SAFETY ================= */
+#receipt {
+  page-break-inside: avoid;
+}
+
+/* Prevent only critical sections from splitting */
+.qr-section,
+.grand {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+
+

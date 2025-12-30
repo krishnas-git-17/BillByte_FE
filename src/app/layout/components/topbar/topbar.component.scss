@@ -1,49 +1,126 @@
 .topbar {
   height: 60px;
-  background: #ffffff; /* SAME AS SIDEBAR */
+  background: #ffffff;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-
   padding: 0 20px;
-
-  /* Keep the bottom border only */
-//   border-bottom: 1px solid #e0e0e0;
 }
 
-
-/* Page Title */
-.title {
-  font-size: 20px;
-  font-weight: 600;
-}
-
-/* Search box container */
-.search-box {
-  display: flex;
-  align-items: center;
-  background: #f5f5f5;
-  padding: 6px 12px;
-  border-radius: 8px;
-  width: 250px;
-}
-
-.search-box mat-icon {
-  margin-right: 8px;
-  color: #757575;
-}
-
-.search-box input {
-  border: none;
-  outline: none;
-  background: transparent;
-  width: 100%;
-  font-size: 14px;
-}
-
-/* Icons section */
+/* Shared actions */
 .actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
+
+/* Push right side to end */
+.right-actions {
+  margin-left: auto;   /* ✅ forces right alignment */
+}
+
+
+/* LEFT side actions */
+.left-actions {
+  gap: 14px;
+}
+
+/* Primary Button */
+/* Primary – New Order (light accent) */
+.primary-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+
+  background: #fff7f0;          /* very light orange */
+  color: #ff7a18;
+
+  border: 1px solid #ffd7b8;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.primary-btn:hover {
+  background: #ffe8d6;
+  border-color: #ff7a18;
+}
+
+/* Secondary – Reservation (neutral light) */
+.secondary-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+
+  background: #f9fafb;          /* light gray */
+  color: #333;
+
+  border: 1px solid #e5e7eb;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.secondary-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.bill-search {
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  padding: 6px 10px;
+  border-radius: 8px;
+  width: 240px;
+  gap: 8px;                 /* 🔥 space between icon & input */
+  border: 1px solid transparent;
+}
+
+.bill-search mat-icon {
+  color: #757575;
+  font-size: 20px;
+  flex-shrink: 0;           /* 🔥 prevent overlap */
+}
+
+.bill-search.invalid {
+  border-color: #ef4444;           /* red border */
+  background: #fff5f5;
+}
+
+.bill-search.invalid input {
+  color: #b91c1c;
+}
+
+.bill-search.invalid input::placeholder {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.bill-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  padding-left: 2px;        /* 🔥 extra safety */
+}
+
+.search-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  color: #ff7a18;
+  padding: 0 4px;
+}
+
+.search-btn:hover {
+  color: #ff5200;
+}
+
+.search-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+

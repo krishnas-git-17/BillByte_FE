@@ -1,0 +1,63 @@
+<div class="popover">
+
+  <!-- HEADER -->
+  <div class="header">
+    <span class="invoice">{{ order.invoiceNo }}</span>
+    <span class="date">{{ order.createdDate | date:'dd/MM/yy HH:mm' }}</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- COLUMN HEADER -->
+  <div class="columns">
+    <span>Item</span>
+    <span class="center">Qty</span>
+    <span class="right">Amount</span>
+  </div>
+
+  <div class="divider dashed"></div>
+
+  <!-- ITEMS -->
+  <div class="items">
+    <div *ngFor="let i of order.items" class="item-row">
+      <span class="name">{{ i.itemName }}</span>
+   <span class="qty">x{{ i.qty }}</span>
+      <span class="amount">₹{{ i.price * i.qty }}</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SUMMARY -->
+  <div class="summary-row">
+    <span>Subtotal</span>
+    <span class="amount">₹ {{ order.subtotal }}</span>
+  </div>
+
+  <div class="summary-row">
+    <span>Tax</span>
+    <span class="amount">₹ {{ order.tax }}</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TOTAL -->
+  <div class="total-row">
+    <span>Total</span>
+    <span class="total-amount">₹ {{ order.total }}</span>
+  </div>
+
+  <div class="divider dashed"></div>
+
+ <div class="minutes">
+  <span>
+    Time Spent: {{ formatTime(order.tableTimeMinutes) }}
+  </span>
+
+  <span class="table-id">
+    Table: {{ order.tableId || '-' }}
+  </span>
+</div>
+
+
+</div>

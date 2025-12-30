@@ -7,6 +7,7 @@ import { TablePreferenceService } from '../../services/table-preferences.sevice'
 import { LoaderService } from '../../services/loader.service';
 import { ReportsComponent } from '../reports/reports.component';
 import { CompletedOrdersService } from '../../services/completed-orders.service';
+import { RealtimeService } from '../../core/signalrsevices/realtime.service';
 import { FormsModule } from '@angular/forms';
 
 interface Section {
@@ -29,7 +30,7 @@ export class DiningComponent implements OnInit, OnDestroy {
   yesterdayOrders = 0;
   yesterdayPercent = 0;
   todayPercent = 0;
-
+  showReports = false;
   totalOrders = 0;
   totalRevenue = 0;
   activeTables = 0;
@@ -37,15 +38,18 @@ export class DiningComponent implements OnInit, OnDestroy {
 
   sections: Section[] = [];
   tablesBySection: { name: string; tables: string[] }[] = [];
-  currentPage = 0;
-  pageSize = 2;
+  // currentPage = 0;
+  // pageSize = 2;
+  selectedSection: string = 'ALL';
+  filteredSections: { name: string; tables: string[] }[] = [];
 
   timers: { [id: string]: string } = {};
-  occupiedTables = new Set<string>();
+  // occupiedTables = new Set<string>();
   loadingTables = true;
   loadingReports = true;
   skeletonArray = Array.from({ length: 60 });
-
+  tableStates = new Map<string, string>();
+  tableStateSub!: Subscription;
   private subs: Subscription[] = [];
   private timerInterval: any;
 
@@ -55,29 +59,49 @@ export class DiningComponent implements OnInit, OnDestroy {
     private tablePreferenceService: TablePreferenceService,
     private loader: LoaderService,
     private completedOrders: CompletedOrdersService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private realtime : RealtimeService
   ) { }
 
 
   ngOnInit(): void {
-    this.loadSections();
-    this.loadActiveTables();
-    this.loadTodayReports();
+     const token = localStorage.getItem('token');
+  if (token) {
+    this.realtime.connect(token);
+  }
+  this.selectedSection = this.tableStatus.getSelectedSection();
+  this.loadSections();
+  this.loadActiveTables();
+  this.loadTodayReports();
 
-    this.timerInterval = setInterval(() => {
-      this.timers = this.tableStatus.getAllTimers();
-    }, 1000);
-
-    const sub = this.tableStatus.occupiedTables$.subscribe(set => {
-      this.occupiedTables = new Set(set);
-      this.activeTables = set.size;
-    });
+this.tableStateSub = this.tableStatus.watchTableStates()
+  .subscribe(map => {
+    this.tableStates = map;   // 🔥 THIS WAS MISSING
+    this.cdr.detectChanges();
+  });
 
 
-    this.subs.push(sub);
+this.subs.push(
+  this.tableStatus.watchTimers().subscribe(timers => {
+    this.timers = timers;
+    this.cdr.detectChanges();
+  })
+);
+
+}
+
+
+  selectSection(section: string) {
+    this.selectedSection = section;
+    this.tableStatus.setSelectedSection(section);
+    this.applySectionFilter();
   }
 
- loadTodayReports() {
+  toggleReports() {
+    this.showReports = !this.showReports;
+  }
+
+  loadTodayReports() {
     this.loadingReports = true;
 
     this.completedOrders.getAll().subscribe({
@@ -172,36 +196,48 @@ export class DiningComponent implements OnInit, OnDestroy {
 
 
 
-  ngOnDestroy(): void {
-    this.subs.forEach(s => s.unsubscribe());
-    clearInterval(this.timerInterval);
-  }
+ngOnDestroy(): void {
+  this.tableStateSub?.unsubscribe();
+  clearInterval(this.timerInterval);
+}
+
 
 
   hasTables(): boolean {
     return this.tablesBySection.length > 0;
   }
 
-  get pagedSections() {
-    const start = this.currentPage * this.pageSize;
-    return this.tablesBySection.slice(start, start + this.pageSize);
-  }
+  // get pagedSections() {
+  //   const start = this.currentPage * this.pageSize;
+  //   return this.tablesBySection.slice(start, start + this.pageSize);
+  // }
 
-  get totalPages(): number {
-    return Math.ceil(this.tablesBySection.length / this.pageSize);
-  }
+  // get totalPages(): number {
+  //   return Math.ceil(this.tablesBySection.length / this.pageSize);
+  // }
 
-  prevPage() {
-    if (this.currentPage > 0) this.currentPage--;
-  }
+  // prevPage() {
+  //   if (this.currentPage > 0) this.currentPage--;
+  // }
 
-  nextPage() {
-    if (this.currentPage < this.totalPages - 1) this.currentPage++;
-  }
+  // nextPage() {
+  //   if (this.currentPage < this.totalPages - 1) this.currentPage++;
+  // }
 
   goToSettings() {
     this.router.navigate(['settings/table-preferences']);
   }
+
+  applySectionFilter() {
+    if (this.selectedSection === 'ALL') {
+      this.filteredSections = this.tablesBySection;
+    } else {
+      this.filteredSections = this.tablesBySection.filter(
+        s => s.name === this.selectedSection
+      );
+    }
+  }
+
 
   loadSections() {
     this.loadingTables = true;
@@ -217,7 +253,7 @@ export class DiningComponent implements OnInit, OnDestroy {
           )
         }));
 
-        this.currentPage = 0;
+        this.applySectionFilter();
         this.loadingTables = false;
       },
       error: () => {
@@ -237,9 +273,19 @@ export class DiningComponent implements OnInit, OnDestroy {
       next: states => {
         console.log('ACTIVE TABLES:', states);
 
+        // states.forEach(s => {
+        //   this.tableStatus.markOccupied(s.tableId, s.startTime);
+        // });
+
         states.forEach(s => {
-          this.tableStatus.markOccupied(s.tableId, s.startTime);
+          this.tableStatus.setTableState(s.tableId, s.status, s.startTime);
         });
+
+        this.activeTables = states.filter(
+          s => s.status !== 'available'
+        ).length;
+
+
 
         this.timers = this.tableStatus.getAllTimers();
       },
@@ -250,9 +296,17 @@ export class DiningComponent implements OnInit, OnDestroy {
     this.subs.push(sub);
   }
 
-  isOccupied(tableId: string): boolean {
-    return this.occupiedTables.has(tableId);
-  }
+  // isOccupied(tableId: string): boolean {
+  //   return this.occupiedTables.has(tableId);
+  // }
+
+getTableStatus(tableId: string) {
+  return this.tableStates.get(tableId) || 'available';
+}
+
+
+
+
 
   getTimer(id: string): string {
     return this.cleanTimer(this.timers[id]);
@@ -267,8 +321,19 @@ export class DiningComponent implements OnInit, OnDestroy {
   }
 
   openOrders(table: string, section: string) {
-    this.router.navigate(['dashboard/orders', table, section]);
+
+    this.tableStatus.setOccupied(table).subscribe({
+      next: () => {
+        this.router.navigate(['dashboard/orders', table, section]);
+      },
+      error: () => {
+        alert('Failed to occupy table');
+      }
+
+    });
+
   }
+
 
   getDisplayName(id: string): string {
     return id.split('-T')[1];

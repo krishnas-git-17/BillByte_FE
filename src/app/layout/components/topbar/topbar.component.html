@@ -1,26 +1,60 @@
 <div class="topbar">
 
-  <!-- Search box -->
-  <div class="search-box">
-    <mat-icon>search</mat-icon>
-    <input
-      type="text"
-      placeholder="Search..."
-      [(ngModel)]="searchText"
-    />
+  <!-- LEFT SIDE -->
+  <div class="actions left-actions">
+    <button
+      class="primary-btn"
+      #newOrderBtn
+      (click)="openNewOrderPopover()">
+      Take Away
+    </button>
+
+<button
+  class="secondary-btn"
+  #reserveBtn
+  (click)="openReservationPopover(reserveBtn)">
+  Reservation
+</button>
+
+
+<div
+  class="bill-search"
+  #billSearchBox
+  [class.invalid]="isInvoiceInvalid"
+>
+  <mat-icon>receipt</mat-icon>
+
+  <input
+    type="text"
+    [placeholder]="isInvoiceInvalid ? 'Invalid invoice' : 'Search Bill No'"
+    [(ngModel)]="billNo"
+    (keydown.enter)="searchBill()"
+    (input)="isInvoiceInvalid = false"
+  />
+
+<button
+  class="search-btn"
+  (click)="searchBill()"
+  [disabled]="isSearching"
+  type="button">
+  ➜
+</button>
+
+</div>
+
+
   </div>
+  
 
-  <!-- Right Icons -->
-  <div class="actions">
-
+  <!-- RIGHT SIDE (ALWAYS AT END) -->
+  <div class="actions right-actions">
+    <!-- 🔔 Notification -->
     <button mat-icon-button>
       <mat-icon>notifications</mat-icon>
     </button>
 
-    <!-- Profile Menu -->
-    <button
-      mat-icon-button
-      [matMenuTriggerFor]="profileMenu">
+    <!-- 👤 Profile / Logout -->
+    <button mat-icon-button [matMenuTriggerFor]="profileMenu">
       <mat-icon>account_circle</mat-icon>
     </button>
 
@@ -30,6 +64,6 @@
         <span>Logout</span>
       </button>
     </mat-menu>
-
   </div>
+
 </div>

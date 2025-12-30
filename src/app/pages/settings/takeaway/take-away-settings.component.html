@@ -1,0 +1,19 @@
+<h2>Take Away Settings</h2>
+
+<mat-checkbox [(ngModel)]="settings.parcel">
+  Parcel
+</mat-checkbox>
+
+<mat-checkbox [(ngModel)]="settings.zomato">
+  Zomato
+</mat-checkbox>
+
+<mat-checkbox [(ngModel)]="settings.swiggy">
+  Swiggy
+</mat-checkbox>
+
+<br /><br />
+
+<button class="primary-btn" (click)="save()">
+  Save
+</button>
