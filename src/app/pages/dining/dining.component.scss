@@ -1,4 +1,3 @@
-/* ===== MAIN LAYOUT ===== */
 .dining-layout {
   display: grid;
   grid-template-columns: 1fr 320px;   /* tables | reports */
@@ -58,8 +57,6 @@
 .reports-close-btn:hover {
   color: #ffb97c;
 }
-
-/* ===== LEFT TABLES SECTION ===== */
 
 .tables-header {
   position: sticky;
@@ -190,14 +187,12 @@
   width: 0;
 }
 
-/* Wrapper handles centering */
 .section-tabs-wrapper {
   display: flex;
  justify-content: flex-start;
   width: 100%;
 }
 
-/* Tabs row stays scrollable */
 .section-tabs {
   display: flex;
   align-items: center;
@@ -209,7 +204,6 @@
   padding-bottom: 4px;
 }
 
-/* hide scrollbar */
 .section-tabs::-webkit-scrollbar {
   height: 0;
 }
@@ -380,29 +374,11 @@
   filter: brightness(0.97);
 }
 
-
-
-
-
-
-
-/* Occupied */
-// .table-card.occupied {
-//   background: #fff7cc;     /* only background */
-//   border-color: #bdbdbd;   /* stays gray */
-// }
-
-
-/* Timer */
 .table-timer {
   font-size: 11px;
   margin-top: 2px;
   color: #444;
 }
-
-/* ===== REPORTS PANEL ===== */
-
-
 
 .create-btn {
   padding: 10px 18px;
@@ -441,8 +417,6 @@
   color: #555;
 }
 
-
-/* ===== REPORTS PANEL ===== */
 .reports-panel {
   display: flex;
   flex-direction: column;
@@ -450,17 +424,17 @@
   height: 100%;
 }
 
-/* ===== HEADER ===== */
+
 .reports-header {
   display: flex;
   align-items: center;
 }
 
-/* Title */
+
 .reports-title {
   margin: 0;
   font-size: 27px;
-  font-weight: 900;              /* 🔥 STRONGER */
+  font-weight: 900;             
   color: #111;
   left: 15px;
   display: flex;
@@ -469,7 +443,6 @@
   letter-spacing: 0.3px;
 }
 
-/* Inline nav icon */
 .nav-icon.inline {
   width: 26px;
   height: 26px;
@@ -496,7 +469,6 @@
   box-shadow: 0 6px 14px rgba(255, 122, 24, 0.6);
 }
 
-/* ===== CARD ===== */
 
 .value-row {
   display: flex;
@@ -551,7 +523,6 @@
   color: #222;
 }
 
-/* ===== HIGHLIGHT (REVENUE) ===== */
 .report-card.highlight {
   background: linear-gradient(45deg, #ff7a18, #ffb347);
   border: none;
@@ -563,7 +534,6 @@
   color: #fff;
 }
 
-/* ===== MINI CHART ===== */
 .mini-chart {
   display: flex;
   flex-direction: column;
@@ -605,7 +575,6 @@
   flex: 1;
 }
 
-/* List title enhancement */
 .report-card.list .label {
   font-size: 15px;
   font-weight: 800;
