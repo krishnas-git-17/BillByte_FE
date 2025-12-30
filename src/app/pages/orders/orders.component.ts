@@ -9,9 +9,25 @@ import { MatIconModule } from '@angular/material/icon';
 import { CheckoutComponent } from '../../layout/components/checkout/checkout.component';
 import { CompletedOrdersService } from '../../services/completed-orders.service';
 import { ActiveOrdersService } from '../../services/active-orders.service';
+import { KotService } from '../../services/kot.service';
+import { KotItem } from '../../services/kot.service';
 import { ReceiptComponent } from '../../receipt/receipt.component';
+import { RealtimeService } from '../../core/signalrsevices/realtime.service';
 import html2pdf from 'html2pdf.js';
 import { Router } from '@angular/router';
+// import { forkJoin } from 'rxjs';
+
+
+type CartItem = MenuItem & {
+  qty: number;
+  kotQty?: number;     // ✅ qty already printed in KOT
+  notes?: string[];
+  showNoteInput?: boolean;
+  noteInput?: string;
+};
+
+
+
 @Component({
   selector: 'app-orders',
   standalone: true,
@@ -21,13 +37,14 @@ import { Router } from '@angular/router';
 })
 
 export class OrdersComponent implements AfterViewInit {
+  
   @ViewChild(MenuListComponent, { static: false })
   menuList!: MenuListComponent;
   loadingOrders = true
   tableId = '';
   tableType = '';
   searchText: string = "";
-  cart: { [id: number]: MenuItem & { qty: number } } = {};
+ cart: { [id: number]: CartItem } = {};
   quantities: { [id: number]: number } = {};
   isCheckoutMode = false;
   orderType: 'Dine' | 'Parcel' | 'Delivery' = 'Dine';
@@ -40,6 +57,10 @@ export class OrdersComponent implements AfterViewInit {
   tax = 0;
   total = 0;
   isOccupied = false;
+  showNotes = false;
+notes?: string[];  
+specialNotes: string[] = [];
+showNoteInput?: boolean;
   private isRestoring = true;
   private buildOrderData() {
     return {
@@ -61,6 +82,8 @@ export class OrdersComponent implements AfterViewInit {
     private completedOrders: CompletedOrdersService,
     private cdr: ChangeDetectorRef,
     private activeOrders: ActiveOrdersService,
+     private kotService: KotService,
+      private realtime: RealtimeService,
     private router: Router
   ) {
     this.isOccupied = false;
@@ -72,7 +95,10 @@ export class OrdersComponent implements AfterViewInit {
 
   goBack() {
     if (this.cartCount === 0) {
-
+      if (this.orderType === 'Parcel') {
+        this.router.navigate(['/dashboard']);
+        return;
+      }
       this.tableStatus.resetTable(this.tableId).subscribe({
         next: () => this.location.back(),
         error: () => this.location.back()
@@ -100,7 +126,57 @@ export class OrdersComponent implements AfterViewInit {
     this.menuList.searchText = text;
     this.menuList.applyFilters();
   }
+private syncCartFromSignalR(items: any[]) {
+
+  // Table cleared
+  if (!items || items.length === 0) {
+    this.cart = {};
+    this.quantities = {};
+    this.calculateTotals();
+    return;
+  }
+
+  const newCart: any = {};
+  const newQuantities: any = {};
+
+  items.forEach(i => {
+    newCart[i.itemId] = {
+      id: i.itemId,
+      name: i.itemName,
+      price: i.price,
+      qty: i.qty,
+      kotQty: this.cart[i.itemId]?.kotQty ?? 0,
+      notes: this.cart[i.itemId]?.notes ?? []
+    };
+
+    newQuantities[i.itemId] = i.qty;
+  });
+
+  this.cart = newCart;
+  this.quantities = newQuantities;
+
+  this.calculateTotals();
+  this.restoreMenuQuantities();
+  this.cdr.detectChanges();
+}
+
+
 ngOnInit() {
+   const token = localStorage.getItem('token')!;
+  this.realtime.connect(token);
+  this.realtime.events$.subscribe(event => {
+
+  if (event.type === 'ACTIVE_TABLE_ITEMS_CHANGED') {
+    const { tableId, items } = event.payload;
+
+    // 🔒 Ignore other tables
+    if (tableId !== this.tableId) return;
+
+    this.syncCartFromSignalR(items);
+  }
+
+});
+
   const url = this.router.url;
 
   if (url.includes('/parcel')) {
@@ -124,14 +200,17 @@ ngOnInit() {
           id: i.itemId,
           name: i.itemName,
           price: i.price,
-          qty: i.qty
+          qty: i.qty,
+          kotQty: 0,
+          notes: [] 
         } as any;
         this.quantities[i.itemId] = i.qty;
       });
+      
       this.calculateTotals();
-      if (items.length > 0) {
-        this.tableStatus.setOrdered(this.tableId).subscribe();
-      }
+      // if (items.length > 0) {
+      //   this.tableStatus.setOrdered(this.tableId).subscribe();
+      // }
       setTimeout(() => {
         this.restoreMenuQuantities();
         this.isRestoring = false;
@@ -147,74 +226,50 @@ ngOnInit() {
     return this.cartCount > 0;
   }
 
-  onQuantityChange(ev: { item: MenuItem; qty: number }) {
+onQuantityChange(ev: { item: MenuItem; qty: number }) {
 
-    if (!ev || !ev.item || ev.qty == null) return;
-    if (this.isRestoring) return;
+  if (!ev || !ev.item || ev.qty == null) return;
+  if (this.isRestoring) return;
 
-   if (this.orderType === 'Parcel') {
+  const { item, qty } = ev;
 
-  if (ev.qty === 0) {
-    delete this.cart[ev.item.id];
-    delete this.quantities[ev.item.id];
-  } else {
-    this.cart[ev.item.id] = { ...ev.item, qty: ev.qty };
-    this.quantities[ev.item.id] = ev.qty;
-  }
+  // ========== PARCEL ==========
+  if (this.orderType === 'Parcel') {
 
-  if (this.menuList) {
-    this.menuList.quantities = { ...this.quantities };
-  }
-
-  this.calculateTotals();
-  this.cdr.detectChanges();
-  return;
-}
-
-    const { item, qty } = ev;
-
-    if (this.cartCount === 0 && qty > 0) {
-      this.tableStatus.setOccupied(this.tableId).subscribe(() => {
-        this.tableStatus.setOrdered(this.tableId).subscribe();
-      });
-    }
-
-    if (qty === 0) {
-
+    if (qty <= 0) {
       delete this.cart[item.id];
       delete this.quantities[item.id];
-
-      this.activeOrders.deleteItem(this.tableId, item.id).subscribe(() => {
-        if (this.cartCount === 0) {
-          this.tableStatus.resetTable(this.tableId).subscribe();
-        }
-      });
-
     } else {
-
       this.cart[item.id] = { ...item, qty };
       this.quantities[item.id] = qty;
+    }
 
-      if (qty === 1) {
-        this.activeOrders.addItem(this.tableId, {
-          itemId: item.id,
-          itemName: item.name,
-          price: item.price,
-          qty
-        }).subscribe();
-      } else {
-        this.activeOrders.updateItemQty(
-          this.tableId,
-          item.id,
-          qty
-        ).subscribe();
-      }
+    if (this.menuList) {
+      this.menuList.quantities = { ...this.quantities };
     }
 
     this.calculateTotals();
-    this.quantities = { ...this.quantities };
     this.cdr.detectChanges();
+    return;
   }
+
+  // ========== DINE / TABLE (DRAFT MODE ONLY) ==========
+  if (qty <= 0) {
+    delete this.cart[item.id];
+    delete this.quantities[item.id];
+  } else {
+    this.cart[item.id] = { ...item, qty };
+    this.quantities[item.id] = qty;
+  }
+
+  // ❌ NO API CALLS
+  // ❌ NO TABLE STATUS CHANGE
+
+  this.calculateTotals();
+  this.quantities = { ...this.quantities };
+  this.cdr.detectChanges();
+}
+
 
   increaseQty(item: any) {
     const updatedQty = (this.quantities[item.id] || 0) + 1;
@@ -268,100 +323,258 @@ ngOnInit() {
     return this.cart ? Object.keys(this.cart).length : 0;
   }
 
-  saveOnly() {
-    alert('Order saved');
+//   toggleNotes() {
+//   this.showNotes = !this.showNotes;
+// }
+
+// addNote(event: KeyboardEvent) {
+//   if (event.key !== 'Enter') return;
+
+//   const value = this.noteInput.trim();
+//   if (!value) return;
+
+//   // max 5 notes, single word
+//   if (this.specialNotes.length >= 5) return;
+
+//   if (!this.specialNotes.includes(value)) {
+//     this.specialNotes.push(value);
+//   }
+
+//   this.noteInput = '';
+// }
+
+toggleItemNote(item: CartItem) {
+  item.showNoteInput = !item.showNoteInput;
+  item.noteInput = '';
+}
+
+addItemNote(item: CartItem) {
+  const value = (item.noteInput || '').trim();
+  if (!value) return;
+
+  if (!item.notes) {
+    item.notes = [];
   }
-  saveAndKOT() {
-    this.tableStatus.setOrdered(this.tableId).subscribe();
-    this.receiptData = this.buildOrderData();
-    this.receiptMode = 'KOT';
-    setTimeout(() => {
-      const el = document.getElementById('receipt');
 
-      html2pdf()
-        .set({
-          margin: 5,
-          filename: this.formatBillFileName(this.tableId),
-          html2canvas: { scale: 2 }
-        })
-        .from(el!)
-        .save();
-    }, 100);
-  }
+  if (item.notes.length >= 5) return; // max 5 notes
 
-  // saveAndPrintBill() {
+  item.notes.push(value);
+  item.noteInput = '';
+  item.showNoteInput = false;
+}
 
-  //   this.tableStatus.setBilling(this.tableId).subscribe();
-
-  //   this.receiptData = this.buildOrderData();
-  //   this.receiptMode = 'BILL';
-
-  //   setTimeout(() => {
-  //     const el = document.getElementById('receipt');
-
-  //     html2pdf()
-  //       .set({
-  //         filename: `BILL_${this.tableId}.pdf`
-  //       })
-  //       .from(el!)
-  //       .save();
-  //   }, 100);
-  // }
+removeItemNote(item: CartItem, index: number) {
+  item.notes?.splice(index, 1);
+}
 
 
-  settleOrder(paymentMode: 'CASH' | 'CARD' | 'UPI') {
-    const orderData = {
-      tableId: this.tableId,
-      orderType: this.orderType,
-      subtotal: this.subtotal,
-      tax: this.tax,
-      discount: this.discountPercent,
-      total: this.total,
-      paymentMode,
-      createdAt: new Date(),
-      items: Object.values(this.cart).map(i => ({
+
+// updateItemNote(item: any, value: string) {
+//   item.specialNote = value;
+// }
+
+
+
+// 🔹 Discount calculation
+onDiscountChange() {
+  this.calculateTotals();
+}
+
+
+saveOnly() {
+  if (this.cartCount === 0) return;
+
+  const items = Object.values(this.cart);
+
+  // Clear old draft
+  this.activeOrders.clearTable(this.tableId).subscribe(() => {
+
+    // Save current items
+    items.forEach(i => {
+      this.activeOrders.addItem(this.tableId, {
+        itemId: i.id,
         itemName: i.name,
         price: i.price,
         qty: i.qty
-      }))
+      }).subscribe();
+    });
+
+    // Update table status
+    this.tableStatus.setOrdered(this.tableId).subscribe(() => {
+      alert('Order saved');
+    });
+  });
+}
+
+
+saveAndKOT() {
+  if (this.cartCount === 0) return;
+
+  const items = Object.values(this.cart);
+  const kotItems: KotItem[] = [];
+
+  // 1️⃣ Build incremental KOT
+  for (const i of items) {
+    const alreadySent = i.kotQty ?? 0;
+    const diffQty = i.qty - alreadySent;
+
+    if (diffQty !== 0) {
+      kotItems.push({
+        itemName: i.name,
+        qty: diffQty,
+        specialNote:
+          diffQty < 0
+            ? 'CANCEL'
+            : i.notes?.length
+              ? i.notes.join(', ')
+              : ''
+      });
+    }
+  }
+
+  if (kotItems.length === 0) {
+    alert('No changes for KOT');
+    return;
+  }
+
+  // 2️⃣ FIRST: Save KOT
+  this.kotService.createKot({
+    tableId: this.tableId,
+    items: kotItems
+  }).subscribe(kot => {
+
+    // 3️⃣ THEN: Persist FULL state to ActiveOrders
+    this.activeOrders.clearTable(this.tableId).subscribe(() => {
+      items.forEach(i => {
+        this.activeOrders.addItem(this.tableId, {
+          itemId: i.id,
+          itemName: i.name,
+          price: i.price,
+          qty: i.qty
+        }).subscribe();
+      });
+    });
+
+    // 4️⃣ Update local KOT baseline
+    items.forEach(i => {
+      i.kotQty = i.qty;
+    });
+
+    // 5️⃣ Print KOT
+    this.receiptData = {
+      tableId: this.tableId,
+      createdAt: new Date(),
+      kotNo: kot.kotNo,
+      items: kotItems
     };
 
-    const BASE_HEIGHT = 85;     
-    const ITEM_HEIGHT = 6;  
-    const itemCount = orderData.items.length;
-    const calculatedHeight =
-    BASE_HEIGHT + (itemCount * ITEM_HEIGHT);
-    this.completedOrders.saveOrder(orderData).subscribe(() => {
-      this.receiptData = orderData;
-      this.receiptMode = 'BILL';
-      this.cdr.detectChanges();
-      setTimeout(() => {
-        const el = document.getElementById('receipt');
-        if (!el) return;
+    this.receiptMode = 'KOT';
+    this.cdr.detectChanges();
 
-     html2pdf()
-  .set({
-    margin: [1, 1, 1, 1],
-    filename: this.formatBillFileName(this.tableId),
-    html2canvas: { scale: 2 },
-    jsPDF: {
-      unit: 'mm',
-      format: [58, calculatedHeight],
-      orientation: 'portrait'
-    }
-  })
-  .from(el)
-  .save()
+    setTimeout(() => {
+      const el = document.getElementById('receipt');
+      if (el) html2pdf().from(el).save();
+    }, 150);
+  });
+}
 
-          .then(() => {
-            this.activeOrders.clearTable(this.tableId).subscribe(() => {
-              this.tableStatus.resetTable(this.tableId).subscribe(() => {
-                this.router.navigate(['/dashboard']);
-              });
-            });
-          });
 
-      }, 150);
+
+
+
+
+
+
+
+
+
+billing(paymentMode: 'CASH' | 'CARD' | 'UPI') {
+
+  const orderData = {
+    tableId: this.tableId,
+    orderType: this.orderType,
+    subtotal: this.subtotal,
+    tax: this.tax,
+    discount: this.discountPercent,
+    total: this.total,
+    paymentMode,
+    createdAt: new Date(),
+    items: Object.values(this.cart).map(i => ({
+      itemName: i.name,
+      price: i.price,
+      qty: i.qty
+    }))
+  };
+
+  const BASE_HEIGHT = 85;
+  const ITEM_HEIGHT = 6;
+  const itemCount = orderData.items.length;
+  const calculatedHeight = BASE_HEIGHT + (itemCount * ITEM_HEIGHT);
+
+  this.completedOrders.saveOrder(orderData).subscribe((res: any) => {
+
+    this.receiptData = {
+      ...orderData,
+      invoiceNo: res.invoiceNo
+    };
+    this.receiptMode = 'BILL';
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      const el = document.getElementById('receipt');
+      if (!el) return;
+
+      html2pdf()
+        .set({
+          margin: 0,
+          filename: this.formatBillFileName(
+            this.receiptData.invoiceNo || this.tableId
+          ),
+          html2canvas: { scale: 2 },
+          jsPDF: {
+            unit: 'mm',
+            format: [58, calculatedHeight],
+            orientation: 'portrait'
+          }
+        })
+        .from(el)
+        .save();
+
+      // ❌ NO clearTable
+      // ❌ NO resetTable
+      // ❌ NO navigation
+
+    }, 150);
+  });
+}
+ settleOrder(paymentMode: 'CASH' | 'CARD' | 'UPI') {
+
+  const orderData = {
+    tableId: this.tableId,
+    orderType: this.orderType,
+    subtotal: this.subtotal,
+    tax: this.tax,
+    discount: this.discountPercent,
+    total: this.total,
+    paymentMode,
+    createdAt: new Date(),
+    items: Object.values(this.cart).map(i => ({
+      itemName: i.name,
+      price: i.price,
+      qty: i.qty
+    }))
+  };
+
+  this.completedOrders.saveOrder(orderData).subscribe(() => {
+
+    this.activeOrders.clearTable(this.tableId).subscribe(() => {
+
+      this.tableStatus.resetTable(this.tableId).subscribe(() => {
+        this.router.navigate(['/dashboard']);
+      });
+
     });
-  }
+  });
+}
+
 }

@@ -7,6 +7,7 @@ import { TablePreferenceService } from '../../services/table-preferences.sevice'
 import { LoaderService } from '../../services/loader.service';
 import { ReportsComponent } from '../reports/reports.component';
 import { CompletedOrdersService } from '../../services/completed-orders.service';
+import { RealtimeService } from '../../core/signalrsevices/realtime.service';
 import { FormsModule } from '@angular/forms';
 
 interface Section {
@@ -47,7 +48,8 @@ export class DiningComponent implements OnInit, OnDestroy {
   loadingTables = true;
   loadingReports = true;
   skeletonArray = Array.from({ length: 60 });
-
+  tableStates = new Map<string, string>();
+  tableStateSub!: Subscription;
   private subs: Subscription[] = [];
   private timerInterval: any;
 
@@ -57,28 +59,37 @@ export class DiningComponent implements OnInit, OnDestroy {
     private tablePreferenceService: TablePreferenceService,
     private loader: LoaderService,
     private completedOrders: CompletedOrdersService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private realtime : RealtimeService
   ) { }
 
 
   ngOnInit(): void {
-    this.selectedSection = this.tableStatus.getSelectedSection();
-    this.loadSections();
-    this.loadActiveTables();
-    this.loadTodayReports();
-
-    this.timerInterval = setInterval(() => {
-      this.timers = this.tableStatus.getAllTimers();
-    }, 1000);
-
-    // const sub = this.tableStatus.occupiedTables$.subscribe(set => {
-    //   this.occupiedTables = new Set(set);
-    //   this.activeTables = set.size;
-    // });
-
-
-    // this.subs.push(sub);
+     const token = localStorage.getItem('token');
+  if (token) {
+    this.realtime.connect(token);
   }
+  this.selectedSection = this.tableStatus.getSelectedSection();
+  this.loadSections();
+  this.loadActiveTables();
+  this.loadTodayReports();
+
+this.tableStateSub = this.tableStatus.watchTableStates()
+  .subscribe(map => {
+    this.tableStates = map;   // 🔥 THIS WAS MISSING
+    this.cdr.detectChanges();
+  });
+
+
+this.subs.push(
+  this.tableStatus.watchTimers().subscribe(timers => {
+    this.timers = timers;
+    this.cdr.detectChanges();
+  })
+);
+
+}
+
 
   selectSection(section: string) {
     this.selectedSection = section;
@@ -185,10 +196,11 @@ export class DiningComponent implements OnInit, OnDestroy {
 
 
 
-  ngOnDestroy(): void {
-    this.subs.forEach(s => s.unsubscribe());
-    clearInterval(this.timerInterval);
-  }
+ngOnDestroy(): void {
+  this.tableStateSub?.unsubscribe();
+  clearInterval(this.timerInterval);
+}
+
 
 
   hasTables(): boolean {
@@ -288,9 +300,10 @@ export class DiningComponent implements OnInit, OnDestroy {
   //   return this.occupiedTables.has(tableId);
   // }
 
-  getTableStatus(tableId: string) {
-    return this.tableStatus.getStatus(tableId);
-  }
+getTableStatus(tableId: string) {
+  return this.tableStates.get(tableId) || 'available';
+}
+
 
 
 

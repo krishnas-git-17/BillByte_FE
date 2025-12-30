@@ -1,15 +1,30 @@
 import { Injectable, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { API_CONFIG } from '../core/api.config';
 import { RealtimeService } from '../core/signalrsevices/realtime.service';
 
-type TableStatus = 'available' | 'occupied' | 'ordered' | 'billing';
+type TableStatus =
+  | 'available'
+  | 'occupied'
+  | 'ordered'
+  | 'billing'
+  | 'reservation';
 
 @Injectable({ providedIn: 'root' })
-
 export class TableStatusService {
- private selectedSection = 'ALL';
+
+  private selectedSection = 'ALL';
+
+  private statusMap = new Map<string, TableStatus>();
+  private tableState$ = new BehaviorSubject<Map<string, TableStatus>>(new Map());
+  private timers$ = new BehaviorSubject<{ [id: string]: string }>({});
+
+
+  private liveTimers: { [id: string]: number } = {};
+  private uiTimers: { [id: string]: string } = {};
+  private interval: any;
+
   constructor(
     private http: HttpClient,
     private zone: NgZone,
@@ -19,14 +34,21 @@ export class TableStatusService {
     this.listenRealtime();
   }
 
-  /* ================= API ================= */
- setSelectedSection(section: string) {
+  setSelectedSection(section: string) {
     this.selectedSection = section;
   }
 
   getSelectedSection(): string {
     return this.selectedSection;
   }
+
+  watchTableStates() {
+    return this.tableState$.asObservable();
+  }
+  watchTimers() {
+  return this.timers$.asObservable();
+}
+
 
   loadActiveTables(): Observable<any[]> {
     return this.http.get<any[]>(
@@ -41,9 +63,23 @@ export class TableStatusService {
     );
   }
 
-  sendKOT(tableId: string) {        // 🔥 MAIN METHOD
+  setOrdered(tableId: string) {
     return this.http.post(
-      API_CONFIG.BASE_URL + API_CONFIG.TABLE_STATE.KOT(tableId),
+      API_CONFIG.BASE_URL + `/table-state/ordered/${tableId}`,
+      {}
+    );
+  }
+
+  setBilling(tableId: string) {
+  return this.http.post(
+    API_CONFIG.BASE_URL + `/table-state/billing/${tableId}`,
+    {}
+  );
+}
+
+  setReservation(tableId: string) {
+    return this.http.post(
+      API_CONFIG.BASE_URL + `/table-state/reservation/${tableId}`,
       {}
     );
   }
@@ -55,12 +91,9 @@ export class TableStatusService {
     );
   }
 
-  /* ================= STATE ================= */
-
-  private statusMap = new Map<string, TableStatus>();
-
   setTableState(tableId: string, status: TableStatus, startTime?: string) {
     this.statusMap.set(tableId, status);
+    this.tableState$.next(new Map(this.statusMap));
 
     if (status !== 'available' && startTime) {
       this.initTimer(tableId, startTime);
@@ -74,57 +107,46 @@ export class TableStatusService {
     return this.statusMap.get(tableId) || 'available';
   }
 
-  setOrdered(tableId: string) {
-  return this.http.post(
-    API_CONFIG.BASE_URL + `/table-state/ordered/${tableId}`,
-    {}
-  );
-}
-
-// setBilling(tableId: string) {
-//   return this.http.post(
-//     API_CONFIG.BASE_URL + `/table-state/billing/${tableId}`,
-//     {}
-//   );
-// }
-
-  /* ================= REALTIME ================= */
-
   private listenRealtime() {
     this.realtime.events$.subscribe(event => {
       if (event.type === 'TABLE_STATUS_CHANGED') {
         const { tableId, status, startTime } = event.payload;
-        this.setTableState(tableId, status, startTime);
+        this.zone.run(() => {
+          this.setTableState(tableId, status, startTime);
+        });
       }
     });
   }
-
-  /* ================= TIMER ================= */
-
-  private liveTimers: { [id: string]: number } = {};
-  private uiTimers: { [id: string]: string } = {};
-  private interval: any;
 
   private startGlobalTimer() {
     if (this.interval) return;
 
     this.interval = setInterval(() => {
       this.zone.run(() => {
+        let changed = false;
+
         Object.keys(this.liveTimers).forEach(id => {
           this.liveTimers[id]++;
           this.uiTimers[id] = this.format(this.liveTimers[id]);
+          changed = true;
         });
+
+        if (changed) {
+          this.timers$.next({ ...this.uiTimers });
+        }
       });
     }, 1000);
   }
 
+
   private initTimer(tableId: string, startTime: string) {
     const diffSec =
       Math.floor((Date.now() - new Date(startTime).getTime()) / 1000);
-
     this.liveTimers[tableId] = diffSec;
     this.uiTimers[tableId] = this.format(diffSec);
+    this.timers$.next({ ...this.uiTimers });
   }
+
 
   getAllTimers() {
     return { ...this.uiTimers };

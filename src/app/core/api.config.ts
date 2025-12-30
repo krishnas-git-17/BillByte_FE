@@ -1,6 +1,6 @@
 export const API_CONFIG = {
-    BASE_URL: "https://localhost:7117/api",
-    //  BASE_URL: "https://billbyte-be-4.onrender.com/api",
+    // BASE_URL: "https://localhost:7117/api",
+ BASE_URL: "https://billbyte-be-4.onrender.com/api",
 
   MENU: {
   GET_ALL: "/menu-items",
@@ -21,7 +21,9 @@ export const API_CONFIG = {
         GET_ALL: "/completed-orders",
         CREATE: "/completed-orders",
         GET_BY_ID: (id: string) => `/completed-orders/${id}`,
-        DELETE: (id: string) => `/completed-orders/${id}`
+        DELETE: (id: string) => `/completed-orders/${id}`,
+        GET_BY_INVOICE: (invoiceNo: string) =>
+    `/completed-orders/by-invoice/${invoiceNo}`
     },
     TABLE_PREFERENCES: {
     GET_ALL: "/table-preferences",
@@ -45,6 +47,14 @@ export const API_CONFIG = {
   RESET: (tableId: string) =>
     `/table-state/reset/${tableId}`
 },
+
+KOT: {
+  CREATE: '/kot',
+  GET_TODAY: '/kot/today',
+  GET_LATEST: (tableId: string) => `/kot/latest/${tableId}`,
+  GET_BY_KOT_NO: (kotNo: string) => `/kot/by-kot-no/${kotNo}`
+},
+
 
   ACTIVE_TABLE_ITEMS: {
     GET_BY_TABLE: (tableId: string) =>

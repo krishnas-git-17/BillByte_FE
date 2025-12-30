@@ -1,0 +1,133 @@
+.popover {
+  position: relative;
+  width: 300px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #ffd7b8;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  font-size: 13px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Arrow */
+.popover::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 24px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-left: 1px solid #ffd7b8;
+  border-top: 1px solid #ffd7b8;
+  transform: rotate(45deg);
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.divider.dashed {
+  background: repeating-linear-gradient(
+    to right,
+    #d1d5db,
+    #d1d5db 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 70px 90px; /* 🔥 FIXED COLUMNS */
+  column-gap: 12px;                    /* 🔥 SPACE BETWEEN COLS */
+  font-weight: 600;
+}
+.columns .center {
+  text-align: center;
+  padding-left: 32px;   /* 🔥 SAME OFFSET AS ROW QTY */
+}
+
+
+.columns .right {
+  text-align: right;
+}
+
+/* Items */
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.item-row {
+  display: grid;
+  grid-template-columns: 1fr 70px 90px; /* 🔥 SAME AS HEADER */
+  column-gap: 12px;                    /* 🔥 IMPORTANT */
+  align-items: center;
+}
+
+
+.name {
+  font-weight: 500;
+}
+
+.qty {
+  text-align: center;
+  font-weight: 500;
+  white-space: nowrap;
+  transform: translateX(16px); /* 🔥 micro shift right */
+}
+
+
+
+.amount {
+  text-align: right;
+  font-weight: 500;
+}
+
+
+/* Summary rows */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 500;
+}
+
+/* Total */
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+}
+
+.total-amount {
+  color: #ff7a18;
+  font-size: 16px;
+}
+
+.minutes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  color: #444;
+}
+
+.table-id {
+  font-weight: 600;
+}
+

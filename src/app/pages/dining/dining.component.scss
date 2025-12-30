@@ -150,6 +150,16 @@
   background: #e6f0ff;   /* blue */
 }
 
+.dot.reservation {
+  background: #dcfce7;   /* blue */
+}
+
+.table-card.reserved {
+  background: #dcfce7;
+  border-color: #22c55e;
+}
+
+
 
 .top-bar {
   display: flex;
@@ -360,6 +370,11 @@
 .table-card.billing .table-inner {
   background: #e6f0ff;
 }
+.table-card.reserved .table-inner {
+  background: #dcfce7;   /* light green */
+}
+
+
 
 .table-card:hover .table-inner {
   filter: brightness(0.97);

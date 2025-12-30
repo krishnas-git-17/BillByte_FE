@@ -84,19 +84,66 @@
       <h2 class="section-title">Order Items</h2>
 
       <div class="order-scroll">
-        <div class="order-row" *ngFor="let c of cart | keyvalue">
-          <div class="order-name">{{ $any(c.value).name }}</div>
+       <ng-container *ngFor="let c of cart | keyvalue">
+  <!-- ITEM ROW -->
+  <div class="order-row">
+   <div class="order-name">
+  <div class="item-title">
+    {{ $any(c.value).name }}
+  </div>
 
-          <div class="qty-box">
-            <button class="qty-btn" (click)="decreaseQty($any(c.value))">−</button>
-            <span class="qty-value">{{ $any(c.value).qty }}</span>
-            <button class="qty-btn" (click)="increaseQty($any(c.value))">+</button>
-          </div>
+  <button
+    class="add-note-btn"
+    (click)="toggleItemNote($any(c.value))">
+    + Add note
+  </button>
+</div>
 
-          <div class="order-price">
-            ₹ {{ $any(c.value).price * $any(c.value).qty }}
-          </div>
-        </div>
+
+    <div class="qty-box">
+      <button class="qty-btn" (click)="decreaseQty($any(c.value))">−</button>
+      <span class="qty-value">{{ $any(c.value).qty }}</span>
+      <button class="qty-btn" (click)="increaseQty($any(c.value))">+</button>
+    </div>
+
+    <div class="order-price">
+      ₹ {{ $any(c.value).price * $any(c.value).qty }}
+    </div>
+  </div>
+
+<div class="note-input-row" *ngIf="$any(c.value).showNoteInput">
+  <div class="note-input-wrapper">
+    <input
+      type="text"
+      class="note-input"
+      placeholder="Eg: Spicy"
+      [(ngModel)]="$any(c.value).noteInput"
+      (keyup.enter)="addItemNote($any(c.value))"
+    />
+
+    <span
+      class="note-tick-inside"
+      (click)="addItemNote($any(c.value))">
+      ✓
+    </span>
+  </div>
+</div>
+
+
+
+
+
+ <div class="note-chip-row" *ngIf="$any(c.value).notes?.length">
+  <span
+    class="note-chip"
+    *ngFor="let n of $any(c.value).notes; let i = index">
+    {{ n }}
+    <span class="remove" (click)="removeItemNote($any(c.value), i)">×</span>
+  </span>
+</div>
+
+</ng-container>
+
       </div>
 
       <div class="order-bottom">
@@ -131,23 +178,18 @@
           </div>
         </div>
 
-        <div class="order-actions">
+       <div class="order-actions">
 
-          <button class="btn save" (click)="saveOnly()">
-            SAVE
-          </button>
+  <button class="btn save" (click)="saveOnly()">SAVE</button>
 
-          <button class="btn kot" (click)="saveAndKOT()">
-            SAVE & KOT
-          </button>
+  <button class="btn kot" (click)="saveAndKOT()">SAVE & KOT</button>
 
+  <button class="btn billing" (click)="billing('CASH')">BILLING</button>
 
+  <button class="btn settle" (click)="settleOrder('CASH')">SETTLE</button>
 
-          <button class="btn settle" (click)="settleOrder('CASH')">
-            SETTLE
-          </button>
+</div>
 
-        </div>
 
 
 

@@ -42,6 +42,9 @@
             <div class="legend-item">
               <span class="dot billing"></span> Billing
             </div>
+             <div class="legend-item">
+              <span class="dot reservation"></span> Reservation
+            </div>
           </div>
         </div>
 
@@ -61,19 +64,23 @@
           </h2>
 
           <div class="table-grid">
-            <div class="table-card" *ngFor="let t of section.tables" (click)="openOrders(t, section.name)"
-              [class.occupied]="getTableStatus(t) === 'occupied'" [class.ordered]="getTableStatus(t) === 'ordered'"
-              [class.billing]="getTableStatus(t) === 'billing'">
+          <div
+  class="table-card"
+  *ngFor="let t of section.tables"
+  (click)="openOrders(t, section.name)"
+  [class.occupied]="getTableStatus(t) === 'occupied'"
+  [class.ordered]="getTableStatus(t) === 'ordered'"
+  [class.billing]="getTableStatus(t) === 'billing'"
+  [class.reserved]="getTableStatus(t) === 'reservation'">
 
-              <div class="table-inner">
-                {{ getDisplayName(t) }}
+  <div class="table-inner">
+    {{ getDisplayName(t) }}
 
-                <div class="timer" *ngIf="getTimer(t)">
-                  ⏱ {{ getTimer(t) }}
-                </div>
-              </div>
-
-            </div>
+    <div class="timer" *ngIf="getTimer(t)">
+      ⏱ {{ getTimer(t) }}
+    </div>
+  </div>
+</div>
           </div>
 
 

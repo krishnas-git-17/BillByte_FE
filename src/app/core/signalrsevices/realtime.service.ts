@@ -1,31 +1,35 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Subject } from 'rxjs';
+import { API_CONFIG } from '../api.config';
 
 @Injectable({ providedIn: 'root' })
 export class RealtimeService {
 
   private hub?: signalR.HubConnection;
-
-  // Generic event stream
   private event$ = new Subject<{ type: string; payload: any }>();
   events$ = this.event$.asObservable();
 
   connect(token: string) {
-    // ✅ prevent duplicate connections
     if (this.hub && this.hub.state === signalR.HubConnectionState.Connected) {
       return;
     }
-
+ const hubUrl = API_CONFIG.BASE_URL.replace('/api', '') + '/posHub';
     this.hub = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:7117/hubs/pos', {
+      .withUrl(hubUrl, {
         accessTokenFactory: () => token
       })
       .withAutomaticReconnect()
       .build();
 
-    this.hub.on('RealtimeEvent', (event) => {
-      this.event$.next(event);
+    // ✅ TABLE STATUS
+    this.hub.on('TABLE_STATUS_CHANGED', payload => {
+      this.event$.next({ type: 'TABLE_STATUS_CHANGED', payload });
+    });
+
+    // ✅ ACTIVE TABLE ITEMS
+    this.hub.on('ACTIVE_TABLE_ITEMS_CHANGED', payload => {
+      this.event$.next({ type: 'ACTIVE_TABLE_ITEMS_CHANGED', payload });
     });
 
     this.hub.start()
@@ -34,9 +38,7 @@ export class RealtimeService {
   }
 
   disconnect() {
-    if (this.hub) {
-      this.hub.stop();
-      this.hub = undefined;
-    }
+    this.hub?.stop();
+    this.hub = undefined;
   }
 }

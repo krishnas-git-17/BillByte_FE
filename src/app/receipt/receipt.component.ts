@@ -1,13 +1,21 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-/**
- * Tell TypeScript that a global function exists on window
- */
 declare global {
   interface Window {
     generateQRCode: (text: string, size?: number) => string;
   }
+}
+
+export interface ReceiptItem {
+  itemName: string;
+  qty: number;
+
+  // BILL only
+  price?: number;
+
+  // KOT only
+  specialNote?: string;
 }
 
 @Component({
@@ -19,42 +27,38 @@ declare global {
 })
 export class ReceiptComponent {
 
-  @Input() order!: {
-    tableId?: string;
-    orderType?: string;
-    invoiceNo?: string;
-    createdAt: Date;
-    subtotal: number;
-    tax: number;
-    total: number;
-    items: {
-      itemName: string;
-      price: number;
-      qty: number;
-    }[];
-  };
-
   @Input() mode: 'KOT' | 'BILL' = 'BILL';
 
-  /**
-   * Total quantity of all items
-   */
-  getTotalQty(items: any[]): number {
-    return items.reduce((sum, i) => sum + i.qty, 0);
+  @Input() order!: {
+    tableId?: string;
+    createdAt: Date;
+
+    // BILL
+    invoiceNo?: string;
+    subtotal?: number;
+    tax?: number;
+    total?: number;
+
+    // KOT
+    kotNo?: number;
+
+    items: ReceiptItem[];
+  };
+
+  getTotalQty(): number {
+    return this.order.items.reduce((sum, i) => sum + i.qty, 0);
   }
 
-  /**
-   * Generate UPI QR code (from code itself)
-   * No npm, no external API
-   */
-  get upiQrDataUrl(): string {
-    if (!this.order || !window.generateQRCode) {
-      return '';
-    }
+  getItemAmount(i: ReceiptItem): number {
+    return (i.price ?? 0) * i.qty;
+  }
 
-    const upiId = '8886784877-2@ybl'; // 🔴 replace with real merchant UPI
+  get upiQrDataUrl(): string {
+    if (this.mode !== 'BILL' || !window.generateQRCode) return '';
+
+    const upiId = '8886784877-2@ybl';
     const merchantName = 'BillByte';
-    const amount = this.order.total;
+    const amount = this.order.total ?? 0;
     const invoice = this.order.invoiceNo || 'AUTO';
 
     const upiString =
@@ -66,5 +70,4 @@ export class ReceiptComponent {
 
     return window.generateQRCode(upiString, 120);
   }
-
 }

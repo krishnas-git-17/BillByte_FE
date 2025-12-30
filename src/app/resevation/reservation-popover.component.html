@@ -1,0 +1,30 @@
+<div class="popover">
+  <div class="popover-header">
+    <h4>Reserve Table</h4>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-tabs">
+    <button
+      class="tab"
+      *ngFor="let s of sections"
+      [class.active]="s === selectedSection"
+      (click)="selectSection(s)">
+      {{ s.name }}
+    </button>
+  </div>
+
+  <div class="popup-grid">
+    <div
+      class="popup-card"
+      *ngFor="let t of tables"
+      [class.available]="!isDisabled(t)"
+      [class.disabled]="isDisabled(t)"
+      (click)="reserve(t)">
+      <div class="popup-inner">
+        {{ t.split('-T')[1] }}
+      </div>
+    </div>
+  </div>
+</div>

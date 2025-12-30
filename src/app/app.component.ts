@@ -8,14 +8,15 @@ import { RouterOutlet } from '@angular/router';
   imports: [RouterOutlet],
   template: `<router-outlet></router-outlet>`
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
 
   constructor(private realtime: RealtimeService) {}
 
-  ngOnInit(): void {
-    const token = localStorage.getItem('token');
-    if (token) {
-      this.realtime.connect(token);
-    }
-  }
+//   ngOnInit(): void {
+//    const token = localStorage.getItem('token');
+// if (token) {
+//   this.realtime.connect(token);
+// }
+
+//   }
 }
