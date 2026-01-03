@@ -72,6 +72,17 @@ KOT: {
     CLEAR_TABLE: (tableId: string) =>
       `/active-table-items/clear/${tableId}`,
   },
+
+   USERS: {
+    GET_ALL: "/users",
+    CREATE: "/users",
+    UPDATE_STATUS: (id: number) => `/users/${id}/status`
+  },
+  ASSIGN_TABLES: {
+  CREATE: '/table-assignments',
+   GET_BY_EMPLOYEE: (employeeId: string) =>
+    `/table-assignments/by-employee/${employeeId}`
+}
   
 
 };

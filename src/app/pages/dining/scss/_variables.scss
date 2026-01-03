@@ -1,0 +1,65 @@
+// ========== COLOR PALETTE ==========
+$primary-orange: #ff7a18;
+$primary-orange-light: #ffb347;
+$orange-gradient: linear-gradient(45deg, #ff7a18, #ffb347);
+
+$gray-light: #f9fafb;
+$gray-border: #eee;
+$gray-text: #555;
+$gray-text-dark: #222;
+$gray-text-muted: #666;
+$gray-disabled: #c0c0c0;
+
+$status-yellow: #fff7cc;
+$status-red: #ffe3e3;
+$status-blue: #e6f0ff;
+$status-green: #dcfce7;
+
+$trend-up: #2ecc71;
+$trend-down: #e74c3c;
+$trend-neutral: #999;
+
+$shadow-sm: 0 3px 8px rgba(255, 122, 24, 0.4);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.04);
+$shadow-lg: 0 6px 14px rgba(0, 0, 0, 0.2);
+$shadow-xl: 0 6px 16px rgba(0, 0, 0, 0.15);
+
+// ========== SPACING ==========
+$gap-sm: 6px;
+$gap-md: 10px;
+$gap-lg: 14px;
+$gap-xl: 25px;
+
+$padding-sm: 8px;
+$padding-md: 10px 12px;
+$padding-lg: 12px 16px;
+$padding-xl: 30px 40px;
+
+// ========== TYPOGRAPHY ==========
+$font-xs: 11px;
+$font-sm: 12px;
+$font-base: 13px;
+$font-md: 14px;
+$font-lg: 15px;
+$font-xl: 17px;
+$font-2xl: 24px;
+$font-3xl: 27px;
+
+$weight-normal: 600;
+$weight-bold: 700;
+$weight-heavy: 800;
+$weight-black: 900;
+
+// ========== BORDER RADIUS ==========
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 10px;
+$radius-xl: 20px;
+$radius-full: 50%;
+
+// ========== DIMENSIONS ==========
+$header-height: 80px;
+$table-card-height: 55px;
+$table-grid-cols: 6;
+$reports-width: 320px;
+$viewport-height: calc(95vh - 80px);

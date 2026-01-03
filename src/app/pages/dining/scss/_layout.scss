@@ -1,0 +1,266 @@
+@import './variables';
+
+// ========== MAIN DINING LAYOUT ==========
+.dining-layout {
+  display: grid;
+  grid-template-columns: 1fr $reports-width;
+  gap: $gap-xl;
+  height: $viewport-height;
+  padding: $padding-md;
+  overflow: hidden;
+  position: relative;
+  transition: grid-template-columns 0.25s ease;
+}
+
+.dining-layout.reports-hidden {
+  grid-template-columns: 1fr;
+}
+
+.dining-layout.reports-hidden .table-grid {
+  grid-template-columns: repeat(9, 1fr);
+}
+
+// ========== TABLES SECTION ==========
+.tables-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+}
+
+.tables-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  padding: $padding-md;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid $gray-border;
+  border-radius: $radius-md;
+  margin-bottom: $gap-md;
+  justify-content: center;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// ========== SECTION TABS ==========
+.section-tabs-wrapper {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.section-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: $gap-md;
+  overflow-x: auto;
+  max-width: 100%;
+  padding-bottom: 4px;
+
+  &::-webkit-scrollbar {
+    height: 0;
+  }
+}
+
+.tab {
+  padding: 8px 16px;
+  border-radius: $radius-xl;
+  border: 1px solid $gray-border;
+  background: #fff;
+  font-weight: $weight-bold;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &.active {
+    background: $primary-orange;
+    color: #fff;
+    border-color: $primary-orange;
+  }
+}
+
+// ========== STATUS INFO & LEGEND ==========
+.status-info {
+  position: relative;
+  font-size: 18px;
+  cursor: pointer;
+  color: $gray-text;
+}
+
+.status-tooltip {
+  position: absolute;
+  right: 0;
+  top: 26px;
+  background: #ffffff;
+  border: 1px solid $gray-border;
+  border-radius: $radius-md;
+  padding: $padding-sm 12px;
+  width: 160px;
+  box-shadow: $shadow-xl;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: 0.2s ease;
+  z-index: 100;
+}
+
+.status-info:hover .status-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: $gap-md;
+  font-size: $font-sm;
+  font-weight: $weight-bold;
+  margin-bottom: $gap-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: $radius-full;
+  border: 1px dashed $gray-disabled;
+
+  &.available {
+    background: $gray-light;
+  }
+
+  &.occupied {
+    background: $status-yellow;
+  }
+
+  &.ordered {
+    background: $status-red;
+  }
+
+  &.billing {
+    background: $status-blue;
+  }
+
+  &.reservation {
+    background: $status-green;
+  }
+}
+
+// ========== TABLES BODY & ZONES ==========
+.tables-body {
+  flex: 1;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+}
+
+.zone-box {
+  background: #ffffff;
+  border-radius: $radius-md;
+  border: 1px solid #e5e5e5;
+  padding: $padding-md;
+  display: block;
+  margin-bottom: $gap-lg;
+
+  &.full-height {
+    flex: 1 1 100%;
+  }
+}
+
+.zone-title {
+  margin: $gap-sm 0 8px;
+  font-size: $font-lg;
+  font-weight: $weight-heavy;
+}
+
+.zone-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: $gap-md;
+
+  button {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-full;
+    border: none;
+    background: $orange-gradient;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  span {
+    font-weight: $weight-normal;
+    color: $gray-text;
+  }
+}
+
+// ========== TABLE SCROLL ==========
+.table-scroll {
+  flex: 1;
+  overflow: visible;
+  padding-right: 6px;
+
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+}
+
+// ========== REPORTS TOGGLE BUTTON ==========
+.reports-vertical-toggle {
+  position: fixed;
+  top: $header-height;
+  right: 0;
+  padding: 10px 6px;
+  background: $primary-orange;
+  color: #fff;
+  border: none;
+  border-radius: $radius-md 0 0 $radius-md;
+  font-size: $font-base;
+  font-weight: $weight-black;
+  line-height: 16px;
+  cursor: pointer;
+  z-index: 999;
+  box-shadow: $shadow-lg;
+
+  &:hover {
+    background: $primary-orange;
+  }
+}
+
+.reports-close-btn {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  font-weight: $weight-black;
+  color: $gray-text;
+  cursor: pointer;
+
+  &:hover {
+    color: $primary-orange;
+  }
+}

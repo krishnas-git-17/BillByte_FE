@@ -21,6 +21,7 @@ import { ReservationPopoverComponent } from '../../../resevation/reservation-pop
 import { TableStatusService } from '../../../services/table-status.service';
 import { TablePreferenceService } from '../../../services/table-preferences.sevice';
 import { RealtimeService } from '../../../core/signalrsevices/realtime.service';
+import { AuthService } from '../../../core/authservices/auth.service';
 @Component({
   selector: 'app-topbar',
   standalone: true,
@@ -72,7 +73,8 @@ private reservationOverlay?: OverlayRef;
     private completedOrders: CompletedOrdersService,
     private tableStatus: TableStatusService,
      private tablePref: TablePreferenceService,
-     private realtime: RealtimeService
+     private realtime: RealtimeService,
+     private auth: AuthService
   ) {}
 
 ngOnInit() {
@@ -146,7 +148,6 @@ ngOnInit() {
   }
 
 searchBill() {
-  // 🔒 Prevent double click / double enter
   if (this.isSearching) return;
 
   const value = this.billNo?.trim();
@@ -156,26 +157,27 @@ searchBill() {
     return;
   }
 
-  const restaurantId = 1; // TODO: dynamic
+  const restaurantId = this.auth.getRestaurantId(); // ✅ FROM EXISTING SERVICE
+
+  if (!restaurantId) {
+    this.markInvalid();
+    return;
+  }
+
   const year = new Date().getFullYear();
   const invoice = `INV-${restaurantId}-${year}-${value}`;
 
-  this.isSearching = true;   // 🔒 LOCK
+  this.isSearching = true;
 
   this.completedOrders.getByInvoice(invoice).subscribe({
     next: order => {
-      this.isSearching = false;     // 🔓 UNLOCK
-      this.isInvoiceInvalid = false;
+      this.isSearching = false;
       this.openBillPopup(order);
     },
     error: err => {
-      this.isSearching = false;     // 🔓 UNLOCK
-
-      if (err.status === 404) {
-        this.markInvalid();
-      } else {
-        console.error(err);
-      }
+      this.isSearching = false;
+      if (err.status === 404) this.markInvalid();
+      else console.error(err);
     }
   });
 }
