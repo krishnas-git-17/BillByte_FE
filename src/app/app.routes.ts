@@ -56,8 +56,13 @@ export const routes: Routes = [
           import('./pages/menu-items/menu-items/menu-items.component')
             .then(m => m.MenuItemsComponent)
       },
-
       {
+  path: 'users',
+  loadComponent: () =>
+    import('./pages/users/users.component')
+      .then(m => m.UsersComponent)
+},    
+ {
         path: 'reports',
         loadComponent: () =>
           import('./pages/reports/reports.component')

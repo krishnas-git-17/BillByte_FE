@@ -1,0 +1,123 @@
+@import './variables';
+
+// ========== TABLE GRID ==========
+.table-grid {
+  display: grid;
+  grid-template-columns: repeat($table-grid-cols, 1fr);
+  grid-auto-rows: $table-card-height;
+  gap: $gap-md;
+}
+
+// ========== TABLE CARD OUTER ==========
+.table-card {
+  height: $table-card-height;
+  border-radius: $radius-lg;
+  outline: 2px dashed $gray-disabled;
+  outline-offset: -2px;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+
+  &:hover .table-inner {
+    background: #eef2f7;
+    filter: brightness(0.97);
+  }
+
+  // ========== STATUS STATES ==========
+  &.occupied .table-inner {
+    background: $status-yellow;
+  }
+
+  &.ordered .table-inner {
+    background: $status-red;
+  }
+
+  &.billing .table-inner {
+    background: $status-blue;
+  }
+
+  &.reserved {
+    background: $status-green;
+    border-color: #22c55e;
+
+    .table-inner {
+      background: $status-green;
+    }
+  }
+}
+
+// ========== TABLE CARD INNER ==========
+.table-inner {
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+  border-radius: $radius-sm;
+  background: $gray-light;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-md;
+  font-weight: $weight-normal;
+  box-sizing: border-box;
+}
+
+.timer {
+  font-size: $font-xs;
+  margin-top: 2px;
+  color: #444;
+}
+
+// ========== CREATE BUTTON ==========
+.create-btn {
+  padding: 10px 18px;
+  border-radius: $radius-md;
+  background: $orange-gradient;
+  color: white;
+  border: none;
+  font-weight: $weight-normal;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+}
+
+// ========== EMPTY STATE ==========
+.empty-state {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  border: 1px dashed #ccc;
+  border-radius: $radius-lg;
+  padding: $padding-xl;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $gap-md;
+  text-align: center;
+  color: $gray-text;
+}
+
+// ========== RESPONSIVE ==========
+@media (max-height: 700px) {
+  .table-grid {
+    grid-auto-rows: 60px;
+  }
+
+  .table-card {
+    height: 60px;
+    font-size: $font-sm;
+  }
+
+  .zone-title {
+    font-size: $font-lg;
+  }
+}

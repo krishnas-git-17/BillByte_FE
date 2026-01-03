@@ -1,0 +1,77 @@
+<h2>Users</h2>
+
+<button class="add-btn" (click)="openCreate()">+ Add User</button>
+
+<table *ngIf="!loading">
+  <thead>
+    <tr>
+      <th>Employee ID</th>
+      <th>Name</th>
+      <th>Role</th>
+      <th>Status</th>
+      <th>Actions</th>
+      <th>Assign Tables</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let u of users">
+      <td>{{ u.employeeId }}</td>
+      <td>{{ u.name }}</td>
+      <td>{{ roleMap[u.role] || u.role }}</td>
+      <td>
+        <span [class.active]="u.isActive" [class.disabled]="!u.isActive">
+          {{ u.isActive ? 'Active' : 'Disabled' }}
+        </span>
+      </td>
+      <td>
+        <button (click)="toggle(u)">
+          {{ u.isActive ? 'Disable' : 'Enable' }}
+        </button>
+      </td>
+      <td>
+<button
+  (click)="openAssign(u)"
+  [disabled]="u.role === 1 || u.role === 2">
+  Assign
+</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="modal-backdrop" *ngIf="assigningUser">
+  <div class="modal">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h3>Assign Tables</h3>
+      <span class="close-btn" (click)="closeAssign()">✖</span>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+      <p class="emp">
+        Employee: <b>{{ assigningUser.employeeId }}</b>
+      </p>
+
+      <div class="sections">
+        <label *ngFor="let s of sections">
+          <input
+            type="checkbox"
+            [checked]="selectedSections.includes(s.id)"
+            (change)="toggleSection(s.id)"
+          />
+          {{ s.name }}
+        </label>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <button class="save-btn" (click)="saveAssignment()">✔ Save</button>
+      <button class="cancel-btn" (click)="closeAssign()">✖ Close</button>
+    </div>
+
+  </div>
+</div>
