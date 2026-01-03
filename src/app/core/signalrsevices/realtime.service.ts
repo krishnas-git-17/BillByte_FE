@@ -35,7 +35,14 @@ export class RealtimeService {
     this.hub.start()
       .then(() => console.log('[Realtime] Connected'))
       .catch(err => console.error('[Realtime] Connection failed', err));
+
+      this.hub.on('ASSIGNED_TABLES_CHANGED', payload => {
+  console.log('[Realtime] ASSIGNED_TABLES_CHANGED', payload);
+  this.event$.next({ type: 'ASSIGNED_TABLES_CHANGED', payload });
+});
   }
+
+  
 
   disconnect() {
     this.hub?.stop();
