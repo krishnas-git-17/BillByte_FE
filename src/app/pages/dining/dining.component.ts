@@ -88,6 +88,17 @@ this.subs.push(
   })
 );
 
+// Listen for assignment changes from SignalR and reload sections
+this.subs.push(
+  this.realtime.events$.subscribe(evt => {
+    if (evt?.type === 'ASSIGNED_TABLES_CHANGED') {
+      console.log('[Realtime] ASSIGNED_TABLES_CHANGED received', evt.payload);
+      // reload table preferences / sections so dashboard reflects new assignment
+      this.loadSections();
+    }
+  })
+);
+
 }
 
 
@@ -198,6 +209,7 @@ this.subs.push(
 
 ngOnDestroy(): void {
   this.tableStateSub?.unsubscribe();
+  this.subs.forEach(s => s.unsubscribe());
   clearInterval(this.timerInterval);
 }
 
@@ -255,6 +267,7 @@ ngOnDestroy(): void {
 
         this.applySectionFilter();
         this.loadingTables = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.loadingTables = false;
@@ -303,6 +316,10 @@ ngOnDestroy(): void {
 getTableStatus(tableId: string) {
   return this.tableStates.get(tableId) || 'available';
 }
+
+
+
+
 
 
 
