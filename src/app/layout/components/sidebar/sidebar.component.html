@@ -28,6 +28,15 @@
       </ng-container>
 
     </div>
+<!-- 🌐 NETWORK STATUS -->
+<div
+  class="sidebar-network-status"
+  [class.online]="isOnline"
+  [class.offline]="!isOnline"
+>
+  <span class="dot"></span>
+  {{ isOnline ? 'Online' : 'Offline' }}
+</div>
 
   </mat-sidenav>
 </mat-sidenav-container>

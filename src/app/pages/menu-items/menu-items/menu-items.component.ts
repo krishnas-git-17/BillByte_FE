@@ -172,10 +172,10 @@ importExcel(event: any) {
         newItems.push({
           menuId,
           name,
-          type: row.Type || '',
-          vegType: row.VegType || 'Veg',
+          type: row.type || '',
+          vegType: row.vegType || 'Veg',
           status: row.Status || 'Available',
-          price: Number(row.Price || 0),
+          price: Number(row.price || 0),
           imageUrl: matchedImg ? matchedImg.itemImage : null
         });
       });

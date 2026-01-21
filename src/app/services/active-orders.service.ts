@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { API_CONFIG } from '../core/api.config';
 import { Observable } from 'rxjs';
+import { ActiveOrdersOfflineService } from '../core/offline/active-orders.offline.service';
 
 /* =======================
    FRONTEND DTOs (REQUEST)
@@ -42,56 +43,70 @@ export class ActiveOrdersService {
 
   private BASE = API_CONFIG.BASE_URL;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,   private offline: ActiveOrdersOfflineService) {}
 
-  /* =======================
-     GET ACTIVE ORDER BY TABLE
-     ======================= */
-  getByTable(tableId: string): Observable<ActiveOrderItem[]> {
-    return this.http.get<ActiveOrderItem[]>(
-      this.BASE + API_CONFIG.ACTIVE_TABLE_ITEMS.GET_BY_TABLE(tableId)
-    );
+getByTable(tableId: string) {
+  if (!navigator.onLine) {
+    return this.offline.getByTable(tableId);
   }
 
-  /* =======================
-     ADD ITEM (REAL-TIME)
-     ======================= */
-  addItem(tableId: string, item: ActiveOrderItemDto): Observable<any> {
-    return this.http.post(
-      this.BASE + API_CONFIG.ACTIVE_TABLE_ITEMS.ADD_ITEM(tableId),
-      item
-    );
-  }
+  this.http.get<ActiveOrderItem[]>(
+    this.BASE + API_CONFIG.ACTIVE_TABLE_ITEMS.GET_BY_TABLE(tableId)
+  ).subscribe(items => {
+    items.forEach(i => this.offline.addOrUpdate(tableId, i, true));
+  });
 
-  /* =======================
-     UPDATE ITEM QTY
-     ======================= */
-  updateItemQty(
-    tableId: string,
-    itemId: number,
-    qty: number
-  ): Observable<any> {
-    return this.http.put(
-      this.BASE + API_CONFIG.ACTIVE_TABLE_ITEMS.UPDATE_ITEM(tableId, itemId),
-      { qty }
-    );
-  }
+  return this.offline.getByTable(tableId);
+}
 
-  /* =======================
-     DELETE ITEM
-     ======================= */
-  deleteItem(tableId: string, itemId: number): Observable<any> {
-    return this.http.delete(
-      this.BASE + API_CONFIG.ACTIVE_TABLE_ITEMS.DELETE_ITEM(tableId, itemId)
-    );
-  }
 
-  /* =======================
-     CLEAR TABLE (LATER USE)
-     ======================= */
-  clearTable(tableId: string): Observable<any> {
-    return this.http.delete(
-      this.BASE + API_CONFIG.ACTIVE_TABLE_ITEMS.CLEAR_TABLE(tableId)
-    );
-  }
+addItem(tableId: string, item: ActiveOrderItemDto): void {
+  // 🔥 local first
+  this.offline.addOrUpdate(tableId, item);
+
+  if (!navigator.onLine) return;
+
+  this.http.post(
+    this.BASE + API_CONFIG.ACTIVE_TABLE_ITEMS.ADD_ITEM(tableId),
+    item
+  ).subscribe(() => {
+    this.offline.markSynced(tableId, item.itemId);
+  });
+}
+
+
+updateItemQty(tableId: string, itemId: number, qty: number): void {
+  this.offline.updateQty(tableId, itemId, qty);
+
+  if (!navigator.onLine) return;
+
+  this.http.put(
+    this.BASE + API_CONFIG.ACTIVE_TABLE_ITEMS.UPDATE_ITEM(tableId, itemId),
+    { qty }
+  ).subscribe(() => {
+    this.offline.markSynced(tableId, itemId);
+  });
+}
+
+
+deleteItem(tableId: string, itemId: number): void {
+  this.offline.remove(tableId, itemId);
+
+  if (!navigator.onLine) return;
+
+  this.http.delete(
+    this.BASE + API_CONFIG.ACTIVE_TABLE_ITEMS.DELETE_ITEM(tableId, itemId)
+  ).subscribe();
+}
+
+clearTable(tableId: string): void {
+  this.offline.clearTable(tableId);
+
+  if (!navigator.onLine) return;
+
+  this.http.delete(
+    this.BASE + API_CONFIG.ACTIVE_TABLE_ITEMS.CLEAR_TABLE(tableId)
+  ).subscribe();
+}
+
 }
