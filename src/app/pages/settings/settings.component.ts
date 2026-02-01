@@ -19,4 +19,12 @@ export class SettingsComponent {
   openAppPreferences() {
     this.router.navigate(['/settings/table-preferences']); 
   }
+  openKotSettings() {
+  this.router.navigate(['/settings/kot-settings']);
+}
+openTakeAwaySettings() {
+  this.router.navigate(['/settings/take-away-settings']);
+}
+
+
 }

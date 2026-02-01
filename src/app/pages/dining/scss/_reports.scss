@@ -1,0 +1,237 @@
+@import './variables';
+
+// ========== REPORTS PANEL ==========
+.reports-panel {
+  display: flex;
+  flex-direction: column;
+  gap: $gap-lg;
+  height: 100%;
+}
+
+.reports-header {
+  display: flex;
+  align-items: center;
+}
+
+.reports-title {
+  margin: 0;
+  font-size: $font-3xl;
+  font-weight: $weight-black;
+  color: $gray-text-dark;
+  left: 15px;
+  display: flex;
+  align-items: center;
+  gap: $gap-md;
+  letter-spacing: 0.3px;
+}
+
+// ========== REPORT CARD BASE ==========
+.report-card {
+  background: #ffffff;
+  border: 1px solid #e3e3e3;
+  border-radius: $radius-lg;
+  padding: $padding-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $gap-sm;
+  box-shadow: $shadow-md;
+
+  &.highlight {
+    background: $orange-gradient;
+    border: none;
+    box-shadow: 0 6px 16px rgba(255, 122, 24, 0.35);
+
+    .label,
+    .value {
+      color: #fff;
+    }
+  }
+
+  &.list {
+    flex: 1;
+  }
+
+  &.chart {
+    flex: 1;
+  }
+}
+
+// ========== LABELS & VALUES ==========
+.label {
+  font-size: $font-sm;
+  color: $gray-text-muted;
+  font-weight: $weight-bold;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.value {
+  font-size: $font-2xl;
+  font-weight: $weight-black;
+  color: $gray-text-dark;
+}
+
+.value-row {
+  display: flex;
+  align-items: center;
+  gap: $gap-md;
+}
+
+// ========== TRENDS ==========
+.trend {
+  font-size: $font-sm;
+  font-weight: $weight-heavy;
+
+  &.up {
+    color: $trend-up;
+  }
+
+  &.down {
+    color: $trend-down;
+  }
+
+  &.same {
+    color: $trend-neutral;
+  }
+}
+
+// ========== MINI CHART ==========
+.mini-chart {
+  display: flex;
+  flex-direction: column;
+  gap: $gap-md;
+  margin-top: 8px;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 75px 1fr 30px;
+  align-items: center;
+  gap: $gap-md;
+  font-size: $font-sm;
+  font-weight: $weight-normal;
+}
+
+.track {
+  height: 10px;
+  background: #eaeaea;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: 12px;
+
+  &.today {
+    background: $orange-gradient;
+  }
+
+  &.yesterday {
+    background: #c7c7c7;
+  }
+}
+
+// ========== LIST VIEW ==========
+.report-card.list .label {
+  font-size: $font-lg;
+  font-weight: $weight-heavy;
+  color: $gray-text-muted;
+}
+
+.report-card.list ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+}
+
+.report-card.list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: $font-xl;
+  font-weight: $weight-normal;
+  padding: 8px 0;
+  border-bottom: 1px dashed #e5e5e5;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.item-name {
+  flex: 1;
+}
+
+.item-qty {
+  font-weight: $weight-black;
+  color: $primary-orange;
+}
+
+// ========== LIST HEADER ==========
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.range-select {
+  padding: 4px 10px;
+  border-radius: $radius-md;
+  border: 1px solid $gray-border;
+  background: #fff;
+  font-size: $font-sm;
+  font-weight: $weight-bold;
+  color: #333;
+  cursor: pointer;
+  outline: none;
+
+  &:hover {
+    border-color: $primary-orange;
+  }
+
+  &:focus {
+    border-color: $primary-orange;
+    box-shadow: 0 0 0 2px rgba(255, 122, 24, 0.2);
+  }
+}
+
+// ========== NAV ICON (INLINE) ==========
+.nav-icon.inline {
+  width: 26px;
+  height: 26px;
+  border-radius: $radius-full;
+  border: none;
+  background: $orange-gradient;
+  color: #ffffff;
+  font-size: $font-sm;
+  font-weight: $weight-black;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: $shadow-sm;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 6px 14px rgba(255, 122, 24, 0.6);
+  }
+}
+
+// ========== NEW ORDER BUTTON ==========
+.new-order-btn {
+  padding: 10px 18px;
+  border-radius: $radius-lg;
+  background: $orange-gradient;
+  color: #fff;
+  font-weight: $weight-black;
+  border: none;
+  cursor: pointer;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

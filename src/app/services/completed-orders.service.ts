@@ -17,4 +17,13 @@ export class CompletedOrdersService {
   return this.http.get<any[]>(API_CONFIG.BASE_URL + API_CONFIG.COMPLETED_ORDERS.GET_ALL);
 }
 
+getByInvoice(invoiceNo: string) {
+  return this.http.get<any>(
+    API_CONFIG.BASE_URL +
+    API_CONFIG.COMPLETED_ORDERS.GET_BY_INVOICE(invoiceNo)
+  );
+}
+
+
+
 }

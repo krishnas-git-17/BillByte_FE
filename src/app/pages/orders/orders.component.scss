@@ -5,23 +5,18 @@
   height: 100%;
   flex: 1;
 }
-
-
-/* ========== HEADER ========== */
 .order-header {
   display: flex;
   align-items: center;
   gap: 15px;
   padding: 10px 0;
 }
-
 .back-btn {
   font-size: 22px;
   background: none;
   border: none;
   cursor: pointer;
 }
-
 .header-title {
   font-size: 22px;
   font-weight: 600;
@@ -72,7 +67,6 @@
 }
 
 
-/* ========== MENU BOX ========== */
 .menu-box {
   width: 750px;
   background: #f5f6fa;
@@ -88,7 +82,6 @@
 }
 
 
-/* ========== ORDER BOX ========== */
 .order-box {
   width: 350px;
   background: #fff;
@@ -97,28 +90,25 @@
   display: flex;
   flex-direction: column;
 
-  /* THE MAGIC FIX */
   max-height: 100%;
   height: 100%;
   overflow: hidden;
 }
 
-/* scroll content */
 .order-scroll {
   flex: 1;
   overflow-y: auto;
   padding-right: 6px;
 }
 .order-scroll::-webkit-scrollbar {
-  display: none;          /* Chrome, Edge, Safari */
+  display: none;       
 }
 
 .order-scroll {
-  -ms-overflow-style: none;  /* Internet Explorer */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
 }
 
-/* ORDER ROW */
 .order-row {
   display: grid;
   grid-template-columns: 1fr auto auto;
@@ -133,7 +123,7 @@
 }
 
 .qty-box {
-  min-width: 65px;           /* FIXED WIDTH */
+  min-width: 65px;      
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -141,7 +131,7 @@
   border: 1px solid #ddd;
   padding: 6px 12px;
   border-radius: 8px;
-  margin-right: 10px;         /* spacing before price */
+  margin-right: 10px;     
 }
 
 
@@ -160,23 +150,19 @@
 }
 
 .order-price {
-  min-width: 60px;            /* FIXED PRICE AREA */
+  min-width: 60px;           
   text-align: right;
   font-size: 15px;
   font-weight: 600;
 }
 
 
-
-
-/* ========== FIXED BOTTOM ========== */
 .order-bottom {
   padding: 15px 0;
   margin-top: auto;
   background: #fff;
 }
 
-/* order type buttons */
 .order-type-row {
   display: flex;
   gap: 8px;
@@ -215,7 +201,139 @@
 }
 
 
-/* billing */
+.item-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.add-note-btn {
+  margin-top: 4px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  color: #ff8800;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-note-btn:hover {
+  text-decoration: underline;
+}
+
+
+.note-input-row {
+  display: flex;
+  align-items: center;
+}
+
+.note-input-wrapper {
+  position: relative;
+  width: 180px;      /* ✅ FIXED width (POS-friendly) */
+  max-width: 180px;
+  flex: none;        /* ✅ PREVENT stretch */
+}
+
+
+
+.note-input {
+  width: 100%;
+  padding: 8px 32px 8px 12px;
+  border-radius: 18px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+
+.note-tick-inside {
+  position: absolute;
+  left: 110%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  font-weight: 700;
+  color: #16a34a;
+  cursor: pointer;
+  line-height: 1;
+}
+
+
+
+
+.note-tick-inside:hover {
+  color: #15803d;
+}
+
+
+.note-input:focus {
+  border-color: #16a34a;
+}
+
+.note-save-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #16a34a;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.note-save-btn:hover {
+  background: #15803d;
+}
+.note-tick-btn {
+  width: 36px;
+  height: 32px;
+  border-radius: 10px;
+  border: none;
+  background: #16a34a;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.note-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.note-chip {
+  display: inline-flex;
+  align-items: center;
+  background: #fff4dd;
+  border: 1px solid #ffb347;
+  color: #000;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.note-chip .remove {
+  margin-left: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.note-icon-btn {
+  margin-left: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.note-icon-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
 .bill-details {
   margin-bottom: 10px;
 }
@@ -240,17 +358,16 @@
   font-weight: 700;
 }
 
-/* PROCEED BUTTON */
 .proceed-btn {
   width: 100%;
   height: 48px;
-  background: #16a34a;      /* Green color similar to screenshot */
+  background: #16a34a;     
   color: #ffffff;
   border: none;
-  border-radius: 0px;       /* Square corners like screenshot */
+  border-radius: 0px;       
   font-size: 18px;
-  font-weight: 700;         /* Bold text */
-  text-transform: uppercase; /* DELIVER HERE style */
+  font-weight: 700;        
+  text-transform: uppercase;
   letter-spacing: 1px;
   cursor: pointer;
   display: flex;
@@ -259,7 +376,7 @@
 }
 
 .proceed-btn:hover {
-  background: #15803d;     /* Slight darker green on hover */
+  background: #15803d;  
 }
 .checkout {
   background: #ff5722;
@@ -269,7 +386,71 @@
   background: #e64a19;
 }
 
-/* ===== ORDER SKELETON ===== */
+/* ================= ACTION BUTTONS ================= */
+
+.order-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Base button */
+.btn {
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.5px;
+}
+
+/* SAVE – neutral */
+.btn.save {
+  background: #f3f4f6;        /* light gray */
+  color: #111827;
+  border-color: #d1d5db;
+}
+
+.btn.save:hover {
+  background: #e5e7eb;
+}
+
+/* SAVE & KOT – warm (existing orange theme) */
+.btn.kot {
+  background: #fff4e5;        /* light orange */
+  color: #ff8800;
+  border-color: #ffcc99;
+}
+
+.btn.kot:hover {
+  background: #ffe8cc;
+}
+
+/* BILLING – primary action (light green) */
+.btn.billing {
+  background: #ecfdf5;        /* very light green */
+  color: #16a34a;
+  border-color: #86efac;
+}
+
+.btn.billing:hover {
+  background: #d1fae5;
+}
+
+/* SETTLE – final action (slightly stronger) */
+.btn.settle {
+  background: #16a34a;
+  color: #ffffff;
+  border-color: #16a34a;
+}
+
+.btn.settle:hover {
+  background: #15803d;
+}
+
 
 .skeleton {
   background: linear-gradient(

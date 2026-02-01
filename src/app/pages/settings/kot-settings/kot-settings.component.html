@@ -1,0 +1,35 @@
+<div class="kot-settings">
+
+  <h2>KOT / Bill Settings</h2>
+
+  <div class="settings-section">
+    <h3>Header</h3>
+    <label><input type="checkbox" [(ngModel)]="settings.showLogo"> Show Logo</label>
+    <label><input type="checkbox" [(ngModel)]="settings.showRestaurantName"> Restaurant Name</label>
+    <label><input type="checkbox" [(ngModel)]="settings.showAddress"> Address</label>
+    <label><input type="checkbox" [(ngModel)]="settings.showGST"> GST Number</label>
+    <label><input type="checkbox" [(ngModel)]="settings.showDateTime"> Date & Time</label>
+  </div>
+
+  <div class="settings-section">
+    <h3>Order Info</h3>
+    <label><input type="checkbox" [(ngModel)]="settings.showTable"> Table Number</label>
+    <label><input type="checkbox" [(ngModel)]="settings.showOrderType"> Order Type</label>
+    <label><input type="checkbox" [(ngModel)]="settings.showItemNotes"> Item Notes</label>
+  </div>
+
+  <div class="settings-section">
+    <h3>Items</h3>
+    <label><input type="checkbox" [(ngModel)]="settings.groupSameItems"> Group Same Items</label>
+  </div>
+
+  <div class="settings-section">
+    <h3>Totals</h3>
+    <label><input type="checkbox" [(ngModel)]="settings.showSubtotal"> Subtotal</label>
+    <label><input type="checkbox" [(ngModel)]="settings.showTax"> Tax</label>
+    <label><input type="checkbox" [(ngModel)]="settings.showGrandTotal"> Grand Total</label>
+  </div>
+
+  <button class="save-btn" (click)="save()">Save Settings</button>
+
+</div>

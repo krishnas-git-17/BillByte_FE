@@ -1,0 +1,122 @@
+<div *ngIf="order" id="receipt"
+     [ngClass]="mode === 'BILL' ? 'bill' : 'kot'">
+
+
+  <!-- TITLE -->
+  <div class="center title">BillByte</div>
+
+  <!-- META -->
+  <div class="meta two-col">
+    <div>Date</div>
+    <div class="right">
+      {{ order.createdAt | date:'dd/MM/yy HH:mm' }}
+    </div>
+  </div>
+
+  <div class="meta two-col">
+    <div>Table</div>
+    <div class="right">{{ order.tableId || '-' }}</div>
+  </div>
+
+  <!-- KOT NO -->
+  <div class="meta kot-row" *ngIf="mode === 'KOT'">
+    <div>KOT No</div>
+    <div class="right kot-no">{{ order.kotNo }}</div>
+  </div>
+
+  <!-- INVOICE -->
+  <div class="meta two-col" *ngIf="mode === 'BILL'">
+    <div>Invoice No</div>
+    <div class="right">{{ order.invoiceNo || 'AUTO' }}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ================= HEADER ================= -->
+
+  <!-- KOT HEADER -->
+  <div class="row header" *ngIf="mode === 'KOT'">
+    <span class="item">Item</span>
+    <span class="note">Note</span>
+    <span class="qty end">Qty</span>
+  </div>
+
+  <!-- BILL HEADER -->
+  <div class="row header" *ngIf="mode === 'BILL'">
+    <span class="item">Item</span>
+    <span class="qty">Qty</span>
+    <span class="price">Price</span>
+    <span class="amt">Amount</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ================= ITEMS ================= -->
+
+  <div *ngFor="let i of order.items; let last = last">
+
+    <div class="row">
+
+      <!-- ITEM -->
+      <span class="item">{{ i.itemName }}</span>
+
+      <!-- KOT -->
+      <ng-container *ngIf="mode === 'KOT'">
+        <span class="note">{{ i.specialNote || '-' }}</span>
+        <span class="qty end">{{ i.qty }}</span>
+      </ng-container>
+
+      <!-- BILL -->
+      <ng-container *ngIf="mode === 'BILL'">
+        <span class="qty">{{ i.qty }}</span>
+        <span class="price">{{ i.price }}</span>
+        <span class="amt">{{ getItemAmount(i) }}</span>
+      </ng-container>
+
+    </div>
+
+    <!-- THIN ITEM DIVIDER -->
+    <div class="item-divider" *ngIf="!last"></div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TOTAL QTY -->
+  <div class="row">
+    <span class="item">Total Qty</span>
+    <span class="amt right">{{ getTotalQty() }}</span>
+  </div>
+
+  <!-- ================= BILL TOTALS ================= -->
+
+  <ng-container *ngIf="mode === 'BILL'">
+
+    <div class="row">
+      <span class="item">Subtotal</span>
+      <span class="amt right">{{ order.subtotal }}</span>
+    </div>
+
+    <div class="row">
+      <span class="item">Tax</span>
+      <span class="amt right">{{ order.tax }}</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row grand">
+      <span class="item">Grand Total</span>
+      <span class="amt right">₹ {{ order.total }}/-</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- UPI QR -->
+    <div class="center qr-section">
+      <img [src]="upiQrDataUrl" class="upi-qr" />
+      <div class="qr-text">Scan & Pay via UPI</div>
+    </div>
+
+  </ng-container>
+
+</div>

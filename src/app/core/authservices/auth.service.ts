@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-
   private TOKEN_KEY = 'token';
   private ROLE_KEY = 'role';
 
@@ -11,20 +10,35 @@ export class AuthService {
     localStorage.setItem(this.ROLE_KEY, role);
   }
 
-  getToken(): string | null {
+  getToken() {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  getRole(): string | null {
+  getRole() {
     return localStorage.getItem(this.ROLE_KEY);
   }
 
-  isLoggedIn(): boolean {
+  isLoggedIn() {
     return !!this.getToken();
   }
 
   logout() {
-    localStorage.clear();
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+  }
+
+  getRestaurantId(): string | null {
+  const token = this.getToken();
+  if (!token) return null;
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.restaurantId ?? null;
+  } catch {
+    return null;
   }
 }
+
+}
+
 

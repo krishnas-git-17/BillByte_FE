@@ -1,0 +1,565 @@
+<div class="landing-page">
+  <!-- NAVIGATION BAR -->
+  <nav class="navbar" [class.scrolled]="scrolled">
+    <div class="navbar-container">
+      <!-- Logo -->
+      <div class="navbar-brand" routerLink="/">
+        <div class="logo-icon">₹</div>
+        <span class="logo-text">BillByte</span>
+      </div>
+
+      <!-- Desktop Nav Links -->
+      <ul class="nav-links">
+        <li><a (click)="scrollToSection('about')" class="nav-link">About</a></li>
+        <li><a (click)="scrollToSection('features')" class="nav-link">Features</a></li>
+        <li><a href="#" class="nav-link">Pricing</a></li>
+      </ul>
+
+      <!-- Auth Buttons -->
+      <div class="auth-buttons">
+        <button class="btn btn-ghost" (click)="navigateToLogin()">Login</button>
+        <button class="btn btn-primary" (click)="openSignUp()">Get Started</button>
+      </div>
+
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-toggle" [class.active]="mobileMenuOpen" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" [class.open]="mobileMenuOpen">
+      <a (click)="scrollToSection('about')" class="mobile-menu-item">About</a>
+      <a (click)="scrollToSection('features')" class="mobile-menu-item">Features</a>
+      <a href="#" class="mobile-menu-item">Pricing</a>
+      <button class="btn btn-ghost btn-block" (click)="navigateToLogin()">Login</button>
+      <button class="btn btn-primary btn-block" (click)="openSignUp()">Get Started</button>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="hero-background">
+      <div class="gradient-blob blob-1"></div>
+      <div class="gradient-blob blob-2"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">Transform Your Restaurant Operations</h1>
+        <p class="hero-subtitle">
+          Complete POS system built for modern restaurants. Manage orders, tables, billing, and analytics in one powerful platform.
+        </p>
+
+        <div class="hero-buttons">
+          <button class="btn btn-primary btn-lg" (click)="navigateToLogin()">
+            <span>Start Free Trial</span>
+            <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M7 10H13M13 10L10 7M13 10L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="btn btn-secondary btn-lg" (click)="scrollToSection('features')">
+            Learn More
+          </button>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Restaurants</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">99.9%</div>
+            <div class="stat-label">Uptime</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Support</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-image">
+        <div class="hero-illustration">
+          <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#0d6efd;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#0861c1;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            
+            <!-- Dashboard container -->
+            <rect x="40" y="40" width="420" height="320" fill="white" stroke="url(#grad1)" stroke-width="2" rx="12" box-shadow="0 20px 40px rgba(13, 110, 253, 0.2)"/>
+            
+            <!-- Header -->
+            <rect x="40" y="40" width="420" height="50" fill="url(#grad1)" rx="12"/>
+            <circle cx="70" cy="65" r="6" fill="white"/>
+            <circle cx="95" cy="65" r="6" fill="white"/>
+            <circle cx="120" cy="65" r="6" fill="white"/>
+            
+            <!-- Content areas -->
+            <rect x="55" y="110" width="180" height="20" fill="#e8f0fe" rx="4"/>
+            <rect x="55" y="145" width="180" height="12" fill="#f0f4ff" rx="2"/>
+            <rect x="55" y="165" width="180" height="12" fill="#f0f4ff" rx="2"/>
+            
+            <rect x="265" y="110" width="180" height="50" fill="#e8f0fe" rx="4"/>
+            
+            <rect x="55" y="200" width="390" height="130" fill="#f8f9ff" rx="4" stroke="#e8f0fe" stroke-width="1"/>
+            
+            <!-- Chart bars -->
+            <rect x="75" y="290" width="15" height="30" fill="url(#grad1)"/>
+            <rect x="105" y="270" width="15" height="50" fill="url(#grad1)"/>
+            <rect x="135" y="250" width="15" height="70" fill="url(#grad1)"/>
+            <rect x="165" y="280" width="15" height="40" fill="url(#grad1)"/>
+            
+            <!-- Decorative dots -->
+            <circle cx="420" cy="100" r="4" fill="#0d6efd" opacity="0.3"/>
+            <circle cx="460" cy="150" r="3" fill="#0d6efd" opacity="0.2"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES SECTION -->
+  <section class="features" id="features">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">KEY FEATURES</span>
+        <h2 class="section-title">Everything You Need to Run Your Restaurant</h2>
+        <p class="section-description">Powerful tools designed for efficiency and growth</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-card-icon">📋</div>
+          <h3 class="feature-card-title">Order Management</h3>
+          <p class="feature-card-text">
+            Streamlined order processing with kitchen display system, KOT printing, and real-time status tracking
+          </p>
+          <a href="#" class="feature-link">Learn more →</a>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-card-icon">🍽️</div>
+          <h3 class="feature-card-title">Table Management</h3>
+          <p class="feature-card-text">
+            Visual table layout, seating management, and capacity tracking for optimal restaurant flow
+          </p>
+          <a href="#" class="feature-link">Learn more →</a>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-card-icon">💰</div>
+          <h3 class="feature-card-title">Billing System</h3>
+          <p class="feature-card-text">
+            Fast and accurate billing with multiple payment methods, tax calculation, and receipt generation
+          </p>
+          <a href="#" class="feature-link">Learn more →</a>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-card-icon">📊</div>
+          <h3 class="feature-card-title">Real-Time Analytics</h3>
+          <p class="feature-card-text">
+            Comprehensive reports, sales insights, inventory tracking, and business intelligence dashboards
+          </p>
+          <a href="#" class="feature-link">Learn more →</a>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-card">
+          <div class="feature-card-icon">👥</div>
+          <h3 class="feature-card-title">Staff Management</h3>
+          <p class="feature-card-text">
+            Role-based access control, staff assignments, performance tracking, and shift management
+          </p>
+          <a href="#" class="feature-link">Learn more →</a>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-card">
+          <div class="feature-card-icon">🚀</div>
+          <h3 class="feature-card-title">Parcel Orders</h3>
+          <p class="feature-card-text">
+            Seamless take-away order management with delivery tracking and online ordering integration
+          </p>
+          <a href="#" class="feature-link">Learn more →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT SECTION -->
+  <section class="about" id="about">
+    <div class="section-container">
+      <div class="about-grid">
+        <!-- Left: Content -->
+        <div class="about-content">
+          <span class="section-tag">ABOUT</span>
+          <h2 class="section-title">Built for Modern Restaurants</h2>
+          <p class="about-text">
+            BillByte is a comprehensive restaurant management platform that brings together 
+            order management, table reservation, billing, and business intelligence in one 
+            intuitive interface. Trusted by hundreds of restaurants across India.
+          </p>
+
+          <div class="about-features">
+            <div class="about-feature">
+              <div class="feature-check">✓</div>
+              <div class="feature-content">
+                <h4>Cloud-Based Solution</h4>
+                <p>Access your restaurant from anywhere, anytime</p>
+              </div>
+            </div>
+
+            <div class="about-feature">
+              <div class="feature-check">✓</div>
+              <div class="feature-content">
+                <h4>Mobile Responsive</h4>
+                <p>Perfect experience on all devices and screen sizes</p>
+              </div>
+            </div>
+
+            <div class="about-feature">
+              <div class="feature-check">✓</div>
+              <div class="feature-content">
+                <h4>Advanced Security</h4>
+                <p>Enterprise-grade encryption and data protection</p>
+              </div>
+            </div>
+
+            <div class="about-feature">
+              <div class="feature-check">✓</div>
+              <div class="feature-content">
+                <h4>Dedicated Support</h4>
+                <p>Expert support team available 24/7 for your needs</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="about-links">
+            <a href="https://github.com" target="_blank" class="about-link-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v 3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+              GitHub
+            </a>
+            <a href="https://docs.example.com" target="_blank" class="about-link-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              Documentation
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Image -->
+        <div class="about-image">
+          <div class="about-illustration">
+            <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#e8f0fe;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#f0f7ff;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              
+              <!-- Phone frame -->
+              <rect x="50" y="20" width="300" height="460" fill="white" stroke="#0d6efd" stroke-width="2" rx="30"/>
+              
+              <!-- Phone notch -->
+              <rect x="140" y="25" width="120" height="20" fill="#000" rx="10"/>
+              
+              <!-- Screen content -->
+              <rect x="60" y="50" width="280" height="400" fill="url(#grad2)" rx="20"/>
+              
+              <!-- Header -->
+              <rect x="70" y="65" width="260" height="40" fill="#0d6efd" rx="8"/>
+              <circle cx="90" cy="85" r="5" fill="white"/>
+              <circle cx="110" cy="85" r="5" fill="white"/>
+              <circle cx="130" cy="85" r="5" fill="white"/>
+              
+              <!-- Content -->
+              <rect x="70" y="120" width="260" height="15" fill="#e8f0fe" rx="4"/>
+              <rect x="70" y="145" width="260" height="12" fill="#f0f4ff" rx="2"/>
+              <rect x="70" y="165" width="260" height="12" fill="#f0f4ff" rx="2"/>
+              
+              <!-- Items -->
+              <rect x="70" y="195" width="120" height="80" fill="#f8f9ff" rx="6" stroke="#e8f0fe" stroke-width="1"/>
+              <circle cx="130" cy="235" r="25" fill="#0d6efd" opacity="0.2"/>
+              
+              <rect x="210" y="195" width="120" height="80" fill="#f8f9ff" rx="6" stroke="#e8f0fe" stroke-width="1"/>
+              <circle cx="270" cy="235" r="25" fill="#0d6efd" opacity="0.2"/>
+              
+              <!-- Bottom button -->
+              <rect x="70" y="400" width="260" height="35" fill="#0d6efd" rx="8"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABLE MANAGEMENT SHOWCASE SECTION -->
+  <section class="table-showcase">
+    <div class="section-container">
+      <div class="showcase-header">
+        <span class="section-tag">TABLE MANAGEMENT</span>
+        <h2 class="section-title">Intelligent Table Status Dashboard</h2>
+        <p class="showcase-subtitle">Real-time table management with color-coded status indicators for efficient restaurant operations</p>
+      </div>
+
+      <div class="showcase-grid">
+        <!-- Left: Table Grid -->
+        <div class="table-grid-container">
+          <div class="table-grid-header">
+            <h3>AC Section - Table Layout</h3>
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-color occupied"></div>
+                <span>Occupied</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color available"></div>
+                <span>Available</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color reserved"></div>
+                <span>Reserved</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color maintenance"></div>
+                <span>Maintenance</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-grid">
+            <div class="table-item occupied" (click)="showTableDetail(1)">
+              <div class="table-number">1</div>
+              <div class="table-duration">0 4h 59m</div>
+            </div>
+            <div class="table-item available">
+              <div class="table-number">2</div>
+            </div>
+            <div class="table-item reserved">
+              <div class="table-number">3</div>
+              <div class="table-duration">3h 57m</div>
+            </div>
+            <div class="table-item reserved">
+              <div class="table-number">4</div>
+              <div class="table-duration">3h 55m</div>
+            </div>
+            <div class="table-item occupied">
+              <div class="table-number">5</div>
+              <div class="table-duration">1h 38m</div>
+            </div>
+            <div class="table-item available">
+              <div class="table-number">6</div>
+            </div>
+            <div class="table-item available">
+              <div class="table-number">7</div>
+            </div>
+            <div class="table-item available">
+              <div class="table-number">8</div>
+            </div>
+            <div class="table-item available">
+              <div class="table-number">9</div>
+            </div>
+            <div class="table-item available">
+              <div class="table-number">10</div>
+            </div>
+            <div class="table-item occupied">
+              <div class="table-number">11</div>
+              <div class="table-duration">4h 56m</div>
+            </div>
+            <div class="table-item occupied">
+              <div class="table-number">12</div>
+              <div class="table-duration">4h 33m</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Detailed Table Info -->
+        <div class="table-detail-container">
+          <div class="table-detail-card">
+            <div class="detail-header">
+              <h3 class="detail-title">Table #1</h3>
+              <span class="detail-status occupied-label">Occupied</span>
+            </div>
+
+            <div class="detail-info">
+              <div class="info-row">
+                <span class="info-label">Capacity:</span>
+                <span class="info-value">4 Guests</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Current Guests:</span>
+                <span class="info-value">4</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Duration:</span>
+                <span class="info-value">4h 59m</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Section:</span>
+                <span class="info-value">AC</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Server:</span>
+                <span class="info-value">Rajesh Kumar</span>
+              </div>
+            </div>
+
+            <div class="detail-items">
+              <h4 class="items-title">Current Orders</h4>
+              <div class="order-list">
+                <div class="order-item">
+                  <span class="order-name">Butter Chicken Biryani x 2</span>
+                  <span class="order-status">Served</span>
+                </div>
+                <div class="order-item">
+                  <span class="order-name">Garlic Naan x 4</span>
+                  <span class="order-status">Served</span>
+                </div>
+                <div class="order-item">
+                  <span class="order-name">Mango Lassi x 4</span>
+                  <span class="order-status">Served</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-actions">
+              <button class="action-btn primary">Print Bill</button>
+              <button class="action-btn secondary">Add Order</button>
+              <button class="action-btn tertiary">Mark as Free</button>
+            </div>
+          </div>
+
+          <div class="feature-highlights">
+            <h4>Key Features</h4>
+            <ul class="highlight-list">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                  <path d="M13.5 2.5L6 10l-3-3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Real-time table status updates
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                  <path d="M13.5 2.5L6 10l-3-3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Color-coded status indicators
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                  <path d="M13.5 2.5L6 10l-3-3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Quick access to table details
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                  <path d="M13.5 2.5L6 10l-3-3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Multiple section support
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                  <path d="M13.5 2.5L6 10l-3-3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Duration tracking per table
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                  <path d="M13.5 2.5L6 10l-3-3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Direct order management
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="cta">
+    <div class="cta-background">
+      <div class="gradient-blob blob-3"></div>
+      <div class="gradient-blob blob-4"></div>
+    </div>
+
+    <div class="cta-content">
+      <h2 class="cta-title">Ready to Transform Your Restaurant?</h2>
+      <p class="cta-subtitle">Join 500+ restaurants already using BillByte</p>
+      <div class="cta-buttons">
+        <button class="btn btn-primary btn-lg" (click)="navigateToLogin()">
+          Start Free Trial
+        </button>
+        <button class="btn btn-secondary btn-lg" (click)="openSignUp()">
+          Schedule Demo
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="section-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-brand">
+            <div class="logo-icon">₹</div>
+            <span>BillByte</span>
+          </div>
+          <p class="footer-description">
+            Modern POS system for restaurants and cafes
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Product</h4>
+          <ul class="footer-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#">Pricing</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Resources</h4>
+          <ul class="footer-links">
+            <li><a href="https://docs.example.com" target="_blank">Documentation</a></li>
+            <li><a href="https://github.com" target="_blank">GitHub</a></li>
+            <li><a href="#">API Reference</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Company</h4>
+          <ul class="footer-links">
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Support</a></li>
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 BillByte. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+</div>
