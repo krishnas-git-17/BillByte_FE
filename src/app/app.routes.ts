@@ -13,6 +13,13 @@ export const routes: Routes = [
   },
 
   // ✅ LOGIN (NO LAYOUT)
+   {
+    path: 'signup',
+    loadComponent: () =>
+      import('./signup/signup.component')
+        .then(m => m.SignupComponent),
+
+  },
   {
     path: 'login',
     loadComponent: () =>

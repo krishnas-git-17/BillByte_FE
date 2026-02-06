@@ -45,10 +45,11 @@ export class LandingPageComponent {
     this.router.navigate(['/login']);
   }
 
-  openSignUp(): void {
-    this.closeMobileMenu();
-    alert('Sign Up page coming soon');
-  }
+openSignUp(): void {
+  this.closeMobileMenu();
+  this.router.navigate(['/signup']);
+}
+
 
   scrollToSection(sectionId: string): void {
     this.closeMobileMenu();

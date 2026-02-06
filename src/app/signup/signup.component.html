@@ -1,0 +1,94 @@
+<div class="signup-container">
+
+  <h2 *ngIf="step === 'SIGNUP'">Create account</h2>
+  <h2 *ngIf="step === 'OTP'">Verify your email</h2>
+
+  <!-- ================= SIGNUP STEP ================= -->
+  <form
+    *ngIf="step === 'SIGNUP'"
+    [formGroup]="signupForm"
+    (ngSubmit)="submit()"
+    novalidate
+  >
+
+    <input
+      type="text"
+      placeholder="Restaurant Name"
+      formControlName="restaurantName"
+    />
+
+    <input
+      type="email"
+      placeholder="Email"
+      formControlName="email"
+    />
+
+    <input
+      type="password"
+      placeholder="Password"
+      formControlName="password"
+    />
+
+    <h3>Select a Plan</h3>
+
+    <div class="plans">
+      <div
+        class="plan-card"
+        *ngFor="let plan of plans"
+        [class.active]="signupForm.value.planId === plan.id"
+        (click)="selectPlan(plan.id)"
+      >
+        <h4>{{ plan.name }}</h4>
+        <p class="price">
+          {{ plan.price === 0 ? 'Free' : '₹' + plan.price }}
+        </p>
+        <p class="duration">
+          {{ plan.durationInDays }} days
+        </p>
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="loading"
+    >
+      {{ loading ? 'Creating Account...' : 'Sign Up' }}
+    </button>
+
+  </form>
+
+  <!-- ================= OTP STEP ================= -->
+  <form
+    *ngIf="step === 'OTP'"
+    [formGroup]="otpForm"
+    (ngSubmit)="verifyOtp()"
+    novalidate
+  >
+
+    <p class="email">
+      OTP sent to <strong>{{ emailForOtp }}</strong>
+    </p>
+
+    <input
+      type="text"
+      placeholder="Enter 6-digit OTP"
+      formControlName="otp"
+      maxlength="6"
+      autocomplete="one-time-code"
+    />
+
+    <button
+      type="submit"
+      [disabled]="loading"
+    >
+      {{ loading ? 'Verifying...' : 'Verify OTP' }}
+    </button>
+
+  </form>
+
+  <!-- ================= ERROR ================= -->
+  <div class="error" *ngIf="errorMsg">
+    {{ errorMsg }}
+  </div>
+
+</div>

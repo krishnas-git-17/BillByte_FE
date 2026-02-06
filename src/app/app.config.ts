@@ -28,12 +28,12 @@ export const appConfig: ApplicationConfig = {
     ),
 
     // 🔑 THIS IS THE FIX
-    SqliteService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initSqlite,
-      deps: [SqliteService],
-      multi: true
-    }
+    // SqliteService,
+    // {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: initSqlite,
+    //   deps: [SqliteService],
+    //   multi: true
+    // }
   ]
 };
