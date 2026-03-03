@@ -93,20 +93,24 @@ showNoteInput?: boolean;
     this.isOccupied = false;
   }
 
-  goBack() {
-    if (this.cartCount === 0) {
-      if (this.orderType === 'Parcel') {
-        this.router.navigate(['/dashboard']);
-        return;
-      }
-      this.tableStatus.resetTable(this.tableId).subscribe({
-        next: () => this.location.back(),
-        error: () => this.location.back()
-      });
+goBack() {
+  if (this.cartCount === 0) {
+    if (this.orderType === 'Parcel') {
+      this.router.navigate(['/dashboard']);
       return;
     }
+
+    // 🔥 Offline-safe, instant reset
+    this.tableStatus.resetTable(this.tableId);
+
+    // 🔥 Navigate immediately
     this.location.back();
+    return;
   }
+
+  this.location.back();
+}
+
   private restoreMenuQuantities() {
     if (!this.menuList) return;
 
@@ -187,40 +191,39 @@ ngOnInit() {
 }
 
 
-  ngAfterViewInit() {
-   if (this.orderType === 'Parcel') {
-    this.isRestoring = false;   // ✅ IMPORTANT
+ngAfterViewInit() {
+  if (this.orderType === 'Parcel') {
+    this.isRestoring = false;
     this.loadingOrders = false;
     return;
   }
 
-    this.activeOrders.getByTable(this.tableId).subscribe(items => {
-      items.forEach(i => {
-        this.cart[i.itemId] = {
-          id: i.itemId,
-          name: i.itemName,
-          price: i.price,
-          qty: i.qty,
-          kotQty: 0,
-          notes: [] 
-        } as any;
-        this.quantities[i.itemId] = i.qty;
-      });
-      
-      this.calculateTotals();
-      // if (items.length > 0) {
-      //   this.tableStatus.setOrdered(this.tableId).subscribe();
-      // }
-      setTimeout(() => {
-        this.restoreMenuQuantities();
-        this.isRestoring = false;
-        this.loadingOrders = false;
-        this.cdr.detectChanges();
-      });
+  const items = this.activeOrders.getByTable(this.tableId);
 
-    });
+  items.forEach(i => {
+    this.cart[i.itemId] = {
+      id: i.itemId,
+      name: i.itemName,
+      price: i.price,
+      qty: i.qty,
+      kotQty: 0,
+      notes: []
+    } as any;
 
-  }
+    this.quantities[i.itemId] = i.qty;
+  });
+
+  this.calculateTotals();
+
+  // 🔥 Keep async UI stabilization only
+  setTimeout(() => {
+    this.restoreMenuQuantities();
+    this.isRestoring = false;
+    this.loadingOrders = false;
+    this.cdr.detectChanges();
+  });
+}
+
 
   isTableAlreadyOrdered(): boolean {
     return this.cartCount > 0;
@@ -288,19 +291,26 @@ onQuantityChange(ev: { item: MenuItem; qty: number }) {
   }
 
 
-  removeFromCart(id: number) {
+removeFromCart(id: number) {
 
-    delete this.cart[id];
-    delete this.quantities[id];
-    if (this.orderType !== 'Parcel') {
-    this.activeOrders.deleteItem(this.tableId, id).subscribe();
+  // 🔥 Update local cart immediately
+  delete this.cart[id];
+  delete this.quantities[id];
+
+  // 🔥 Update active orders (offline-safe)
+  if (this.orderType !== 'Parcel') {
+    this.activeOrders.deleteItem(this.tableId, id);
   }
-    this.activeOrders.deleteItem(this.tableId, id).subscribe();
-    if (this.menuList) {
-      this.menuList.resetQuantity(id);
-    }
-    this.calculateTotals();
+
+  // 🔥 Reset menu UI
+  if (this.menuList) {
+    this.menuList.resetQuantity(id);
   }
+
+  // 🔥 Recalculate totals
+  this.calculateTotals();
+}
+
 
 
   calculateTotals() {
@@ -386,25 +396,26 @@ saveOnly() {
 
   const items = Object.values(this.cart);
 
-  // Clear old draft
-  this.activeOrders.clearTable(this.tableId).subscribe(() => {
+  // 🔥 Clear old draft (offline-safe)
+  this.activeOrders.clearTable(this.tableId);
 
-    // Save current items
-    items.forEach(i => {
-      this.activeOrders.addItem(this.tableId, {
-        itemId: i.id,
-        itemName: i.name,
-        price: i.price,
-        qty: i.qty
-      }).subscribe();
-    });
-
-    // Update table status
-    this.tableStatus.setOrdered(this.tableId).subscribe(() => {
-      alert('Order saved');
+  // 🔥 Save items locally (offline-safe)
+  items.forEach(i => {
+    this.activeOrders.addItem(this.tableId, {
+      itemId: i.id,
+      itemName: i.name,
+      price: i.price,
+      qty: i.qty
     });
   });
+
+  // 🔥 Update table status instantly
+  this.tableStatus.setOrdered(this.tableId);
+
+  // 🔥 UX feedback (do NOT wait for API)
+  alert('Order saved');
 }
+
 
 
 saveAndKOT() {
@@ -444,16 +455,18 @@ saveAndKOT() {
   }).subscribe(kot => {
 
     // 3️⃣ THEN: Persist FULL state to ActiveOrders
-    this.activeOrders.clearTable(this.tableId).subscribe(() => {
-      items.forEach(i => {
-        this.activeOrders.addItem(this.tableId, {
-          itemId: i.id,
-          itemName: i.name,
-          price: i.price,
-          qty: i.qty
-        }).subscribe();
-      });
-    });
+    // 🔥 Clear table locally (offline-safe)
+this.activeOrders.clearTable(this.tableId);
+
+// 🔥 Add items locally (offline-safe)
+items.forEach(i => {
+  this.activeOrders.addItem(this.tableId, {
+    itemId: i.id,
+    itemName: i.name,
+    price: i.price,
+    qty: i.qty
+  });
+});
 
     // 4️⃣ Update local KOT baseline
     items.forEach(i => {
@@ -565,16 +578,18 @@ billing(paymentMode: 'CASH' | 'CARD' | 'UPI') {
     }))
   };
 
-  this.completedOrders.saveOrder(orderData).subscribe(() => {
+  // 🔥 Save completed order locally (offline-safe)
+  this.completedOrders.saveOrder(orderData);
 
-    this.activeOrders.clearTable(this.tableId).subscribe(() => {
+  // 🔥 Clear active table items locally
+  this.activeOrders.clearTable(this.tableId);
 
-      this.tableStatus.resetTable(this.tableId).subscribe(() => {
-        this.router.navigate(['/dashboard']);
-      });
+  // 🔥 Reset table state instantly
+  this.tableStatus.resetTable(this.tableId);
 
-    });
-  });
+  // 🔥 Navigate immediately
+  this.router.navigate(['/dashboard']);
 }
+
 
 }

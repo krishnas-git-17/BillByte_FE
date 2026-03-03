@@ -337,19 +337,14 @@ getTableStatus(tableId: string) {
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
   }
 
-  openOrders(table: string, section: string) {
+openOrders(table: string, section: string) {
+  // 🔥 Instant UI update (offline safe)
+  this.tableStatus.setOccupied(table);
 
-    this.tableStatus.setOccupied(table).subscribe({
-      next: () => {
-        this.router.navigate(['dashboard/orders', table, section]);
-      },
-      error: () => {
-        alert('Failed to occupy table');
-      }
+  // 🔥 Navigate immediately (POS must be fast)
+  this.router.navigate(['dashboard/orders', table, section]);
+}
 
-    });
-
-  }
 
 
   getDisplayName(id: string): string {

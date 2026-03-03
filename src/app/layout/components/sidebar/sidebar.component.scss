@@ -11,6 +11,7 @@
   flex-direction: column;
   border-radius: 0 !important;
   border-right: none !important;
+    // position: relative;
 }
 
 .logo {
@@ -90,4 +91,46 @@
   height: 14px;
   width: 120px;
   border-radius: 4px;
+}
+.sidebar-network-status {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 4px 8px;
+  border-radius: 12px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  background: transparent;   // ❌ no row highlight
+  pointer-events: none;      // ❌ not clickable
+}
+
+.sidebar-network-status .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* 🟢 ONLINE */
+.sidebar-network-status.online {
+  color: #16a34a;
+}
+
+.sidebar-network-status.online .dot {
+  background: #16a34a;
+}
+
+/* 🟡 OFFLINE */
+.sidebar-network-status.offline {
+  color: #f59e0b;
+}
+
+.sidebar-network-status.offline .dot {
+  background: #f59e0b;
 }

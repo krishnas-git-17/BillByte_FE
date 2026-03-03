@@ -1,7 +1,18 @@
 export const API_CONFIG = {
-    // BASE_URL: "https://localhost:7117/api",
- BASE_URL: "https://billbyte-h3dfabcna4gtaycp.centralindia-01.azurewebsites.net/api",
+    BASE_URL: "https://localhost:7117/api",
+    // BASE_URL: "https://billbyte-h3dfabcna4gtaycp.centralindia-01.azurewebsites.net/api",
 
+
+  AUTH: {
+    SIGNUP: "/auth/signup",
+    VERIFY_EMAIL: "/auth/verify-email",
+    LOGIN: "/auth/login",
+  },
+
+  // 💳 PLANS
+  PLANS: {
+    GET_ALL: "/plans"
+  },
   MENU: {
   GET_ALL: "/menu-items",
   CREATE: "/menu-items",

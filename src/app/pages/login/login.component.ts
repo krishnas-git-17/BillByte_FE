@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { API_CONFIG } from '../../core/api.config';
+import { SqliteService } from '../../core/offline/sqlite.service';
 @Component({
   standalone: true,
   selector: 'app-login',
@@ -20,10 +21,11 @@ export class LoginComponent {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private sqliteService: SqliteService 
   ) {}
 
-  login() {
+  async login() {
     if (!this.email || !this.password) {
       this.error = 'Email and password required';
       return;
@@ -32,25 +34,29 @@ export class LoginComponent {
     this.loading = true;
     this.error = '';
 
-    this.http.post<any>(
-      `${API_CONFIG.BASE_URL}/auth/login`,
-      {
-        email: this.email,
-        password: this.password
-      }
-    ).subscribe({
-      next: res => {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('role', res.role);
-        localStorage.setItem('email', res.email);
+  this.http.post<any>(
+  `${API_CONFIG.BASE_URL}/auth/login`,
+  {
+    email: this.email,
+    password: this.password
+  }
+).subscribe({
+  next: async (res) => {   // ✅ MAKE THIS ASYNC
+    localStorage.setItem('token', res.token);
+    localStorage.setItem('role', res.role);
+    localStorage.setItem('email', res.email);
 
-        this.router.navigate(['/dashboard']);
-      },
-      error: () => {
-        this.error = 'Invalid credentials';
-        this.loading = false;
-      },
-      complete: () => this.loading = false
-    });
+    // ✅ NOW THIS IS VALID
+    await this.sqliteService.init();
+
+    this.router.navigate(['/dashboard']);
+  },
+  error: () => {
+    this.error = 'Invalid credentials';
+    this.loading = false;
+  },
+  complete: () => this.loading = false
+});
+
   }
 }

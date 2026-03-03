@@ -2,19 +2,40 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { API_CONFIG } from '../core/api.config';
 import { MenuItem } from '../models/menu-item.model';
+import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { MenuItemsOfflineService } from '../core/offline/menu-items.offline.service';
 
 @Injectable({ providedIn: 'root' })
 export class MenuItemsService {
 
   private BASE = API_CONFIG.BASE_URL;
 
-  constructor(private http: HttpClient) {}
+constructor(
+  private http: HttpClient,
+  private offline: MenuItemsOfflineService
+) {}
 
-  getAll() {
-    return this.http.get<MenuItem[]>(
-      this.BASE + API_CONFIG.MENU.GET_ALL
-    );
+getAll(): Observable<MenuItem[]> {
+
+  // 🔥 OFFLINE FIRST
+  if (!navigator.onLine) {
+    const local = this.offline.getAll();
+    return new Observable(obs => {
+      obs.next(local);
+      obs.complete();
+    });
   }
+
+  // 🔥 ONLINE → CACHE → UI
+  return this.http.get<MenuItem[]>(
+    this.BASE + API_CONFIG.MENU.GET_ALL
+  ).pipe(
+    tap(items => {
+      this.offline.bulkUpsert(items);
+    })
+  );
+}
 
   createMenuItem(data: MenuItem) {
     return this.http.post(

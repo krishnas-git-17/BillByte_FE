@@ -6,18 +6,24 @@ export class TablePreferenceOfflineService {
 
   constructor(private sqlite: SqliteService) {}
 
-getAll(): any[] {
-  const res = this.sqlite.query(
-    'SELECT payload FROM table_preferences'
-  );
+  getAll(): any[] {
+    const res = this.sqlite.query(
+      'SELECT id, payload FROM table_preferences'
+    );
 
-  if (!res.length || !res[0].values.length) return [];
+    if (!res.length || !res[0].values.length) return [];
 
-  return res[0].values.map((v: any[]) => JSON.parse(v[0]));
-}
-
+    return res[0].values.map((v: any[]) => {
+      const payload = JSON.parse(v[1]);
+      return { ...payload, id: v[0] };
+    });
+  }
 
   upsert(item: any, synced = false) {
+    if (!item.id) {
+      item.id = Date.now();
+    }
+
     this.sqlite.run(
       `INSERT OR REPLACE INTO table_preferences
        (id, payload, synced)
@@ -33,20 +39,18 @@ getAll(): any[] {
     );
   }
 
-unsynced(): any[] {
-  const res = this.sqlite.query(
-    'SELECT id, payload FROM table_preferences WHERE synced=0'
-  );
+  unsynced(): any[] {
+    const res = this.sqlite.query(
+      'SELECT id, payload FROM table_preferences WHERE synced=0'
+    );
 
-  if (!res.length) return [];
+    if (!res.length) return [];
 
-  return res[0].values.map((r: any[]) => ({
-    id: r[0],
-    payload: JSON.parse(r[1])
-  }));
-}
-
-
+    return res[0].values.map((r: any[]) => ({
+      id: r[0],
+      payload: JSON.parse(r[1])
+    }));
+  }
 
   markSynced(id: number) {
     this.sqlite.run(

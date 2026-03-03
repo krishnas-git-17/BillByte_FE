@@ -249,12 +249,16 @@ openReservationPopover(btn: HTMLElement) {
   ref.instance.sections = this.sections;
   ref.instance.tableStatusMap = this.tableStatusMap;
 
-  ref.instance.reserved.subscribe((tableId: string) => {
-    this.tableStatus.setReservation(tableId).subscribe(() => {
-      this.reservationOverlay?.dispose();
-      this.reservationOverlay = undefined;
-    });
-  });
+ref.instance.reserved.subscribe((tableId: string) => {
+
+  // 🔥 Offline-safe, instant update
+  this.tableStatus.setReservation(tableId);
+
+  // 🔥 Close popup immediately
+  this.reservationOverlay?.dispose();
+  this.reservationOverlay = undefined;
+});
+
 
   this.reservationOverlay.backdropClick().subscribe(() => {
     this.reservationOverlay?.dispose();
